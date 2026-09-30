@@ -17,12 +17,13 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 echo "🔹 Step 1: Updating System Packages & Installing Prerequisites..."
-dnf update -y
-dnf install -y git curl wget tar bzip2 policycoreutils-python-utils firewalld
+dnf clean packages
+dnf update -y --skip-broken --exclude="cpanel*" || true
+dnf install -y --skip-broken --exclude="cpanel*" git curl wget tar bzip2 policycoreutils-python-utils firewalld
 
 echo "🔹 Step 2: Installing Node.js 20 LTS..."
 curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
-dnf install -y nodejs
+dnf install -y --skip-broken --exclude="cpanel*" nodejs
 npm install -g pm2
 
 echo "Node.js version: $(node -v)"
@@ -30,7 +31,7 @@ echo "NPM version: $(npm -v)"
 echo "PM2 version: $(pm2 -v)"
 
 echo "🔹 Step 3: Installing PostgreSQL & Nginx..."
-dnf install -y postgresql-server postgresql-contrib nginx certbot python3-certbot-nginx
+dnf install -y --skip-broken --exclude="cpanel*" postgresql-server postgresql-contrib nginx certbot python3-certbot-nginx
 
 # Initialize PostgreSQL database if not already initialized
 if [ ! -f /var/lib/pgsql/data/PG_VERSION ]; then
