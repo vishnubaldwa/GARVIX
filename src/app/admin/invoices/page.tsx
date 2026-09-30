@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PlusCircle, ExternalLink } from "lucide-react";
 import { CopyPortalLinkButton } from "@/components/admin/CopyPortalLinkButton";
 import { RecordPaymentModal } from "@/components/admin/RecordPaymentModal";
+import { WhatsAppShareButton } from "@/components/admin/WhatsAppShareButton";
 
 export const dynamic = "force-dynamic";
 
@@ -109,6 +110,15 @@ export default async function AdminInvoicesPage() {
 
                   <td className="py-3.5 px-4 text-right font-sans">
                     <div className="flex items-center justify-end gap-2">
+                      <WhatsAppShareButton
+                        phone={inv.customer.phone}
+                        clientName={inv.customer.companyName}
+                        documentType="Tax Invoice"
+                        documentNumber={inv.invoiceNumber}
+                        amount={inv.totalAmount}
+                        portalUrl={`https://garvix.in/portal/invoice/${inv.token}`}
+                      />
+
                       <RecordPaymentModal invoice={inv} />
 
                       <CopyPortalLinkButton token={inv.token} type="invoice" />

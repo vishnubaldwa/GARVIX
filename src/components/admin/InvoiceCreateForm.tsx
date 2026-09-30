@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { formatINR, HARYANA_STATE_CODE } from "@/lib/gst";
 import { Plus, Trash2, ArrowLeft, Receipt, Truck } from "lucide-react";
 import Link from "next/link";
+import { ClientCreateModal } from "./ClientCreateModal";
 
 interface CustomerOption {
   id: string;
@@ -29,6 +30,7 @@ export function InvoiceCreateForm({
   products: ProductOption[];
 }) {
   const router = useRouter();
+  const [customerList, setCustomerList] = useState<CustomerOption[]>(customers);
   const [customerId, setCustomerId] = useState(customers[0]?.id || "");
   const [invoiceType, setInvoiceType] = useState("TAX_INVOICE");
   const [ewayBillNo, setEwayBillNo] = useState("");
@@ -42,7 +44,7 @@ export function InvoiceCreateForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const selectedCustomer = customers.find((c) => c.id === customerId);
+  const selectedCustomer = customerList.find((c) => c.id === customerId);
   const isIntraState = (selectedCustomer?.stateCode || HARYANA_STATE_CODE) === HARYANA_STATE_CODE;
 
   const [items, setItems] = useState<
@@ -184,15 +186,25 @@ export function InvoiceCreateForm({
         <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Billing Parameters</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="sm:col-span-2">
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Select Client / Buyer *
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-700">
+                Select Client / Buyer *
+              </label>
+              <ClientCreateModal
+                buttonLabel="+ New Client"
+                buttonClassName="text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1"
+                onCreated={(newC) => {
+                  setCustomerList((prev) => [newC, ...prev]);
+                  setCustomerId(newC.id);
+                }}
+              />
+            </div>
             <select
               value={customerId}
               onChange={(e) => setCustomerId(e.target.value)}
               className="w-full admin-input py-2 px-3 text-xs"
             >
-              {customers.map((c) => (
+              {customerList.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.companyName} ({c.state} - Code {c.stateCode}) {c.gstin ? `[GSTIN: ${c.gstin}]` : "[Unregistered/B2C]"}
                 </option>

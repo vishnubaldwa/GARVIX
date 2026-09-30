@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendTelegramQuotationAcceptedAlert } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +37,14 @@ export async function POST(request: Request) {
         details: `Quotation ${quotation.quoteNumber} digitally accepted by ${signature.trim()} (${quotation.customer.companyName})`,
       },
     });
+
+    // Push Telegram Alert to Admin
+    sendTelegramQuotationAcceptedAlert({
+      quoteNumber: quotation.quoteNumber,
+      customerName: quotation.customer.companyName,
+      totalAmount: quotation.totalAmount,
+      signature: signature.trim(),
+    }).catch((e) => console.error("Telegram quote accepted alert failed:", e));
 
     return NextResponse.json({ success: true, quotation: updated });
   } catch (err: any) {

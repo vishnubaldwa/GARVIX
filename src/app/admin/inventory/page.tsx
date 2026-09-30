@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
 import { AlertTriangle, Barcode } from "lucide-react";
 import Link from "next/link";
+import { ProductCreateModal } from "@/components/admin/ProductCreateModal";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,7 @@ export default async function AdminInventoryPage() {
           >
             <Barcode className="h-4 w-4 text-blue-600" /> Serial / IMEI Tracker
           </Link>
+          <ProductCreateModal />
         </div>
       </div>
 

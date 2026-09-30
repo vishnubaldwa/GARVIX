@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildUpiUri } from "@/lib/upi";
 import { getSession } from "@/lib/auth";
+import { sendTelegramInvoiceAlert } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
@@ -87,6 +88,16 @@ export async function POST(request: Request) {
         details: `Converted Quotation ${quote.quoteNumber} to Tax Invoice ${invoice.invoiceNumber} for ${quote.customer.companyName}`,
       },
     });
+
+    // Telegram Push Alert
+    sendTelegramInvoiceAlert({
+      invoiceNumber: invoice.invoiceNumber,
+      customerName: quote.customer.companyName,
+      subtotal: invoice.subtotal,
+      taxAmount: invoice.cgstAmount + invoice.sgstAmount + invoice.igstAmount,
+      totalAmount: invoice.totalAmount,
+      portalUrl: `https://garvix.in/portal/invoice/${invoice.token}`,
+    }).catch((e) => console.error("Telegram convert alert failed:", e));
 
     return NextResponse.json({ success: true, invoice });
   } catch (err: any) {

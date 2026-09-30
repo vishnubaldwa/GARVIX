@@ -19,6 +19,8 @@ import {
   LogOut,
   X,
   Menu,
+  Building2,
+  Settings,
 } from "lucide-react";
 import { useState } from "react";
 import { AuthSession } from "@/lib/auth";
@@ -26,6 +28,7 @@ import { AuthSession } from "@/lib/auth";
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/leads", label: "Leads & CRM", icon: Users },
+  { href: "/admin/clients", label: "Clients & Accounts", icon: Building2 },
   { href: "/admin/inventory", label: "Hardware Products", icon: Package },
   { href: "/admin/inventory/serials", label: "Serial & IMEI Tracker", icon: Barcode },
   { href: "/admin/quotations", label: "Quotations", icon: FileSpreadsheet },
@@ -35,6 +38,7 @@ const navItems = [
   { href: "/admin/expenses", label: "Expense Tracker", icon: Wallet },
   { href: "/admin/amc", label: "AMC & Service", icon: Clock },
   { href: "/admin/gst-returns", label: "1-Click CA Return", icon: Download, highlight: true },
+  { href: "/admin/settings", label: "Settings & Profile", icon: Settings },
   { href: "/admin/audit", label: "Audit Logs", icon: ShieldCheck },
 ];
 

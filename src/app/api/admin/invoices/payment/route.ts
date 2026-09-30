@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { sendTelegramPaymentAlert } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
@@ -14,6 +15,7 @@ export async function POST(request: Request) {
 
     const invoice = await prisma.invoice.findUnique({
       where: { id: invoiceId },
+      include: { customer: true },
     });
 
     if (!invoice) {
@@ -56,6 +58,16 @@ export async function POST(request: Request) {
         details: `Recorded ${paymentMode} payment of INR ${paymentAmount} for Invoice ${invoice.invoiceNumber}. New Status: ${newStatus}`,
       },
     });
+
+    // Telegram Push Alert
+    sendTelegramPaymentAlert({
+      invoiceNumber: invoice.invoiceNumber,
+      customerName: invoice.customer.companyName,
+      amountReceived: paymentAmount,
+      paymentMode,
+      referenceNumber,
+      balanceDue: newBalanceDue,
+    }).catch((e) => console.error("Telegram payment alert failed:", e));
 
     return NextResponse.json({ success: true, payment });
   } catch (err: any) {
