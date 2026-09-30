@@ -160,40 +160,40 @@ export function InvoiceCreateForm({
       <div className="flex items-center justify-between">
         <Link
           href="/admin/invoices"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-cyan-400"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-blue-600"
         >
           <ArrowLeft className="h-4 w-4" /> Back to Invoices
         </Link>
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-2.5 text-xs font-bold uppercase text-black shadow-md hover:opacity-90 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-xs font-bold uppercase text-white shadow-sm hover:bg-blue-700 disabled:opacity-50 transition"
         >
           <Receipt className="h-4 w-4" /> {loading ? "Generating..." : "Generate Tax Invoice & UPI QR"}
         </button>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-rose-500/40 bg-rose-950/40 p-3 text-xs text-rose-300">
+        <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
           {error}
         </div>
       )}
 
       {/* Customer & Tax Parameters */}
-      <div className="rounded-2xl border border-slate-800 bg-[#0d1424] p-6 shadow-xl space-y-4">
-        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Billing Parameters</h3>
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Billing Parameters</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="sm:col-span-2">
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Select Client / Buyer *
             </label>
             <select
               value={customerId}
               onChange={(e) => setCustomerId(e.target.value)}
-              className="w-full rounded-lg cyber-input py-2.5 px-3 text-xs"
+              className="w-full admin-input py-2 px-3 text-xs"
             >
               {customers.map((c) => (
-                <option key={c.id} value={c.id} className="bg-slate-900 text-white">
+                <option key={c.id} value={c.id}>
                   {c.companyName} ({c.state} - Code {c.stateCode}) {c.gstin ? `[GSTIN: ${c.gstin}]` : "[Unregistered/B2C]"}
                 </option>
               ))}
@@ -201,13 +201,13 @@ export function InvoiceCreateForm({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Document Type
             </label>
             <select
               value={invoiceType}
               onChange={(e) => setInvoiceType(e.target.value)}
-              className="w-full rounded-lg cyber-input py-2.5 px-3 text-xs font-bold"
+              className="w-full admin-input py-2 px-3 text-xs font-bold"
             >
               <option value="TAX_INVOICE">TAX INVOICE (Regular Supply)</option>
               <option value="PROFORMA_INVOICE">PROFORMA INVOICE (Advance Payment)</option>
@@ -215,76 +215,76 @@ export function InvoiceCreateForm({
           </div>
         </div>
 
-        <div className="rounded-lg border border-cyan-500/30 bg-cyan-950/40 p-3 text-xs flex items-center justify-between font-mono">
-          <span className="text-slate-300">Haryana GST Engine Rule:</span>
-          <span className="text-cyan-300 font-bold">
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs flex items-center justify-between font-mono">
+          <span className="text-slate-700 font-sans">Haryana GST Engine Rule:</span>
+          <span className="text-blue-800 font-bold">
             {isIntraState ? "Intra-State: CGST (9%) + SGST (9%)" : "Inter-State: IGST (18%)"}
           </span>
         </div>
       </div>
 
       {/* E-Way Bill & Transportation Details */}
-      <div className="rounded-2xl border border-slate-800 bg-[#0d1424] p-6 shadow-xl space-y-4">
-        <div className="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase">
-          <Truck className="h-4 w-4" />
+      <div className="admin-card p-6 space-y-4">
+        <div className="flex items-center gap-2 text-slate-800 text-xs font-bold uppercase">
+          <Truck className="h-4 w-4 text-blue-600" />
           <span>E-Way Bill & Transporter Information (Required if Goods &gt; ₹50,000)</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
           <div>
-            <label className="block text-slate-400 mb-1">E-Way Bill No.</label>
+            <label className="block text-slate-600 mb-1 font-medium">E-Way Bill No.</label>
             <input
               type="text"
               placeholder="e.g. 241829019283"
               value={ewayBillNo}
               onChange={(e) => setEwayBillNo(e.target.value)}
-              className="w-full rounded cyber-input py-2 px-3 font-mono"
+              className="w-full admin-input py-2 px-3 font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-slate-400 mb-1">Transporter Name</label>
+            <label className="block text-slate-600 mb-1 font-medium">Transporter Name</label>
             <input
               type="text"
               placeholder="e.g. Delhivery Logistics Ltd"
               value={transporterName}
               onChange={(e) => setTransporterName(e.target.value)}
-              className="w-full rounded cyber-input py-2 px-3"
+              className="w-full admin-input py-2 px-3"
             />
           </div>
 
           <div>
-            <label className="block text-slate-400 mb-1">Vehicle No.</label>
+            <label className="block text-slate-600 mb-1 font-medium">Vehicle No.</label>
             <input
               type="text"
               placeholder="e.g. HR-55-AJ-1234"
               value={vehicleNo}
               onChange={(e) => setVehicleNo(e.target.value)}
-              className="w-full rounded cyber-input py-2 px-3 font-mono"
+              className="w-full admin-input py-2 px-3 font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-slate-400 mb-1">LR / RR Document No.</label>
+            <label className="block text-slate-600 mb-1 font-medium">LR / RR Document No.</label>
             <input
               type="text"
               placeholder="e.g. DEL-849204"
               value={lrNo}
               onChange={(e) => setLrNo(e.target.value)}
-              className="w-full rounded cyber-input py-2 px-3 font-mono"
+              className="w-full admin-input py-2 px-3 font-mono"
             />
           </div>
         </div>
       </div>
 
       {/* Line Items & Attached Serials */}
-      <div className="rounded-2xl border border-slate-800 bg-[#0d1424] p-6 shadow-xl space-y-4">
+      <div className="admin-card p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider">Line Items & Serial Numbers</h3>
+          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Line Items & Serial Numbers</h3>
           <button
             type="button"
             onClick={addItemRow}
-            className="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 font-semibold"
+            className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-semibold"
           >
             <Plus className="h-4 w-4" /> Add Item Row
           </button>
@@ -294,18 +294,18 @@ export function InvoiceCreateForm({
           {items.map((item, idx) => (
             <div
               key={idx}
-              className="grid grid-cols-12 gap-3 items-center rounded-xl border border-slate-800/80 bg-[#090e18] p-3 text-xs"
+              className="grid grid-cols-12 gap-3 items-center rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-xs"
             >
               <div className="col-span-12 sm:col-span-3">
-                <label className="block text-[10px] text-slate-400 mb-1">Product</label>
+                <label className="block text-[10px] text-slate-500 mb-1">Product</label>
                 <select
                   value={item.productId}
                   onChange={(e) => handleProductSelect(idx, e.target.value)}
-                  className="w-full rounded cyber-input py-1.5 px-2 text-xs"
+                  className="w-full admin-input py-1.5 px-2 text-xs"
                 >
                   <option value="">-- Custom Item --</option>
                   {products.map((p) => (
-                    <option key={p.id} value={p.id} className="bg-slate-900 text-white">
+                    <option key={p.id} value={p.id}>
                       {p.name}
                     </option>
                   ))}
@@ -313,55 +313,55 @@ export function InvoiceCreateForm({
               </div>
 
               <div className="col-span-12 sm:col-span-3">
-                <label className="block text-[10px] text-slate-400 mb-1">Description</label>
+                <label className="block text-[10px] text-slate-500 mb-1">Description</label>
                 <input
                   type="text"
                   value={item.description}
                   onChange={(e) => handleItemChange(idx, "description", e.target.value)}
-                  className="w-full rounded cyber-input py-1.5 px-2 text-xs"
+                  className="w-full admin-input py-1.5 px-2 text-xs"
                 />
               </div>
 
               <div className="col-span-4 sm:col-span-1">
-                <label className="block text-[10px] text-slate-400 mb-1">HSN/SAC</label>
+                <label className="block text-[10px] text-slate-500 mb-1">HSN/SAC</label>
                 <input
                   type="text"
                   value={item.hsnCode}
                   onChange={(e) => handleItemChange(idx, "hsnCode", e.target.value)}
-                  className="w-full rounded cyber-input py-1.5 px-2 text-xs font-mono"
+                  className="w-full admin-input py-1.5 px-2 text-xs font-mono"
                 />
               </div>
 
               <div className="col-span-4 sm:col-span-1">
-                <label className="block text-[10px] text-slate-400 mb-1">Qty</label>
+                <label className="block text-[10px] text-slate-500 mb-1">Qty</label>
                 <input
                   type="number"
                   min="1"
                   value={item.quantity}
                   onChange={(e) => handleItemChange(idx, "quantity", Number(e.target.value))}
-                  className="w-full rounded cyber-input py-1.5 px-2 text-xs font-mono"
+                  className="w-full admin-input py-1.5 px-2 text-xs font-mono"
                 />
               </div>
 
               <div className="col-span-4 sm:col-span-1">
-                <label className="block text-[10px] text-slate-400 mb-1">Rate (₹)</label>
+                <label className="block text-[10px] text-slate-500 mb-1">Rate (₹)</label>
                 <input
                   type="number"
                   min="0"
                   value={item.unitPrice}
                   onChange={(e) => handleItemChange(idx, "unitPrice", Number(e.target.value))}
-                  className="w-full rounded cyber-input py-1.5 px-2 text-xs font-mono"
+                  className="w-full admin-input py-1.5 px-2 text-xs font-mono font-bold"
                 />
               </div>
 
               <div className="col-span-11 sm:col-span-2">
-                <label className="block text-[10px] text-slate-400 mb-1">Attached Serials</label>
+                <label className="block text-[10px] text-slate-500 mb-1">Attached Serials</label>
                 <input
                   type="text"
                   placeholder="e.g. GX400-01"
                   value={item.serialNumbersList}
                   onChange={(e) => handleItemChange(idx, "serialNumbersList", e.target.value)}
-                  className="w-full rounded cyber-input py-1.5 px-2 text-xs font-mono text-cyan-300"
+                  className="w-full admin-input py-1.5 px-2 text-xs font-mono text-blue-700 font-semibold"
                 />
               </div>
 
@@ -369,7 +369,7 @@ export function InvoiceCreateForm({
                 <button
                   type="button"
                   onClick={() => removeItemRow(idx)}
-                  className="text-slate-500 hover:text-rose-400 p-1"
+                  className="text-slate-400 hover:text-rose-600 p-1"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -379,40 +379,40 @@ export function InvoiceCreateForm({
         </div>
 
         {/* Totals Summary */}
-        <div className="border-t border-slate-800 pt-4 flex justify-end font-mono text-xs">
+        <div className="border-t border-slate-200 pt-4 flex justify-end font-mono text-xs">
           <div className="w-64 space-y-2">
-            <div className="flex justify-between text-slate-400">
-              <span>Subtotal:</span> <span>{formatINR(subtotal)}</span>
+            <div className="flex justify-between text-slate-500">
+              <span>Subtotal:</span> <span className="font-semibold text-slate-800">{formatINR(subtotal)}</span>
             </div>
             {isIntraState ? (
               <>
-                <div className="flex justify-between text-slate-400">
-                  <span>CGST (9%):</span> <span>{formatINR(cgst)}</span>
+                <div className="flex justify-between text-slate-500">
+                  <span>CGST (9%):</span> <span className="text-slate-700">{formatINR(cgst)}</span>
                 </div>
-                <div className="flex justify-between text-slate-400">
-                  <span>SGST (9%):</span> <span>{formatINR(sgst)}</span>
+                <div className="flex justify-between text-slate-500">
+                  <span>SGST (9%):</span> <span className="text-slate-700">{formatINR(sgst)}</span>
                 </div>
               </>
             ) : (
-              <div className="flex justify-between text-slate-400">
-                <span>IGST (18%):</span> <span>{formatINR(igst)}</span>
+              <div className="flex justify-between text-slate-500">
+                <span>IGST (18%):</span> <span className="text-slate-700">{formatINR(igst)}</span>
               </div>
             )}
-            <div className="flex justify-between text-cyan-400 font-bold text-sm border-t border-slate-700 pt-2">
-              <span>Grand Total:</span> <span>{formatINR(grandTotal)}</span>
+            <div className="flex justify-between text-slate-900 font-bold text-sm border-t border-slate-200 pt-2">
+              <span>Grand Total:</span> <span className="text-blue-600">{formatINR(grandTotal)}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Terms */}
-      <div className="rounded-2xl border border-slate-800 bg-[#0d1424] p-6 shadow-xl space-y-3">
-        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Invoice Terms & Conditions</h3>
+      <div className="admin-card p-6 space-y-3">
+        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Invoice Terms & Conditions</h3>
         <textarea
           rows={3}
           value={terms}
           onChange={(e) => setTerms(e.target.value)}
-          className="w-full rounded-lg cyber-input p-3 text-xs leading-relaxed"
+          className="w-full admin-input p-3 text-xs leading-relaxed"
         ></textarea>
       </div>
     </form>

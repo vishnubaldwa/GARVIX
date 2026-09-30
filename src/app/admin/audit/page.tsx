@@ -12,16 +12,16 @@ export default async function AdminAuditPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-black text-white tracking-tight">Security & Activity Audit Logs</h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Security & Activity Audit Logs</h1>
+        <p className="text-xs text-slate-500 mt-1">
           Immutable event log tracking quotation creations, invoice conversions, tax return downloads, and staff logins.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-slate-800 bg-[#0d1424] overflow-hidden shadow-xl">
+      <div className="admin-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#090d18] text-slate-400 font-semibold border-b border-slate-800 uppercase">
+            <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase">
               <tr>
                 <th className="py-3 px-4">Timestamp</th>
                 <th className="py-3 px-4">Staff User</th>
@@ -30,38 +30,38 @@ export default async function AdminAuditPage() {
                 <th className="py-3 px-4">Event Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80 font-mono">
+            <tbody className="divide-y divide-slate-100 font-mono">
               {logs.map((log) => (
-                <tr key={log.id} className="hover:bg-slate-900/40">
-                  <td className="py-3.5 px-4 text-slate-400 text-[11px]">
+                <tr key={log.id} className="hover:bg-slate-50 transition">
+                  <td className="py-3.5 px-4 text-slate-500 text-[11px]">
                     {new Date(log.createdAt).toLocaleString("en-IN")}
                   </td>
 
-                  <td className="py-3.5 px-4 font-bold text-cyan-400 font-sans">
+                  <td className="py-3.5 px-4 font-bold text-slate-900 font-sans">
                     {log.username || "System Engine"}
                   </td>
 
                   <td className="py-3.5 px-4 text-center">
                     <span
-                      className={`inline-block rounded px-2 py-0.5 text-[10px] font-bold uppercase ${
+                      className={`inline-block rounded-md px-2 py-0.5 text-[10px] font-bold uppercase ${
                         log.action === "EXPORT_GST"
-                          ? "bg-emerald-950 text-emerald-400 border border-emerald-500/30"
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                           : log.action === "CONVERT"
-                          ? "bg-purple-950 text-purple-300 border border-purple-500/30"
+                          ? "bg-purple-50 text-purple-700 border border-purple-200"
                           : log.action === "CREATE"
-                          ? "bg-cyan-950 text-cyan-300 border border-cyan-500/30"
-                          : "bg-slate-800 text-slate-300"
+                          ? "bg-blue-50 text-blue-700 border border-blue-200"
+                          : "bg-slate-100 text-slate-700 border border-slate-200"
                       }`}
                     >
                       {log.action}
                     </span>
                   </td>
 
-                  <td className="py-3.5 px-4 text-slate-300 font-bold">
+                  <td className="py-3.5 px-4 text-slate-700 font-bold">
                     {log.entityType}
                   </td>
 
-                  <td className="py-3.5 px-4 font-sans text-slate-200 text-xs">
+                  <td className="py-3.5 px-4 font-sans text-slate-600 text-xs">
                     {log.details}
                   </td>
                 </tr>

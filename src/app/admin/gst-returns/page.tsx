@@ -44,11 +44,11 @@ export default async function AdminGstReturnsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-cyan-950 border border-cyan-500/30 px-3 py-0.5 text-[10px] font-mono text-cyan-300 mb-2">
+          <div className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 border border-blue-200 px-3 py-1 text-xs font-mono text-blue-700 mb-2">
             <span>State: Haryana (06) • GSTIN: 06AAACG1234F1Z5</span>
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">One-Click GST Return Hub</h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">One-Click GST Return Hub</h1>
+          <p className="text-xs text-slate-500 mt-1">
             Export standard government-ready GSTR-1 and GSTR-3B Excel workbooks for your Chartered Accountant (CA) with a single click.
           </p>
         </div>
@@ -58,14 +58,14 @@ export default async function AdminGstReturnsPage() {
           <a
             href="/api/admin/gst-export?type=gstr1"
             download
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-2.5 text-xs font-bold text-black shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:opacity-95 transition"
+            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition"
           >
             <Download className="h-4 w-4" /> Download GSTR-1 Excel (Multi-Sheet)
           </a>
           <a
             href="/api/admin/gst-export?type=gstr3b"
             download
-            className="flex items-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-950/40 px-5 py-2.5 text-xs font-bold text-cyan-300 hover:bg-cyan-500/20 transition"
+            className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition"
           >
             <FileSpreadsheet className="h-4 w-4" /> Download GSTR-3B Summary
           </a>
@@ -75,14 +75,14 @@ export default async function AdminGstReturnsPage() {
       {/* Tax Liability & ITC Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Output Tax (Sales) */}
-        <div className="rounded-xl border border-slate-800 bg-[#0d1424] p-5">
-          <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+        <div className="admin-card p-5">
+          <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
             1. Total Output GST (Sales)
           </span>
-          <p className="mt-2 text-2xl font-black text-cyan-400 font-mono">
+          <p className="mt-2 text-2xl font-black text-blue-600 font-mono">
             {formatINR(totalOutputTax)}
           </p>
-          <div className="mt-2 space-y-0.5 text-[11px] text-slate-400 font-mono">
+          <div className="mt-2 space-y-0.5 text-[11px] text-slate-600 font-mono">
             <div className="flex justify-between">
               <span>CGST (9%):</span> <span>{formatINR(totalOutputCGST)}</span>
             </div>
@@ -96,14 +96,14 @@ export default async function AdminGstReturnsPage() {
         </div>
 
         {/* Input Tax Credit (Purchases) */}
-        <div className="rounded-xl border border-slate-800 bg-[#0d1424] p-5">
-          <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+        <div className="admin-card p-5">
+          <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
             2. Eligible Input Tax Credit (ITC)
           </span>
-          <p className="mt-2 text-2xl font-black text-emerald-400 font-mono">
+          <p className="mt-2 text-2xl font-black text-emerald-700 font-mono">
             {formatINR(totalInputTax)}
           </p>
-          <div className="mt-2 space-y-0.5 text-[11px] text-slate-400 font-mono">
+          <div className="mt-2 space-y-0.5 text-[11px] text-slate-600 font-mono">
             <div className="flex justify-between">
               <span>ITC CGST:</span> <span>{formatINR(totalInputCGST)}</span>
             </div>
@@ -117,14 +117,14 @@ export default async function AdminGstReturnsPage() {
         </div>
 
         {/* Net Cash Payable */}
-        <div className="rounded-xl border border-slate-800 bg-[#0d1424] p-5">
-          <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+        <div className="admin-card p-5">
+          <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
             3. Net Cash Tax Payable
           </span>
-          <p className="mt-2 text-2xl font-black text-white font-mono">
+          <p className="mt-2 text-2xl font-black text-slate-900 font-mono">
             {formatINR(netCashPayable)}
           </p>
-          <p className="mt-2 text-[11px] text-slate-400 leading-relaxed">
+          <p className="mt-2 text-[11px] text-slate-500 leading-relaxed">
             Net liability after adjusting available input credit from vendor hardware purchases.
           </p>
         </div>
@@ -132,14 +132,14 @@ export default async function AdminGstReturnsPage() {
 
       {/* GSTR-1 Tables Preview */}
       <div className="space-y-4">
-        <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
           GSTR-1 Sheet Preview: B2B Supplies ({b2bInvoices.length} Invoices with GSTIN)
         </h3>
 
-        <div className="rounded-2xl border border-slate-800 bg-[#0d1424] overflow-hidden shadow-xl">
+        <div className="admin-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#090d18] text-slate-400 font-semibold border-b border-slate-800 uppercase">
+              <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase">
                 <tr>
                   <th className="py-3 px-4">Recipient GSTIN</th>
                   <th className="py-3 px-4">Receiver Name</th>
@@ -153,23 +153,23 @@ export default async function AdminGstReturnsPage() {
                   <th className="py-3 px-4 text-right">Total (₹)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80 font-mono">
+              <tbody className="divide-y divide-slate-100 font-mono">
                 {b2bInvoices.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-slate-900/40">
-                    <td className="py-3.5 px-4 font-bold text-cyan-400">{inv.customer.gstin}</td>
-                    <td className="py-3.5 px-4 font-sans font-medium text-white">{inv.customer.companyName}</td>
-                    <td className="py-3.5 px-4 text-slate-300">{inv.invoiceNumber}</td>
-                    <td className="py-3.5 px-4 text-slate-400">{new Date(inv.invoiceDate).toLocaleDateString("en-IN")}</td>
+                  <tr key={inv.id} className="hover:bg-slate-50 transition">
+                    <td className="py-3.5 px-4 font-bold text-blue-600">{inv.customer.gstin}</td>
+                    <td className="py-3.5 px-4 font-sans font-medium text-slate-900">{inv.customer.companyName}</td>
+                    <td className="py-3.5 px-4 text-slate-700">{inv.invoiceNumber}</td>
+                    <td className="py-3.5 px-4 text-slate-500">{new Date(inv.invoiceDate).toLocaleDateString("en-IN")}</td>
                     <td className="py-3.5 px-4 text-center">
-                      <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px]">
+                      <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] text-slate-700 font-sans font-medium">
                         {inv.customer.stateCode}-{inv.customer.state}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-right">{formatINR(inv.subtotal)}</td>
-                    <td className="py-3.5 px-4 text-right text-slate-400">{formatINR(inv.cgstAmount)}</td>
-                    <td className="py-3.5 px-4 text-right text-slate-400">{formatINR(inv.sgstAmount)}</td>
-                    <td className="py-3.5 px-4 text-right text-slate-400">{formatINR(inv.igstAmount)}</td>
-                    <td className="py-3.5 px-4 text-right font-bold text-white">{formatINR(inv.totalAmount)}</td>
+                    <td className="py-3.5 px-4 text-right text-slate-600">{formatINR(inv.subtotal)}</td>
+                    <td className="py-3.5 px-4 text-right text-slate-600">{formatINR(inv.cgstAmount)}</td>
+                    <td className="py-3.5 px-4 text-right text-slate-600">{formatINR(inv.sgstAmount)}</td>
+                    <td className="py-3.5 px-4 text-right text-slate-600">{formatINR(inv.igstAmount)}</td>
+                    <td className="py-3.5 px-4 text-right font-bold text-slate-900">{formatINR(inv.totalAmount)}</td>
                   </tr>
                 ))}
               </tbody>

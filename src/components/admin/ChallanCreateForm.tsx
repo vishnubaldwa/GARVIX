@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, ArrowLeft, Send, Truck } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, Truck } from "lucide-react";
 import Link from "next/link";
 
 interface CustomerOption {
@@ -136,40 +136,40 @@ export function ChallanCreateForm({
       <div className="flex items-center justify-between">
         <Link
           href="/admin/challans"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-cyan-400"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-blue-600"
         >
           <ArrowLeft className="h-4 w-4" /> Back to Challans
         </Link>
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 px-6 py-2.5 text-xs font-bold uppercase text-black shadow-md hover:opacity-90 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-xs font-bold uppercase text-white shadow-sm hover:bg-blue-700 disabled:opacity-50 transition"
         >
           <Truck className="h-4 w-4" /> {loading ? "Issuing..." : "Issue Delivery Challan"}
         </button>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-rose-500/40 bg-rose-950/40 p-3 text-xs text-rose-300">
+        <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
           {error}
         </div>
       )}
 
       {/* Customer & Challan Mode Card */}
-      <div className="rounded-2xl border border-slate-800 bg-[#0d1424] p-6 shadow-xl space-y-4">
-        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Challan Parameters</h3>
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Challan Parameters</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Select Customer / Consignee *
             </label>
             <select
               value={customerId}
               onChange={(e) => setCustomerId(e.target.value)}
-              className="w-full rounded-lg cyber-input py-2.5 px-3 text-xs"
+              className="w-full admin-input py-2 px-3 text-xs"
             >
               {customers.map((c) => (
-                <option key={c.id} value={c.id} className="bg-slate-900 text-white">
+                <option key={c.id} value={c.id}>
                   {c.companyName} ({c.state})
                 </option>
               ))}
@@ -177,13 +177,13 @@ export function ChallanCreateForm({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Challan Classification *
             </label>
             <select
               value={challanType}
               onChange={(e) => setChallanType(e.target.value)}
-              className="w-full rounded-lg cyber-input py-2.5 px-3 text-xs font-bold"
+              className="w-full admin-input py-2 px-3 text-xs font-bold"
             >
               <option value="RETURNABLE">RETURNABLE (Demo / Testing Kit / Trial)</option>
               <option value="NON_RETURNABLE">NON-RETURNABLE (Direct Installation / Dispatch)</option>
@@ -191,13 +191,13 @@ export function ChallanCreateForm({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Dispatch Reason *
             </label>
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full rounded-lg cyber-input py-2.5 px-3 text-xs"
+              className="w-full admin-input py-2 px-3 text-xs"
             >
               <option value="DEMO_TESTING">Demo / Site Feasibility Testing</option>
               <option value="DEPLOYMENT_INSTALLATION">Phase Deployment / Installation</option>
@@ -208,7 +208,7 @@ export function ChallanCreateForm({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Transporter Name
             </label>
             <input
@@ -216,12 +216,12 @@ export function ChallanCreateForm({
               placeholder="e.g. BlueDart Express / Delhivery / By Hand"
               value={transporterName}
               onChange={(e) => setTransporterName(e.target.value)}
-              className="w-full rounded-lg cyber-input py-2.5 px-3 text-xs"
+              className="w-full admin-input py-2 px-3 text-xs"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Vehicle / LR Number
             </label>
             <input
@@ -229,20 +229,20 @@ export function ChallanCreateForm({
               placeholder="e.g. HR-26-BR-9912"
               value={vehicleNumber}
               onChange={(e) => setVehicleNumber(e.target.value)}
-              className="w-full rounded-lg cyber-input py-2.5 px-3 text-xs font-mono"
+              className="w-full admin-input py-2 px-3 text-xs font-mono"
             />
           </div>
         </div>
       </div>
 
       {/* Dispatched Items & Serial Numbers */}
-      <div className="rounded-2xl border border-slate-800 bg-[#0d1424] p-6 shadow-xl space-y-4">
+      <div className="admin-card p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider">Hardware Items & Serial Numbers</h3>
+          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Hardware Items & Serial Numbers</h3>
           <button
             type="button"
             onClick={addItemRow}
-            className="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 font-semibold"
+            className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-semibold"
           >
             <Plus className="h-4 w-4" /> Add Hardware Item
           </button>
@@ -252,17 +252,17 @@ export function ChallanCreateForm({
           {items.map((item, idx) => (
             <div
               key={idx}
-              className="grid grid-cols-12 gap-3 items-center rounded-xl border border-slate-800/80 bg-[#090e18] p-3 text-xs"
+              className="grid grid-cols-12 gap-3 items-center rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-xs"
             >
               <div className="col-span-12 sm:col-span-4">
-                <label className="block text-[10px] text-slate-400 mb-1">Product</label>
+                <label className="block text-[10px] text-slate-500 mb-1">Product</label>
                 <select
                   value={item.productId}
                   onChange={(e) => handleProductSelect(idx, e.target.value)}
-                  className="w-full rounded cyber-input py-1.5 px-2 text-xs"
+                  className="w-full admin-input py-1.5 px-2 text-xs"
                 >
                   {products.map((p) => (
-                    <option key={p.id} value={p.id} className="bg-slate-900 text-white">
+                    <option key={p.id} value={p.id}>
                       {p.name}
                     </option>
                   ))}
@@ -270,34 +270,34 @@ export function ChallanCreateForm({
               </div>
 
               <div className="col-span-12 sm:col-span-3">
-                <label className="block text-[10px] text-slate-400 mb-1">Description</label>
+                <label className="block text-[10px] text-slate-500 mb-1">Description</label>
                 <input
                   type="text"
                   value={item.description}
                   onChange={(e) => handleItemChange(idx, "description", e.target.value)}
-                  className="w-full rounded cyber-input py-1.5 px-2 text-xs"
+                  className="w-full admin-input py-1.5 px-2 text-xs"
                 />
               </div>
 
               <div className="col-span-4 sm:col-span-1">
-                <label className="block text-[10px] text-slate-400 mb-1">Qty</label>
+                <label className="block text-[10px] text-slate-500 mb-1">Qty</label>
                 <input
                   type="number"
                   min="1"
                   value={item.quantity}
                   onChange={(e) => handleItemChange(idx, "quantity", Number(e.target.value))}
-                  className="w-full rounded cyber-input py-1.5 px-2 text-xs font-mono"
+                  className="w-full admin-input py-1.5 px-2 text-xs font-mono"
                 />
               </div>
 
               <div className="col-span-8 sm:col-span-3">
-                <label className="block text-[10px] text-slate-400 mb-1">Attached Serial / IMEI Numbers</label>
+                <label className="block text-[10px] text-slate-500 mb-1">Attached Serial / IMEI Numbers</label>
                 <input
                   type="text"
                   placeholder="e.g. GX400-001, GX400-002"
                   value={item.serialNumbersList}
                   onChange={(e) => handleItemChange(idx, "serialNumbersList", e.target.value)}
-                  className="w-full rounded cyber-input py-1.5 px-2 text-xs font-mono text-cyan-300"
+                  className="w-full admin-input py-1.5 px-2 text-xs font-mono text-blue-700 font-semibold"
                 />
               </div>
 
@@ -305,7 +305,7 @@ export function ChallanCreateForm({
                 <button
                   type="button"
                   onClick={() => removeItemRow(idx)}
-                  className="text-slate-500 hover:text-rose-400 p-1"
+                  className="text-slate-400 hover:text-rose-600 p-1"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -316,13 +316,13 @@ export function ChallanCreateForm({
       </div>
 
       {/* Notes */}
-      <div className="rounded-2xl border border-slate-800 bg-[#0d1424] p-6 shadow-xl space-y-3">
-        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Challan Dispatch Notes</h3>
+      <div className="admin-card p-6 space-y-3">
+        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Challan Dispatch Notes</h3>
         <textarea
           rows={3}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full rounded-lg cyber-input p-3 text-xs leading-relaxed"
+          className="w-full admin-input p-3 text-xs leading-relaxed"
         ></textarea>
       </div>
     </form>

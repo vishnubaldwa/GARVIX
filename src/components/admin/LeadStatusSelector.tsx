@@ -47,16 +47,16 @@ export function LeadStatusSelector({
       value={status}
       disabled={updating}
       onChange={handleChange}
-      className={`rounded-lg py-1 px-2 text-xs font-semibold focus:outline-none transition ${
+      className={`rounded-lg py-1 px-2.5 text-xs font-semibold focus:outline-none transition cursor-pointer border ${
         status === "WON"
-          ? "bg-emerald-950/80 text-emerald-300 border border-emerald-500/40"
+          ? "bg-emerald-50 text-emerald-700 border-emerald-300"
           : status === "LOST"
-          ? "bg-rose-950/80 text-rose-300 border border-rose-500/40"
-          : "bg-slate-900 text-slate-200 border border-slate-700"
+          ? "bg-rose-50 text-rose-700 border-rose-300"
+          : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
       }`}
     >
       {statusOptions.map((opt) => (
-        <option key={opt.value} value={opt.value} className="bg-slate-900 text-white">
+        <option key={opt.value} value={opt.value} className="bg-white text-slate-900">
           {opt.label}
         </option>
       ))}

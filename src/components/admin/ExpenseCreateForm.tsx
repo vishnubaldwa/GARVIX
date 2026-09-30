@@ -53,17 +53,17 @@ export function ExpenseCreateForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-xs">
       {error && (
-        <div className="rounded border border-rose-500/40 bg-rose-950/40 p-2 text-rose-300">
+        <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-rose-700 font-medium">
           {error}
         </div>
       )}
 
       <div>
-        <label className="block text-slate-300 font-semibold mb-1">Expense Category *</label>
+        <label className="block text-slate-700 font-semibold mb-1">Expense Category *</label>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="w-full rounded-lg cyber-input py-2 px-3"
+          className="w-full admin-input py-2 px-3"
         >
           <option value="TRAVEL">✈️ Travel & Site Survey</option>
           <option value="HARDWARE_RND">🔧 Hardware R&D & Prototyping</option>
@@ -75,7 +75,7 @@ export function ExpenseCreateForm() {
       </div>
 
       <div>
-        <label className="block text-slate-300 font-semibold mb-1">Amount (₹) *</label>
+        <label className="block text-slate-700 font-semibold mb-1">Amount (₹) *</label>
         <input
           type="number"
           min="1"
@@ -83,28 +83,28 @@ export function ExpenseCreateForm() {
           placeholder="e.g. 4500"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="w-full rounded-lg cyber-input py-2 px-3 font-mono font-bold text-white"
+          className="w-full admin-input py-2 px-3 font-mono font-bold text-slate-900"
         />
       </div>
 
       <div>
-        <label className="block text-slate-300 font-semibold mb-1">Description *</label>
+        <label className="block text-slate-700 font-semibold mb-1">Description *</label>
         <input
           type="text"
           required
           placeholder="e.g. Gurugram to Jaipur site audit travel"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full rounded-lg cyber-input py-2 px-3"
+          className="w-full admin-input py-2 px-3"
         />
       </div>
 
       <div>
-        <label className="block text-slate-300 font-semibold mb-1">Payment Method</label>
+        <label className="block text-slate-700 font-semibold mb-1">Payment Method</label>
         <select
           value={paymentMode}
           onChange={(e) => setPaymentMode(e.target.value)}
-          className="w-full rounded-lg cyber-input py-2 px-3"
+          className="w-full admin-input py-2 px-3"
         >
           <option value="UPI">UPI</option>
           <option value="NEFT_RTGS">Bank Transfer (NEFT/IMPS)</option>
@@ -116,7 +116,7 @@ export function ExpenseCreateForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-rose-500 to-amber-600 py-2.5 font-bold uppercase text-black hover:opacity-90 transition disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 py-2.5 font-bold uppercase text-white hover:bg-blue-700 transition disabled:opacity-50 shadow-sm"
       >
         <Plus className="h-4 w-4" /> {loading ? "Recording..." : "Log Expense Entry"}
       </button>

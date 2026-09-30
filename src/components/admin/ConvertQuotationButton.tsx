@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Receipt, Loader2 } from "lucide-react";
+import { Receipt, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function ConvertQuotationButton({ quotationId }: { quotationId: string }) {
@@ -39,14 +39,14 @@ export function ConvertQuotationButton({ quotationId }: { quotationId: string })
     <button
       onClick={handleConvert}
       disabled={loading}
-      className="flex items-center gap-1 rounded bg-cyan-950/80 border border-cyan-500/40 px-2 py-1 text-[11px] font-bold text-cyan-300 hover:bg-cyan-500/20 transition disabled:opacity-50"
+      className="flex items-center gap-1 rounded-md bg-blue-50 border border-blue-200 px-2.5 py-1 text-[11px] font-bold text-blue-700 hover:bg-blue-100 transition disabled:opacity-50"
       title="Convert to Tax Invoice"
     >
       {loading ? (
         <Loader2 className="h-3 w-3 animate-spin" />
       ) : (
         <>
-          <Receipt className="h-3 w-3 text-cyan-400" />
+          <Receipt className="h-3 w-3 text-blue-600" />
           <span>To Invoice</span>
         </>
       )}
