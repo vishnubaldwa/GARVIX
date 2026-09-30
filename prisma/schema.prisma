@@ -1,0 +1,334 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  username     String     @unique
+  email        String     @unique
+  passwordHash String
+  name         String
+  role         String     @default("SUPER_ADMIN") // SUPER_ADMIN, SALES, ACCOUNTS, SERVICE
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  auditLogs    AuditLog[]
+}
+
+model Lead {
+  id               String   @id @default(cuid())
+  name             String
+  company          String?
+  email            String
+  phone            String
+  solution         String   // RFID_JEWELLERY, RFID_WAREHOUSE, RFID_ASSET, RFID_FASTAG, CUSTOM_SOFTWARE, OTHER
+  message          String
+  status           String   @default("NEW") // NEW, CONTACTED, DEMO_SCHEDULED, PROPOSAL_SENT, WON, LOST
+  telegramNotified Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Customer {
+  id              String            @id @default(cuid())
+  companyName     String
+  contactPerson   String?
+  email           String?
+  phone           String
+  gstin           String?
+  state           String            @default("Haryana")
+  stateCode       String            @default("06")
+  billingAddress  String?
+  shippingAddress String?
+  isB2B           Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  quotations      Quotation[]
+  invoices        Invoice[]
+  challans        DeliveryChallan[]
+  amcContracts    AMCContract[]
+  serviceTickets  ServiceTicket[]
+}
+
+model Product {
+  id             String          @id @default(cuid())
+  name           String
+  sku            String          @unique
+  category       String          // HARDWARE_READER, HARDWARE_ANTENNA, HARDWARE_TAG, SOFTWARE_SERVICE, AMC_SUPPORT
+  hsnCode        String
+  description    String?
+  purchasePrice  Float           @default(0)
+  sellingPrice   Float           @default(0)
+  unit           String          @default("PCS") // PCS, ROLL, HOURS, YEAR
+  currentStock   Int             @default(0)
+  minStockAlert  Int             @default(5)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  serialNumbers  SerialNumber[]
+  quotationItems QuotationItem[]
+  challanItems   ChallanItem[]
+  invoiceItems   InvoiceItem[]
+  purchaseItems  PurchaseItem[]
+}
+
+model SerialNumber {
+  id             String           @id @default(cuid())
+  productId      String
+  product        Product          @relation(fields: [productId], references: [id])
+  serialNumber   String           @unique
+  imei           String?
+  status         String           @default("IN_STOCK") // IN_STOCK, DISPATCHED_CHALLAN, SOLD_INVOICE, UNDER_SERVICE
+  purchaseId     String?
+  challanId      String?
+  deliveryChallan DeliveryChallan? @relation(fields: [challanId], references: [id])
+  invoiceId      String?
+  invoice        Invoice?         @relation(fields: [invoiceId], references: [id])
+  warrantyExpiry DateTime?
+  notes          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model Quotation {
+  id                String          @id @default(cuid())
+  quoteNumber       String          @unique
+  token             String          @unique @default(uuid())
+  customerId        String
+  customer          Customer        @relation(fields: [customerId], references: [id])
+  subtotal          Float           @default(0)
+  taxType           String          @default("INTRA_STATE") // INTRA_STATE (CGST+SGST), INTER_STATE (IGST)
+  cgstAmount        Float           @default(0)
+  sgstAmount        Float           @default(0)
+  igstAmount        Float           @default(0)
+  totalAmount       Float           @default(0)
+  status            String          @default("DRAFT") // DRAFT, SENT, ACCEPTED, DECLINED, CONVERTED
+  validUntil        DateTime?
+  terms             String?
+  notes             String?
+  acceptedAt        DateTime?
+  acceptedSignature String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  items             QuotationItem[]
+  invoices          Invoice[]
+}
+
+model QuotationItem {
+  id              String    @id @default(cuid())
+  quotationId     String
+  quotation       Quotation @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  productId       String?
+  product         Product?  @relation(fields: [productId], references: [id])
+  description     String
+  hsnCode         String
+  quantity        Float     @default(1)
+  unitPrice       Float     @default(0)
+  discountPercent Float     @default(0)
+  taxRate         Float     @default(18) // 18% standard
+  taxAmount       Float     @default(0)
+  totalAmount     Float     @default(0)
+}
+
+model DeliveryChallan {
+  id                 String         @id @default(cuid())
+  challanNumber      String         @unique
+  customerId         String
+  customer           Customer       @relation(fields: [customerId], references: [id])
+  challanType        String         @default("RETURNABLE") // RETURNABLE, NON_RETURNABLE
+  dispatchDate       DateTime       @default(now())
+  expectedReturnDate DateTime?
+  reason             String         @default("DEMO_TESTING") // DEMO_TESTING, DEPLOYMENT_INSTALLATION, REPAIR_REPLACEMENT
+  transporterName    String?
+  vehicleNumber      String?
+  status             String         @default("OPEN") // OPEN, RETURNED, CONVERTED_TO_INVOICE
+  notes              String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  items              ChallanItem[]
+  serialNumbers      SerialNumber[]
+  invoices           Invoice[]
+}
+
+model ChallanItem {
+  id                String          @id @default(cuid())
+  challanId         String
+  deliveryChallan   DeliveryChallan @relation(fields: [challanId], references: [id], onDelete: Cascade)
+  productId         String?
+  product           Product?        @relation(fields: [productId], references: [id])
+  description       String
+  hsnCode           String
+  quantity          Float           @default(1)
+  serialNumbersList String?
+  returnedQty       Float           @default(0)
+}
+
+model Invoice {
+  id                String            @id @default(cuid())
+  invoiceNumber     String            @unique
+  token             String            @unique @default(uuid())
+  invoiceType       String            @default("TAX_INVOICE") // TAX_INVOICE, PROFORMA_INVOICE
+  customerId        String
+  customer          Customer          @relation(fields: [customerId], references: [id])
+  quotationId       String?
+  quotation         Quotation?        @relation(fields: [quotationId], references: [id])
+  challanId         String?
+  deliveryChallan   DeliveryChallan?  @relation(fields: [challanId], references: [id])
+  invoiceDate       DateTime          @default(now())
+  dueDate           DateTime?
+  subtotal          Float             @default(0)
+  taxType           String            @default("INTRA_STATE") // INTRA_STATE, INTER_STATE
+  cgstRate          Float             @default(9)
+  cgstAmount        Float             @default(0)
+  sgstRate          Float             @default(9)
+  sgstAmount        Float             @default(0)
+  igstRate          Float             @default(18)
+  igstAmount        Float             @default(0)
+  totalAmount       Float             @default(0)
+  amountPaid        Float             @default(0)
+  balanceDue        Float             @default(0)
+  paymentStatus     String            @default("UNPAID") // UNPAID, PARTIAL, PAID
+  upiQrString       String?
+  ewayBillNo        String?
+  transporterId     String?
+  transporterName   String?
+  vehicleNo         String?
+  lrNo              String?
+  lrDate            DateTime?
+  terms             String?
+  notes             String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  items             InvoiceItem[]
+  payments          Payment[]
+  serialNumbers     SerialNumber[]
+}
+
+model InvoiceItem {
+  id                String   @id @default(cuid())
+  invoiceId         String
+  invoice           Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  productId         String?
+  product           Product? @relation(fields: [productId], references: [id])
+  description       String
+  hsnCode           String
+  quantity          Float    @default(1)
+  unitPrice         Float    @default(0)
+  discountPercent   Float    @default(0)
+  taxRate           Float    @default(18)
+  taxAmount         Float    @default(0)
+  totalAmount       Float    @default(0)
+  serialNumbersList String?
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  invoiceId       String
+  invoice         Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  paymentDate     DateTime @default(now())
+  amount          Float
+  paymentMode     String   @default("UPI") // UPI, NEFT_RTGS, CASH, CHEQUE
+  referenceNumber String?
+  notes           String?
+  createdAt       DateTime @default(now())
+}
+
+model Purchase {
+  id            String         @id @default(cuid())
+  billNumber    String
+  vendorName    String
+  vendorGstin   String?
+  vendorState   String?
+  billDate      DateTime       @default(now())
+  subtotal      Float          @default(0)
+  cgstAmount    Float          @default(0)
+  sgstAmount    Float          @default(0)
+  igstAmount    Float          @default(0)
+  totalAmount   Float          @default(0)
+  itcEligible   Boolean        @default(true)
+  itcStatus     String         @default("CLAIMED") // CLAIMED, INELIGIBLE
+  paymentStatus String         @default("PENDING") // PENDING, PAID
+  notes         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  items         PurchaseItem[]
+}
+
+model PurchaseItem {
+  id          String   @id @default(cuid())
+  purchaseId  String
+  purchase    Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
+  description String
+  hsnCode     String
+  quantity    Float    @default(1)
+  unitPrice   Float    @default(0)
+  taxRate     Float    @default(18)
+  taxAmount   Float    @default(0)
+  totalAmount Float    @default(0)
+}
+
+model Expense {
+  id              String   @id @default(cuid())
+  expenseDate     DateTime @default(now())
+  category        String   // TRAVEL, HARDWARE_RND, CLOUD_SERVER, OFFICE_SUPPLIES, MARKETING, MISC
+  amount          Float
+  description     String
+  paymentMode     String   @default("UPI")
+  receiptUrl      String?
+  isTaxDeductible Boolean  @default(true)
+  createdAt       DateTime @default(now())
+}
+
+model AMCContract {
+  id             String          @id @default(cuid())
+  contractNumber String          @unique
+  customerId     String
+  customer       Customer        @relation(fields: [customerId], references: [id])
+  title          String
+  startDate      DateTime
+  endDate        DateTime
+  contractValue  Float           @default(0)
+  visitFrequency String          @default("QUARTERLY") // MONTHLY, QUARTERLY, BI_ANNUAL, ANNUAL
+  status         String          @default("ACTIVE") // ACTIVE, EXPIRING_SOON, EXPIRED, RENEWED
+  notes          String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  serviceTickets ServiceTicket[]
+}
+
+model ServiceTicket {
+  id              String       @id @default(cuid())
+  ticketNumber    String       @unique
+  customerId      String
+  customer        Customer     @relation(fields: [customerId], references: [id])
+  amcId           String?
+  amcContract     AMCContract? @relation(fields: [amcId], references: [id])
+  issueTitle      String
+  description     String
+  priority        String       @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  status          String       @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+  assignedTo      String?
+  resolutionNotes String?
+  resolvedAt      DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  username   String?
+  action     String   // CREATE, UPDATE, DELETE, CONVERT, EXPORT_GST, LOGIN
+  entityType String   // INVOICE, QUOTATION, CHALLAN, PRODUCT, LEAD, PAYMENT, USER
+  entityId   String?
+  details    String?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}
