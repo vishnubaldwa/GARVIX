@@ -8,7 +8,7 @@ export interface LeadPayload {
 }
 
 
-function escapeHtml(str: string): string {
+export function escapeHtml(str: string): string {
   if (!str) return "";
   return String(str)
     .replace(/&/g, "&amp;")
@@ -25,26 +25,67 @@ export async function sendTelegramMessage(text: string): Promise<boolean> {
     return false;
   }
 
+  return sendTelegramReply(chatId, text);
+}
+
+export async function sendTelegramReply(
+  chatId: string | number,
+  text: string,
+  replyMarkup?: any
+): Promise<boolean> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return false;
+
   try {
     const url = `https://api.telegram.org/bot${token}/sendMessage`;
+    const payload: any = {
+      chat_id: chatId,
+      text: text,
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+    };
+    if (replyMarkup) {
+      payload.reply_markup = replyMarkup;
+    }
+
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: text,
-        parse_mode: "HTML",
-        disable_web_page_preview: true,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();
     return data.ok === true;
   } catch (err) {
-    console.error("Failed to send telegram notification:", err);
+    console.error("Failed to send telegram reply:", err);
     return false;
   }
 }
+
+export async function answerTelegramCallback(
+  callbackQueryId: string,
+  text?: string
+): Promise<boolean> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return false;
+
+  try {
+    const url = `https://api.telegram.org/bot${token}/answerCallbackQuery`;
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        callback_query_id: callbackQueryId,
+        text: text || "",
+      }),
+    });
+    return true;
+  } catch (err) {
+    console.error("Failed to answer telegram callback query:", err);
+    return false;
+  }
+}
+
 
 // 1. New Lead Alert
 export async function sendTelegramLeadAlert(lead: LeadPayload): Promise<boolean> {
