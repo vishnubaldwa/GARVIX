@@ -21,6 +21,7 @@ import {
   Menu,
   Building2,
   Settings,
+  UserCog,
 } from "lucide-react";
 import { useState } from "react";
 import { AuthSession } from "@/lib/auth";
@@ -38,8 +39,9 @@ const navItems = [
   { href: "/admin/expenses", label: "Expense Tracker", icon: Wallet },
   { href: "/admin/amc", label: "AMC & Service", icon: Clock },
   { href: "/admin/gst-returns", label: "1-Click CA Return", icon: Download, highlight: true },
+  { href: "/admin/team", label: "Team & Staff", icon: UserCog, adminOnly: true },
   { href: "/admin/settings", label: "Settings & Profile", icon: Settings },
-  { href: "/admin/audit", label: "Audit Logs", icon: ShieldCheck },
+  { href: "/admin/audit", label: "Audit Logs", icon: ShieldCheck, adminOnly: true },
 ];
 
 export function AdminSidebar({ session }: { session: AuthSession | null }) {
@@ -105,7 +107,9 @@ export function AdminSidebar({ session }: { session: AuthSession | null }) {
 
             {/* Navigation links */}
             <nav className="mt-4 space-y-1">
-              {navItems.map((item) => {
+              {navItems
+                .filter((item) => !item.adminOnly || session?.role === "SUPER_ADMIN")
+                .map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
                 return (

@@ -35,6 +35,8 @@ async function main() {
       passwordHash: passwordHash,
       name: "Vishnu Baldwa",
       role: "SUPER_ADMIN",
+      phone: "9876543210",
+      telegramChatId: "8543269562",
     },
   });
 
@@ -45,6 +47,7 @@ async function main() {
       passwordHash: await bcrypt.hash("sales123", 10),
       name: "Rohan Sharma",
       role: "SALES",
+      phone: "9812345678",
     },
   });
 
@@ -55,10 +58,22 @@ async function main() {
       passwordHash: await bcrypt.hash("accounts123", 10),
       name: "Pooja Gupta",
       role: "ACCOUNTS",
+      phone: "9823456789",
     },
   });
 
-  console.log("Users created:", adminUser.email, salesUser.email, accountsUser.email);
+  const serviceUser = await prisma.user.create({
+    data: {
+      username: "service",
+      email: "service@garvix.in",
+      passwordHash: await bcrypt.hash("service123", 10),
+      name: "Vikram Singh",
+      role: "SERVICE",
+      phone: "9834567890",
+    },
+  });
+
+  console.log("Users created:", adminUser.email, salesUser.email, accountsUser.email, serviceUser.email);
 
   // 2. Customers
   const customerHaryana = await prisma.customer.create({

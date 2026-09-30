@@ -8,16 +8,18 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(cuid())
-  username     String     @unique
-  email        String     @unique
-  passwordHash String
-  name         String
-  role         String     @default("SUPER_ADMIN") // SUPER_ADMIN, SALES, ACCOUNTS, SERVICE
-  isActive     Boolean    @default(true)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  auditLogs    AuditLog[]
+  id             String     @id @default(cuid())
+  username       String     @unique
+  email          String     @unique
+  passwordHash   String
+  name           String
+  role           String     @default("SUPER_ADMIN") // SUPER_ADMIN, SALES, ACCOUNTS, SERVICE
+  phone          String?
+  telegramChatId String?    @unique
+  isActive       Boolean    @default(true)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  auditLogs      AuditLog[]
 }
 
 model Lead {
