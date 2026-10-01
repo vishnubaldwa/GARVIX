@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Users,
   UserPlus,
@@ -16,6 +16,7 @@ import {
   Link2Off,
   Briefcase,
   Lock,
+  Edit3,
 } from "lucide-react";
 
 interface Employee {
@@ -53,6 +54,28 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("ALL");
+  const [availableRoles, setAvailableRoles] = useState<{ name: string; displayName: string }[]>([
+    { name: "SUPER_ADMIN", displayName: "👑 Super Admin" },
+    { name: "SALES", displayName: "💼 Sales Executive" },
+    { name: "ACCOUNTS", displayName: "🧾 Accounts Officer" },
+    { name: "SERVICE", displayName: "🛠️ Service Engineer" },
+  ]);
+
+  useEffect(() => {
+    fetch("/api/admin/roles")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.roles && data.roles.length > 0) {
+          setAvailableRoles(
+            data.roles.map((r: any) => ({
+              name: r.name,
+              displayName: r.displayName || r.name,
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Create Modal state
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -63,6 +86,61 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
   const [password, setPassword] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState("");
+
+  // Edit Modal state
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingEmp, setEditingEmp] = useState<Employee | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editRole, setEditRole] = useState("SALES");
+  const [editPhone, setEditPhone] = useState("");
+  const [editIsActive, setEditIsActive] = useState(true);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  const handleOpenEdit = (emp: Employee) => {
+    setEditingEmp(emp);
+    setEditName(emp.name);
+    setEditRole(emp.role);
+    setEditPhone(emp.phone || "");
+    setEditIsActive(emp.isActive);
+    setEditError("");
+    setEditModalOpen(true);
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingEmp) return;
+    setSavingEdit(true);
+    setEditError("");
+
+    try {
+      const res = await fetch("/api/admin/employees", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingEmp.id,
+          name: editName,
+          role: editRole,
+          phone: editPhone,
+          isActive: editIsActive,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setEmployees(
+          employees.map((e) => (e.id === editingEmp.id ? { ...e, ...data.employee } : e))
+        );
+        setEditModalOpen(false);
+        showToast(`Staff member ${data.employee.name} updated successfully!`);
+      } else {
+        setEditError(data.error || "Failed to update staff member.");
+      }
+    } catch {
+      setEditError("Network error occurred.");
+    } finally {
+      setSavingEdit(false);
+    }
+  };
 
   // Reset Password Modal state
   const [resetModalOpen, setResetModalOpen] = useState(false);
@@ -347,6 +425,14 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
+                            onClick={() => handleOpenEdit(emp)}
+                            title="Edit Staff Member"
+                            className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition shadow-sm"
+                          >
+                            <Edit3 className="h-3.5 w-3.5" />
+                          </button>
+
+                          <button
                             onClick={() => {
                               setSelectedEmp(emp);
                               setResetModalOpen(true);
@@ -496,6 +582,143 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                   className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm disabled:opacity-50"
                 >
                   {creating ? "Creating..." : "Save & Create Employee"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Edit Employee */}
+      {editModalOpen && editingEmp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Edit3 className="h-5 w-5 text-blue-600" />
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">Edit Staff Member</h3>
+                  <p className="text-[11px] text-slate-500">Login ID: {editingEmp.username}@garvix.in</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 text-lg leading-none"
+              >
+                &times;
+              </button>
+            </div>
+
+            {editError && (
+              <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-xs text-rose-700 font-semibold flex items-center gap-1.5">
+                <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" /> {editError}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveEdit} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Rahul Verma"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full admin-input py-2 px-3 text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Username / Email</label>
+                  <input
+                    type="text"
+                    disabled
+                    value={`${editingEmp.username}@garvix.in`}
+                    className="w-full admin-input py-2 px-3 text-xs bg-slate-50 text-slate-500 font-mono cursor-not-allowed"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Assigned Role *</label>
+                  <select
+                    value={editRole}
+                    onChange={(e) => setEditRole(e.target.value)}
+                    className="w-full admin-input py-2 px-3 text-xs font-semibold cursor-pointer"
+                  >
+                    {availableRoles.map((r) => (
+                      <option key={r.name} value={r.name}>
+                        {r.displayName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">
+                  Mobile Number (for Telegram Auto-Link) *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="e.g. 9876543210"
+                  value={editPhone}
+                  onChange={(e) => setEditPhone(e.target.value)}
+                  className="w-full admin-input py-2 px-3 text-xs font-mono"
+                />
+                <p className="text-[10px] text-slate-500 mt-1">
+                  💡 Is mobile number se employee Telegram Bot (@garvix_software_bot) par auto-link hota hai.
+                </p>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Account Status</label>
+                <select
+                  value={editIsActive ? "ACTIVE" : "INACTIVE"}
+                  onChange={(e) => setEditIsActive(e.target.value === "ACTIVE")}
+                  className="w-full admin-input py-2 px-3 text-xs font-semibold cursor-pointer"
+                >
+                  <option value="ACTIVE">🟢 Active (Access Allowed)</option>
+                  <option value="INACTIVE">🔴 Inactive (Account Suspended)</option>
+                </select>
+              </div>
+
+              {editingEmp.telegramChatId && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 flex items-center justify-between gap-2">
+                  <div className="text-[11px] text-emerald-800">
+                    <span className="font-bold flex items-center gap-1">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Telegram Account Connected
+                    </span>
+                    <span className="font-mono text-slate-600 text-[10px]">Chat ID: {editingEmp.telegramChatId}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await handleUnlinkTelegram(editingEmp);
+                      setEditingEmp({ ...editingEmp, telegramChatId: null });
+                    }}
+                    className="flex items-center gap-1 rounded-lg border border-rose-200 bg-white px-2.5 py-1 text-[11px] font-bold text-rose-600 hover:bg-rose-50 transition"
+                  >
+                    <Link2Off className="h-3 w-3" /> Unlink
+                  </button>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditModalOpen(false)}
+                  className="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEdit}
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm disabled:opacity-50"
+                >
+                  {savingEdit ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>

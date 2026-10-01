@@ -136,3 +136,93 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
+// PATCH: Update employee details
+export async function PATCH(request: Request) {
+  try {
+    const session = await getSession();
+    if (!session || session.role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "Access denied. Super Admin role required." }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { id, name, role, phone, isActive } = body;
+
+    if (!id || !name?.trim() || !role) {
+      return NextResponse.json(
+        { error: "Employee ID, Name, and Role are required." },
+        { status: 400 }
+      );
+    }
+
+    const existingEmp = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!existingEmp) {
+      return NextResponse.json({ error: "Employee not found." }, { status: 404 });
+    }
+
+    const cleanPhone = phone ? phone.trim().replace(/\s+/g, "") : null;
+
+    // Check phone uniqueness if changed
+    if (cleanPhone && cleanPhone !== existingEmp.phone) {
+      const duplicatePhone = await prisma.user.findFirst({
+        where: {
+          phone: cleanPhone,
+          id: { not: id },
+        },
+      });
+      if (duplicatePhone) {
+        return NextResponse.json(
+          { error: `Phone number '${cleanPhone}' is already linked to another employee (${duplicatePhone.name}).` },
+          { status: 400 }
+        );
+      }
+    }
+
+    // If phone is changed, unlink existing telegramChatId so new phone can be verified fresh
+    let telegramChatId = existingEmp.telegramChatId;
+    if (cleanPhone !== existingEmp.phone && telegramChatId) {
+      telegramChatId = null;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        name: name.trim(),
+        role,
+        phone: cleanPhone,
+        isActive: typeof isActive === "boolean" ? isActive : existingEmp.isActive,
+        telegramChatId,
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        name: true,
+        role: true,
+        phone: true,
+        telegramChatId: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    // Audit log
+    await prisma.auditLog.create({
+      data: {
+        username: session.username,
+        action: "UPDATE",
+        entityType: "USER",
+        entityId: updatedUser.id,
+        details: `Updated staff account '${updatedUser.name}' (${updatedUser.email}): Role '${updatedUser.role}', Phone '${updatedUser.phone || "none"}', Active: ${updatedUser.isActive}`,
+      },
+    });
+
+    return NextResponse.json({ success: true, employee: updatedUser });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
