@@ -13,6 +13,9 @@ import {
   Smartphone,
   Bot,
   RefreshCw,
+  Edit3,
+  Save,
+  X,
 } from "lucide-react";
 
 export function AdminSettingsView({
@@ -52,6 +55,39 @@ export function AdminSettingsView({
   const [whLoading, setWhLoading] = useState(false);
   const [whSuccess, setWhSuccess] = useState("");
   const [whError, setWhError] = useState("");
+
+  // Profile editing state
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileData, setProfileData] = useState(companyInfo);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileSuccess, setProfileSuccess] = useState("");
+  const [profileError, setProfileError] = useState("");
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    setProfileSuccess("");
+    setProfileError("");
+
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profileData),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setProfileSuccess("Company profile & UPI settings updated in database!");
+        setEditingProfile(false);
+      } else {
+        setProfileError(data.error || "Failed to update settings.");
+      }
+    } catch {
+      setProfileError("Network error occurred.");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   const handleRegisterWebhook = async () => {
     setWhLoading(true);
@@ -229,41 +265,213 @@ export function AdminSettingsView({
         <div className="lg:col-span-7 space-y-6">
           {/* Company Details */}
           <div className="admin-card p-6 space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <Building2 className="h-5 w-5 text-blue-600" />
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-                Company & GST Profile
-              </h3>
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-blue-600" />
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+                  Company & GST Profile
+                </h3>
+              </div>
+              {!editingProfile ? (
+                <button
+                  type="button"
+                  onClick={() => setEditingProfile(true)}
+                  className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm"
+                >
+                  <Edit3 className="h-3.5 w-3.5 text-blue-600" /> Edit Settings
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingProfile(false);
+                    setProfileData(companyInfo);
+                  }}
+                  className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+                >
+                  <X className="h-3.5 w-3.5" /> Cancel
+                </button>
+              )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div>
-                <label className="block text-slate-500 font-semibold mb-1">Company Registered Name</label>
-                <div className="font-bold text-slate-900 text-sm">{companyInfo.name}</div>
+            {profileSuccess && (
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs text-emerald-800 font-semibold flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" /> {profileSuccess}
               </div>
+            )}
+            {profileError && (
+              <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-xs text-rose-700 font-semibold flex items-center gap-1.5">
+                <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" /> {profileError}
+              </div>
+            )}
 
-              <div>
-                <label className="block text-slate-500 font-semibold mb-1">GSTIN & Home State</label>
-                <div className="font-mono font-bold text-slate-900 text-sm">
-                  {companyInfo.gstin} ({companyInfo.state} - {companyInfo.stateCode})
+            {editingProfile ? (
+              <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-700 font-semibold mb-1">Company Registered Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={profileData.name}
+                      onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                      className="w-full admin-input py-2 px-3 text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-semibold mb-1">Tagline</label>
+                    <input
+                      type="text"
+                      value={profileData.tagline}
+                      onChange={(e) => setProfileData({ ...profileData, tagline: e.target.value })}
+                      className="w-full admin-input py-2 px-3 text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-semibold mb-1">GSTIN</label>
+                    <input
+                      type="text"
+                      value={profileData.gstin}
+                      onChange={(e) => {
+                        const gstin = e.target.value.toUpperCase();
+                        const stateCode = gstin.length >= 2 ? gstin.slice(0, 2) : profileData.stateCode;
+                        setProfileData({ ...profileData, gstin, stateCode });
+                      }}
+                      placeholder="e.g. 06AAACG1234F1Z5"
+                      className="w-full admin-input py-2 px-3 text-xs font-mono uppercase"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-slate-700 font-semibold mb-1">Home State</label>
+                      <input
+                        type="text"
+                        value={profileData.state}
+                        onChange={(e) => setProfileData({ ...profileData, state: e.target.value })}
+                        className="w-full admin-input py-2 px-3 text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-700 font-semibold mb-1">State Code</label>
+                      <input
+                        type="text"
+                        value={profileData.stateCode}
+                        onChange={(e) => setProfileData({ ...profileData, stateCode: e.target.value })}
+                        className="w-full admin-input py-2 px-3 text-xs font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-semibold mb-1">Official Phone *</label>
+                    <input
+                      type="text"
+                      required
+                      value={profileData.phone}
+                      onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                      className="w-full admin-input py-2 px-3 text-xs font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-semibold mb-1">Official Email *</label>
+                    <input
+                      type="email"
+                      required
+                      value={profileData.email}
+                      onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                      className="w-full admin-input py-2 px-3 text-xs font-mono"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-slate-700 font-semibold mb-1">Registered Address *</label>
+                    <textarea
+                      rows={2}
+                      required
+                      value={profileData.address}
+                      onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
+                      className="w-full admin-input py-2 px-3 text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-semibold mb-1">Business UPI ID * (for Dynamic QR)</label>
+                    <input
+                      type="text"
+                      required
+                      value={profileData.upiId}
+                      onChange={(e) => setProfileData({ ...profileData, upiId: e.target.value })}
+                      placeholder="e.g. garvix@upi"
+                      className="w-full admin-input py-2 px-3 text-xs font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-semibold mb-1">UPI Payee Display Name</label>
+                    <input
+                      type="text"
+                      value={profileData.upiName}
+                      onChange={(e) => setProfileData({ ...profileData, upiName: e.target.value })}
+                      className="w-full admin-input py-2 px-3 text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                  <button
+                    type="submit"
+                    disabled={savingProfile}
+                    className="flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-2 text-xs font-bold text-white shadow-sm transition disabled:opacity-50"
+                  >
+                    <Save className="h-4 w-4" /> {savingProfile ? "Saving..." : "Save Settings"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingProfile(false);
+                      setProfileData(companyInfo);
+                    }}
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label className="block text-slate-500 font-semibold mb-1">Company Registered Name</label>
+                  <div className="font-bold text-slate-900 text-sm">{profileData.name}</div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">{profileData.tagline}</div>
+                </div>
+
+                <div>
+                  <label className="block text-slate-500 font-semibold mb-1">GSTIN & Home State</label>
+                  <div className="font-mono font-bold text-slate-900 text-sm">
+                    {profileData.gstin} ({profileData.state} - {profileData.stateCode})
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-slate-500 font-semibold mb-1">Official Phone</label>
+                  <div className="font-mono text-slate-800">{profileData.phone}</div>
+                </div>
+
+                <div>
+                  <label className="block text-slate-500 font-semibold mb-1">Official Email</label>
+                  <div className="font-mono text-slate-800">{profileData.email}</div>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-slate-500 font-semibold mb-1">Registered Business Address</label>
+                  <div className="text-slate-800">{profileData.address}</div>
                 </div>
               </div>
-
-              <div>
-                <label className="block text-slate-500 font-semibold mb-1">Official Phone</label>
-                <div className="font-mono text-slate-800">{companyInfo.phone}</div>
-              </div>
-
-              <div>
-                <label className="block text-slate-500 font-semibold mb-1">Official Email</label>
-                <div className="font-mono text-slate-800">{companyInfo.email}</div>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-slate-500 font-semibold mb-1">Registered Business Address</label>
-                <div className="text-slate-800">{companyInfo.address}</div>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Bank & Payment Details */}
@@ -279,14 +487,14 @@ export function AdminSettingsView({
               <div>
                 <label className="block text-slate-500 font-semibold mb-1">Business UPI ID</label>
                 <div className="font-mono font-bold text-emerald-700 text-sm bg-emerald-50 border border-emerald-200 rounded-lg p-2">
-                  {companyInfo.upiId}
+                  {profileData.upiId}
                 </div>
               </div>
 
               <div>
                 <label className="block text-slate-500 font-semibold mb-1">UPI Payee Name</label>
                 <div className="font-bold text-slate-900 text-sm bg-slate-50 border border-slate-200 rounded-lg p-2">
-                  {companyInfo.upiName}
+                  {profileData.upiName}
                 </div>
               </div>
 

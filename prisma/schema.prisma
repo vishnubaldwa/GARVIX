@@ -334,3 +334,44 @@ model AuditLog {
   ipAddress  String?
   createdAt  DateTime @default(now())
 }
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String
+  description String?
+  permissions String   // JSON array of permission strings
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TelegramSession {
+  id        String   @id @default(cuid())
+  chatId    String   @unique
+  flow      String
+  step      Int      @default(1)
+  stateData String   // JSON object string
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CompanySetting {
+  id        String   @id @default("default")
+  name      String   @default("GARVIX TECHNOLOGIES")
+  tagline   String   @default("Next-Gen RFID Ecosystems & Bespoke Software")
+  state     String   @default("Haryana")
+  stateCode String   @default("06")
+  gstin     String   @default("06AAACG1234F1Z5")
+  email     String   @default("contact@garvix.in")
+  phone     String   @default("+91 98765 43210")
+  address   String   @default("Cyber Hub, Sector 24, Gurugram, Haryana - 122002")
+  upiId     String   @default("garvix@upi")
+  upiName   String   @default("GARVIX TECHNOLOGIES")
+  bankName  String?
+  accountNo String?
+  ifscCode  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

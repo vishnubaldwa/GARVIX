@@ -5,97 +5,39 @@ import {
   sendTelegramReply,
   answerTelegramCallback,
 } from "@/lib/telegram";
+import {
+  hasPermission,
+  PERMISSIONS,
+  ensureDefaultRoles,
+} from "@/lib/permissions";
+import {
+  getActiveSession,
+  clearSession,
+  setSession,
+  buildDynamicMenu,
+  startWizard,
+  handleWizardStep,
+  showSettingsMenu,
+  promptEditField,
+  showRolesList,
+  showRolePermissionsEditor,
+  toggleRolePermission,
+  convertQuotationFromTelegram,
+} from "@/lib/telegram-wizard";
 
 export const dynamic = "force-dynamic";
 
 const SITE_URL =
   process.env.NEXTAUTH_URL || process.env.SITE_URL || "https://garvix.in";
 
-// Role-based Keyboards
-function getMenuForRole(role: string) {
-  if (role === "SUPER_ADMIN") {
-    return {
-      inline_keyboard: [
-        [
-          { text: "📋 Recent Quotes", callback_data: "cmd_quotes" },
-          { text: "🧾 Pending Invoices", callback_data: "cmd_invoices" },
-        ],
-        [
-          { text: "👥 Website Leads", callback_data: "cmd_leads" },
-          { text: "📊 Turnover & Summary", callback_data: "cmd_summary" },
-        ],
-        [
-          { text: "🛠️ Service Desk", callback_data: "cmd_tickets" },
-          { text: "👥 Team Members", callback_data: "cmd_team" },
-        ],
-        [
-          { text: "📦 Hardware Stock", callback_data: "cmd_stock" },
-          { text: "🌐 Open Admin Portal", url: `${SITE_URL}/admin` },
-        ],
-      ],
-    };
-  }
-
-  if (role === "SALES") {
-    return {
-      inline_keyboard: [
-        [
-          { text: "📋 Recent Quotes", callback_data: "cmd_quotes" },
-          { text: "👥 Website Leads", callback_data: "cmd_leads" },
-        ],
-        [
-          { text: "📦 Hardware Stock & Specs", callback_data: "cmd_stock" },
-          { text: "🌐 Open Sales Portal", url: `${SITE_URL}/admin/quotations` },
-        ],
-      ],
-    };
-  }
-
-  if (role === "ACCOUNTS") {
-    return {
-      inline_keyboard: [
-        [
-          { text: "🧾 Pending Invoices & Dues", callback_data: "cmd_invoices" },
-          { text: "💰 Collection Summary", callback_data: "cmd_summary" },
-        ],
-        [
-          { text: "📋 View Quotations", callback_data: "cmd_quotes" },
-          { text: "🌐 Open Accounts Portal", url: `${SITE_URL}/admin/invoices` },
-        ],
-      ],
-    };
-  }
-
-  if (role === "SERVICE") {
-    return {
-      inline_keyboard: [
-        [
-          { text: "🛠️ My Service Tickets", callback_data: "cmd_tickets" },
-          { text: "📦 Hardware & Spare Stock", callback_data: "cmd_stock" },
-        ],
-        [
-          { text: "🌐 Open Service Portal", url: `${SITE_URL}/admin/amc` },
-        ],
-      ],
-    };
-  }
-
-  // Fallback
-  return {
-    inline_keyboard: [
-      [{ text: "🌐 Open GARVIX Portal", url: `${SITE_URL}/admin` }],
-    ],
-  };
-}
-
-function getSubMenuKeyboard(refreshCmd: string, role: string) {
+function getSubMenuKeyboard(refreshCmd: string) {
   return {
     inline_keyboard: [
       [
         { text: "🔄 Refresh", callback_data: refreshCmd },
         { text: "🔙 Main Menu", callback_data: "cmd_menu" },
       ],
-      [{ text: "🌐 Open Portal", url: `${SITE_URL}/admin` }],
+      [{ text: "🌐 Open Web ERP", url: `${SITE_URL}/admin` }],
     ],
   };
 }
@@ -104,7 +46,7 @@ function getSubMenuKeyboard(refreshCmd: string, role: string) {
 export async function GET() {
   return NextResponse.json({
     status: "online",
-    service: "GARVIX Telegram Webhook",
+    service: "GARVIX Telegram ERP Terminal",
     timestamp: new Date().toISOString(),
   });
 }
@@ -117,12 +59,14 @@ export async function POST(req: NextRequest) {
     let chatId: string | number | undefined;
     let userText = "";
     let callbackQueryId: string | undefined;
+    let callbackData = "";
     let contactPhone = "";
 
     if (update.callback_query) {
       callbackQueryId = update.callback_query.id;
       chatId = update.callback_query.message?.chat?.id;
-      userText = update.callback_query.data || "";
+      callbackData = update.callback_query.data || "";
+      userText = callbackData;
       if (callbackQueryId) {
         await answerTelegramCallback(callbackQueryId);
       }
@@ -178,14 +122,16 @@ export async function POST(req: NextRequest) {
 🎉 <b>Account Linked Successfully!</b>
 ━━━━━━━━━━━━━━━━━━━━
 Namaste <b>${escapeHtml(user.name)}</b> ji!
-🏢 Department: <b>${user.role}</b>
+🏢 Role: <b>${user.role}</b>
 📞 Mobile: <code>${escapeHtml(user.phone || last10Digits)}</code>
 
-Aapka Telegram account ab <b>GARVIX ERP</b> se 100% connect ho gaya hai. Aapke role ke hisaab se aapka command menu neeche diya gaya hai:
+Aapka Telegram account ab <b>GARVIX ERP Terminal</b> se 100% connect ho gaya hai.
+Aapke permissions ke anusar aapka control menu neeche active hai:
 ━━━━━━━━━━━━━━━━━━━━
         `.trim();
 
-        await sendTelegramReply(chatId, welcomeLinked, getMenuForRole(user.role));
+        const menu = await buildDynamicMenu(user.role);
+        await sendTelegramReply(chatId, welcomeLinked, menu);
         return NextResponse.json({ ok: true });
       } else {
         const notFoundText = `
@@ -193,7 +139,7 @@ Aapka Telegram account ab <b>GARVIX ERP</b> se 100% connect ho gaya hai. Aapke r
 ━━━━━━━━━━━━━━━━━━━━
 Mobile number <code>${last10Digits}</code> GARVIX ERP ke kisi active staff record me nahi mila.
 
-Kripya apne Admin (Vishnu ji) se sampark karein taaki wo <b>/admin/team</b> me aapka number register kar sakein.
+Kripya apne Admin se sampark karein ya sahi registered number share karein:
         `.trim();
 
         await sendTelegramReply(chatId, notFoundText, {
@@ -241,20 +187,178 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
     const role = user.role;
 
     // ----------------------------------------------------
-    // ROLE-BASED COMMAND DISPATCH
+    // 6. CHECK FOR ACTIVE MULTI-STEP SESSION
+    // ----------------------------------------------------
+    const activeSession = await getActiveSession(chatId);
+    if (activeSession) {
+      // If user types cancel, or passes step input
+      const handled = await handleWizardStep(
+        chatId,
+        activeSession,
+        userText,
+        callbackData,
+        user
+      );
+      if (handled) {
+        return NextResponse.json({ ok: true });
+      }
+    }
+
+    // ----------------------------------------------------
+    // 7. HANDLE DIRECT CALLBACK TRIGGERS
+    // ----------------------------------------------------
+    if (callbackData) {
+      if (callbackData === "cmd_menu") {
+        await clearSession(chatId);
+        const welcomeText = `
+👋 <b>Namaste ${escapeHtml(user.name)} ji!</b>
+GARVIX ERP Terminal active hai.
+
+🏢 <b>Role:</b> <code>${role}</code>
+Neeche diye gaye commands and shortcuts me se chunein:
+        `.trim();
+        const menu = await buildDynamicMenu(role);
+        await sendTelegramReply(chatId, welcomeText, menu);
+        return NextResponse.json({ ok: true });
+      }
+
+      // Wizards
+      if (callbackData === "flow_new_client") {
+        await startWizard(chatId, "NEW_CLIENT", user);
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData === "flow_new_employee") {
+        await startWizard(chatId, "NEW_EMPLOYEE", user);
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData === "flow_new_product") {
+        await startWizard(chatId, "NEW_PRODUCT", user);
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData === "flow_new_quote") {
+        await startWizard(chatId, "NEW_QUOTATION", user);
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData.startsWith("q_sel_client_")) {
+        const customerId = callbackData.replace("q_sel_client_", "");
+        await startWizard(chatId, "NEW_QUOTATION", user, { customerId });
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData === "flow_settings") {
+        await startWizard(chatId, "EDIT_SETTINGS", user);
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData.startsWith("set_field_")) {
+        const field = callbackData.replace("set_field_", "");
+        await promptEditField(chatId, field, user);
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData === "flow_roles") {
+        await startWizard(chatId, "MANAGE_ROLES", user);
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData === "flow_add_role") {
+        await setSession(chatId, "ADD_ROLE", 1, {});
+        const text = `
+🛡️ <b>Step 1/2: New Role Code</b>
+━━━━━━━━━━━━━━━━━━━━
+Naye role ka code bhejein (Capital letters only, e.g. <code>MANAGER</code>, <code>DISPATCH_HEAD</code>):
+        `.trim();
+        await sendTelegramReply(chatId, text, {
+          inline_keyboard: [[{ text: "❌ Cancel", callback_data: "wizard_cancel" }]],
+        });
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData.startsWith("role_view_")) {
+        const roleId = callbackData.replace("role_view_", "");
+        await showRolePermissionsEditor(chatId, roleId);
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData.startsWith("rtog_")) {
+        const parts = callbackData.split("_");
+        const roleId = parts[1];
+        const permCode = parts.slice(2).join("_");
+        await toggleRolePermission(chatId, roleId, permCode, callbackQueryId);
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData.startsWith("q_conv_")) {
+        const quoteId = callbackData.replace("q_conv_", "");
+        await convertQuotationFromTelegram(chatId, quoteId, user);
+        return NextResponse.json({ ok: true });
+      }
+    }
+
+    // ----------------------------------------------------
+    // 8. NATURAL LANGUAGE CREATION COMMANDS
+    // ----------------------------------------------------
+    if (
+      cleanInput === "new client" ||
+      cleanInput === "add client" ||
+      cleanInput === "create client"
+    ) {
+      await startWizard(chatId, "NEW_CLIENT", user);
+      return NextResponse.json({ ok: true });
+    }
+    if (
+      cleanInput === "new staff" ||
+      cleanInput === "add staff" ||
+      cleanInput === "new employee" ||
+      cleanInput === "add team" ||
+      cleanInput === "create user"
+    ) {
+      await startWizard(chatId, "NEW_EMPLOYEE", user);
+      return NextResponse.json({ ok: true });
+    }
+    if (
+      cleanInput === "new product" ||
+      cleanInput === "add product" ||
+      cleanInput === "create product" ||
+      cleanInput === "add item"
+    ) {
+      await startWizard(chatId, "NEW_PRODUCT", user);
+      return NextResponse.json({ ok: true });
+    }
+    if (
+      cleanInput === "new quote" ||
+      cleanInput === "new quotation" ||
+      cleanInput === "create quote" ||
+      cleanInput === "make quote"
+    ) {
+      await startWizard(chatId, "NEW_QUOTATION", user);
+      return NextResponse.json({ ok: true });
+    }
+    if (
+      cleanInput === "settings" ||
+      cleanInput === "company settings" ||
+      cleanInput === "edit settings"
+    ) {
+      await startWizard(chatId, "EDIT_SETTINGS", user);
+      return NextResponse.json({ ok: true });
+    }
+    if (
+      cleanInput === "roles" ||
+      cleanInput === "permissions" ||
+      cleanInput === "manage roles"
+    ) {
+      await startWizard(chatId, "MANAGE_ROLES", user);
+      return NextResponse.json({ ok: true });
+    }
+
+    // ----------------------------------------------------
+    // 9. QUERY COMMANDS (QUOTATIONS, INVOICES, LEADS, ETC.)
     // ----------------------------------------------------
 
-    // 1. Quotations (Allowed: SUPER_ADMIN, SALES, ACCOUNTS)
+    // Quotations Query
     if (
       cleanInput === "cmd_quotes" ||
       cleanInput.includes("quot") ||
       cleanInput.includes("quote")
     ) {
-      if (role === "SERVICE") {
+      if (!(await hasPermission(role, PERMISSIONS.CAN_CREATE_QUOTATION))) {
         await sendTelegramReply(
           chatId,
-          `🔒 <b>Access Restricted:</b> Service Engineers cannot view commercial quotations.`,
-          getMenuForRole(role)
+          `🔒 <b>Access Restricted:</b> You do not have permission to view quotations.`,
+          await buildDynamicMenu(role)
         );
         return NextResponse.json({ ok: true });
       }
@@ -269,7 +373,7 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
         await sendTelegramReply(
           chatId,
           `📋 <b>Quotations:</b>\nKoi quotation abhi create nahi hua hai.`,
-          getSubMenuKeyboard("cmd_quotes", role)
+          getSubMenuKeyboard("cmd_quotes")
         );
         return NextResponse.json({ ok: true });
       }
@@ -297,22 +401,22 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
       });
       text += `━━━━━━━━━━━━━━━━━━━━\n<i>Showing last ${quotes.length} quotations</i>`;
 
-      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_quotes", role));
+      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_quotes"));
       return NextResponse.json({ ok: true });
     }
 
-    // 2. Invoices & Receivables (Allowed: SUPER_ADMIN, ACCOUNTS)
+    // Invoices Query
     if (
       cleanInput === "cmd_invoices" ||
       cleanInput.includes("inv") ||
       cleanInput.includes("bill") ||
       cleanInput.includes("payment")
     ) {
-      if (role !== "SUPER_ADMIN" && role !== "ACCOUNTS") {
+      if (!(await hasPermission(role, PERMISSIONS.CAN_MANAGE_INVOICES))) {
         await sendTelegramReply(
           chatId,
-          `🔒 <b>Access Restricted:</b> Invoices and payment dues are only accessible to Accounts and Super Admin.`,
-          getMenuForRole(role)
+          `🔒 <b>Access Restricted:</b> Invoices and payment dues require invoice permissions.`,
+          await buildDynamicMenu(role)
         );
         return NextResponse.json({ ok: true });
       }
@@ -327,7 +431,7 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
         await sendTelegramReply(
           chatId,
           `🧾 <b>Invoices:</b>\nKoi invoice record nahi mila.`,
-          getSubMenuKeyboard("cmd_invoices", role)
+          getSubMenuKeyboard("cmd_invoices")
         );
         return NextResponse.json({ ok: true });
       }
@@ -355,21 +459,21 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
       });
       text += `━━━━━━━━━━━━━━━━━━━━\n<i>Tap link to open instant UPI QR</i>`;
 
-      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_invoices", role));
+      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_invoices"));
       return NextResponse.json({ ok: true });
     }
 
-    // 3. Website Leads & Enquiries (Allowed: SUPER_ADMIN, SALES)
+    // Leads Query
     if (
       cleanInput === "cmd_leads" ||
       cleanInput.includes("lead") ||
       cleanInput.includes("enquir")
     ) {
-      if (role !== "SUPER_ADMIN" && role !== "SALES") {
+      if (!(await hasPermission(role, PERMISSIONS.CAN_VIEW_LEADS))) {
         await sendTelegramReply(
           chatId,
-          `🔒 <b>Access Restricted:</b> Website leads are only accessible to Sales Team and Super Admin.`,
-          getMenuForRole(role)
+          `🔒 <b>Access Restricted:</b> Website leads are restricted for your role.`,
+          await buildDynamicMenu(role)
         );
         return NextResponse.json({ ok: true });
       }
@@ -383,7 +487,7 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
         await sendTelegramReply(
           chatId,
           `👥 <b>Website Leads:</b>\nAbhi koi lead nahi aayi hai.`,
-          getSubMenuKeyboard("cmd_leads", role)
+          getSubMenuKeyboard("cmd_leads")
         );
         return NextResponse.json({ ok: true });
       }
@@ -402,22 +506,22 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
       });
       text += `━━━━━━━━━━━━━━━━━━━━`;
 
-      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_leads", role));
+      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_leads"));
       return NextResponse.json({ ok: true });
     }
 
-    // 4. Financial & Turnover Summary (Allowed: SUPER_ADMIN, ACCOUNTS)
+    // Summary Query
     if (
       cleanInput === "cmd_summary" ||
       cleanInput.includes("sum") ||
       cleanInput.includes("report") ||
       cleanInput.includes("turnover")
     ) {
-      if (role !== "SUPER_ADMIN" && role !== "ACCOUNTS") {
+      if (!(await hasPermission(role, PERMISSIONS.CAN_VIEW_FINANCES))) {
         await sendTelegramReply(
           chatId,
-          `🔒 <b>Access Restricted:</b> Financial turnover and collections are restricted to Accounts and Management.`,
-          getMenuForRole(role)
+          `🔒 <b>Access Restricted:</b> Financial turnover and reports are restricted.`,
+          await buildDynamicMenu(role)
         );
         return NextResponse.json({ ok: true });
       }
@@ -470,11 +574,11 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
 🕒 <i>${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST</i>
       `.trim();
 
-      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_summary", role));
+      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_summary"));
       return NextResponse.json({ ok: true });
     }
 
-    // 5. Service & RMA Tickets (Allowed: SUPER_ADMIN, SERVICE)
+    // Tickets Query
     if (
       cleanInput === "cmd_tickets" ||
       cleanInput.includes("ticket") ||
@@ -482,11 +586,11 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
       cleanInput.includes("complain") ||
       cleanInput.includes("rma")
     ) {
-      if (role !== "SUPER_ADMIN" && role !== "SERVICE") {
+      if (!(await hasPermission(role, PERMISSIONS.CAN_VIEW_SERVICE))) {
         await sendTelegramReply(
           chatId,
-          `🔒 <b>Access Restricted:</b> Service and RMA tickets are handled by Field & Service Engineers.`,
-          getMenuForRole(role)
+          `🔒 <b>Access Restricted:</b> Service and RMA tickets require service permissions.`,
+          await buildDynamicMenu(role)
         );
         return NextResponse.json({ ok: true });
       }
@@ -501,7 +605,7 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
         await sendTelegramReply(
           chatId,
           `🛠️ <b>Service Tickets:</b>\nKoi open complaint nahi hai. All systems running smooth! ✅`,
-          getSubMenuKeyboard("cmd_tickets", role)
+          getSubMenuKeyboard("cmd_tickets")
         );
         return NextResponse.json({ ok: true });
       }
@@ -521,11 +625,11 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
       });
       text += `━━━━━━━━━━━━━━━━━━━━`;
 
-      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_tickets", role));
+      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_tickets"));
       return NextResponse.json({ ok: true });
     }
 
-    // 6. Stock & Inventory Overview (Allowed: ALL ROLES)
+    // Stock Query
     if (
       cleanInput === "cmd_stock" ||
       cleanInput.includes("stock") ||
@@ -549,30 +653,27 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
             p.currentStock <= p.minStockAlert ? "⚠️ LOW STOCK" : "✅ OK";
           text += `<b>${idx + 1}. ${escapeHtml(p.name)}</b> (<code>${escapeHtml(p.sku)}</code>)\n`;
           text += `   Stock: <b>${p.currentStock} ${p.unit}</b> [${alert}] (Alert: ${p.minStockAlert})\n`;
-          if (role === "SUPER_ADMIN" || role === "SALES") {
-            text += `   💰 Price: ₹${p.sellingPrice.toLocaleString("en-IN")}\n`;
-          }
-          text += `\n`;
+          text += `   💰 Price: ₹${p.sellingPrice.toLocaleString("en-IN")}\n\n`;
         });
       }
       text += `━━━━━━━━━━━━━━━━━━━━`;
 
-      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_stock", role));
+      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_stock"));
       return NextResponse.json({ ok: true });
     }
 
-    // 7. Team Overview (Allowed: SUPER_ADMIN ONLY)
+    // Team Query
     if (
       cleanInput === "cmd_team" ||
       cleanInput.includes("team") ||
       cleanInput.includes("employee") ||
       cleanInput.includes("staff")
     ) {
-      if (role !== "SUPER_ADMIN") {
+      if (!(await hasPermission(role, PERMISSIONS.CAN_MANAGE_TEAM))) {
         await sendTelegramReply(
           chatId,
-          `🔒 <b>Access Restricted:</b> Staff and team management is restricted to Super Admin.`,
-          getMenuForRole(role)
+          `🔒 <b>Access Restricted:</b> Staff and team management requires team permission.`,
+          await buildDynamicMenu(role)
         );
         return NextResponse.json({ ok: true });
       }
@@ -592,20 +693,21 @@ Neeche diye gaye button par click karke apna <b>Verified Mobile Number share kar
       });
       text += `━━━━━━━━━━━━━━━━━━━━\n🔗 <a href="${SITE_URL}/admin/team">Manage Team on Admin Web</a>`;
 
-      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_team", role));
+      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_team"));
       return NextResponse.json({ ok: true });
     }
 
-    // 8. Main Menu / Start / Greetings / Fallback
+    // 10. Default Fallback / Main Menu
     const welcomeText = `
 👋 <b>Namaste ${escapeHtml(user.name)} ji!</b>
-GARVIX ERP Assistant active hai.
+GARVIX ERP Terminal active hai.
 
 🏢 <b>Your Assigned Role:</b> <code>${role}</code>
-Aapke department ke anusar aapke commands neeche ready hain:
+Aapke permissions ke anusar aapke commands neeche ready hain:
     `.trim();
 
-    await sendTelegramReply(chatId, welcomeText, getMenuForRole(role));
+    const menu = await buildDynamicMenu(role);
+    await sendTelegramReply(chatId, welcomeText, menu);
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     console.error("[Telegram Webhook Error]:", err);

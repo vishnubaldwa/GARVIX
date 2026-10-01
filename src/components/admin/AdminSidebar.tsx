@@ -22,6 +22,7 @@ import {
   Building2,
   Settings,
   UserCog,
+  Shield,
 } from "lucide-react";
 import { useState } from "react";
 import { AuthSession } from "@/lib/auth";
@@ -40,6 +41,7 @@ const navItems = [
   { href: "/admin/amc", label: "AMC & Service", icon: Clock },
   { href: "/admin/gst-returns", label: "1-Click CA Return", icon: Download, highlight: true },
   { href: "/admin/team", label: "Team & Staff", icon: UserCog, adminOnly: true },
+  { href: "/admin/roles", label: "Roles & Permissions", icon: Shield, adminOnly: true },
   { href: "/admin/settings", label: "Settings & Profile", icon: Settings },
   { href: "/admin/audit", label: "Audit Logs", icon: ShieldCheck, adminOnly: true },
 ];

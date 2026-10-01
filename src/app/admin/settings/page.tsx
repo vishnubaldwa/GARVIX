@@ -1,23 +1,12 @@
 import { getSession } from "@/lib/auth";
+import { getCompanySettings } from "@/lib/settings";
 import { AdminSettingsView } from "@/components/admin/AdminSettingsView";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
   const session = await getSession();
-
-  const companyInfo = {
-    name: process.env.NEXT_PUBLIC_COMPANY_NAME || "GARVIX TECHNOLOGIES",
-    tagline: process.env.NEXT_PUBLIC_COMPANY_TAGLINE || "Next-Gen RFID Ecosystems & Bespoke Software",
-    state: process.env.NEXT_PUBLIC_COMPANY_STATE || "Haryana",
-    stateCode: process.env.NEXT_PUBLIC_COMPANY_STATE_CODE || "06",
-    gstin: process.env.NEXT_PUBLIC_COMPANY_GSTIN || "06AAACG1234F1Z5",
-    email: process.env.NEXT_PUBLIC_COMPANY_EMAIL || "contact@garvix.in",
-    phone: process.env.NEXT_PUBLIC_COMPANY_PHONE || "+91 98765 43210",
-    address: process.env.NEXT_PUBLIC_COMPANY_ADDRESS || "Cyber Hub, Sector 24, Gurugram, Haryana - 122002",
-    upiId: process.env.NEXT_PUBLIC_UPI_ID || "garvix@upi",
-    upiName: process.env.NEXT_PUBLIC_UPI_NAME || "GARVIX TECHNOLOGIES",
-  };
+  const companyInfo = await getCompanySettings();
 
   return (
     <div className="space-y-6">
