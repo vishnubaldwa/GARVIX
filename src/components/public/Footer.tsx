@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Radio, Mail, Phone, MapPin, ShieldCheck } from "lucide-react";
+import { getCompanySettings } from "@/lib/settings";
 
-export function Footer() {
+export async function Footer() {
+  const company = await getCompanySettings();
+  const cleanPhone = company.phone ? company.phone.replace(/[^0-9+]/g, "") : "";
+
   return (
     <footer className="border-t border-cyan-500/20 bg-[#05070a] text-slate-400">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -12,14 +16,19 @@ export function Footer() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-cyan-500/30 bg-cyan-950/40 text-cyan-400">
                 <Radio className="h-4 w-4" />
               </div>
-              <span className="text-lg font-black tracking-widest text-white">GARVIX</span>
+              <span className="text-lg font-black tracking-widest text-white">
+                {company.name.split(" ")[0] || "GARVIX"}
+              </span>
             </div>
             <p className="text-xs leading-relaxed text-slate-400">
-              Pioneering enterprise RFID hardware infrastructure and bespoke high-concurrency software architectures across India.
+              {company.tagline ||
+                "Pioneering enterprise RFID hardware infrastructure and bespoke high-concurrency software architectures across India."}
             </p>
             <div className="flex items-center gap-2 text-xs text-cyan-400">
               <ShieldCheck className="h-4 w-4 text-emerald-400" />
-              <span>Registered in Haryana (Code: 06) • GST Compliant</span>
+              <span>
+                Registered in {company.state} (Code: {company.stateCode}) • GST Compliant
+              </span>
             </div>
           </div>
 
@@ -92,24 +101,28 @@ export function Footer() {
             <h4 className="text-xs font-bold uppercase tracking-wider text-white">Contact GARVIX</h4>
             <div className="flex items-start gap-2.5 text-xs">
               <MapPin className="h-4 w-4 shrink-0 text-cyan-400 mt-0.5" />
-              <span>Cyber Hub, DLF Cyber City, Gurugram, Haryana - 122002</span>
+              <span className="leading-relaxed">{company.address}</span>
             </div>
             <div className="flex items-center gap-2.5 text-xs">
               <Phone className="h-4 w-4 shrink-0 text-cyan-400" />
-              <span>+91 98765 43210</span>
+              <a href={`tel:${cleanPhone}`} className="hover:text-cyan-400 transition font-mono">
+                {company.phone}
+              </a>
             </div>
             <div className="flex items-center gap-2.5 text-xs">
               <Mail className="h-4 w-4 shrink-0 text-cyan-400" />
-              <span>contact@garvix.in</span>
+              <a href={`mailto:${company.email}`} className="hover:text-cyan-400 transition font-mono">
+                {company.email}
+              </a>
             </div>
             <div className="pt-2 text-[11px] text-slate-500 font-mono">
-              GSTIN: 06AAACG1234F1Z5
+              GSTIN: {company.gstin}
             </div>
           </div>
         </div>
 
         <div className="mt-12 border-t border-slate-800/80 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} GARVIX Technologies. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} {company.name}. All rights reserved.</p>
           <p className="flex items-center gap-4 mt-2 md:mt-0">
             <span>Powered by Next.js 15 & Node.js</span>
             <Link href="/admin/login" className="text-cyan-400 hover:underline">

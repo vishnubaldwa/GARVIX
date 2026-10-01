@@ -3,6 +3,7 @@ import { formatINR, numberToWords } from "@/lib/gst";
 import { notFound } from "next/navigation";
 import { Radio, Printer, QrCode, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { generateUpiQrCodeDataUrl } from "@/lib/upi";
+import { getCompanySettings } from "@/lib/settings";
 import Image from "next/image";
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 
 export default async function ClientInvoicePortalPage({ params }: Props) {
   const { token } = await params;
+  const company = await getCompanySettings();
 
   const invoice = await prisma.invoice.findUnique({
     where: { token },
@@ -33,7 +35,7 @@ export default async function ClientInvoicePortalPage({ params }: Props) {
         {/* Top Action Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-cyan-500/30 bg-[#0d1424] p-4 no-print">
           <div>
-            <span className="text-xs font-semibold text-slate-400">GARVIX Billing Portal</span>
+            <span className="text-xs font-semibold text-slate-400">{company.name} Billing Portal</span>
             <h2 className="text-base font-bold text-white">Invoice #{invoice.invoiceNumber}</h2>
           </div>
           <div className="flex items-center gap-3">
@@ -60,12 +62,18 @@ export default async function ClientInvoicePortalPage({ params }: Props) {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-950 border border-cyan-500/40 text-cyan-400">
                   <Radio className="h-5 w-5" />
                 </div>
-                <span className="text-2xl font-black tracking-widest text-white">GARVIX</span>
+                <span className="text-2xl font-black tracking-widest text-white">
+                  {company.name.split(" ")[0] || "GARVIX"}
+                </span>
               </div>
-              <p className="text-xs text-cyan-400 font-semibold mt-1">GARVIX TECHNOLOGIES</p>
-              <p className="text-xs text-slate-400">Cyber Hub, Sector 24, Gurugram, Haryana - 122002</p>
-              <p className="text-xs text-slate-400">Email: contact@garvix.in • Phone: +91 98765 43210</p>
-              <p className="text-xs text-slate-400 font-mono">GSTIN: 06AAACG1234F1Z5 • State: Haryana (06)</p>
+              <p className="text-xs text-cyan-400 font-semibold mt-1">{company.name}</p>
+              <p className="text-xs text-slate-400">{company.address}</p>
+              <p className="text-xs text-slate-400">
+                Email: {company.email} • Phone: {company.phone}
+              </p>
+              <p className="text-xs text-slate-400 font-mono">
+                GSTIN: {company.gstin} • State: {company.state} ({company.stateCode})
+              </p>
             </div>
 
             <div className="text-right sm:text-right space-y-1">
@@ -244,12 +252,12 @@ export default async function ClientInvoicePortalPage({ params }: Props) {
             <div>
               <p className="font-semibold text-slate-300">Terms & Conditions:</p>
               <p className="text-[11px] text-slate-500 whitespace-pre-line mt-1">
-                {invoice.terms || "1. Goods once sold will not be taken back.\n2. Warranty valid per manufacturer terms.\n3. Haryana Jurisdiction."}
+                {invoice.terms || `1. Goods once sold will not be taken back.\n2. Warranty valid per manufacturer terms.\n3. Subject to ${company.state} Jurisdiction.`}
               </p>
             </div>
             <div className="text-right">
               <div className="h-10 border-b border-dashed border-slate-700 w-44 mb-1"></div>
-              <p className="text-slate-300 font-semibold">For GARVIX TECHNOLOGIES</p>
+              <p className="text-slate-300 font-semibold">For {company.name}</p>
               <p className="text-[11px] text-slate-500">Authorized Signatory</p>
             </div>
           </div>

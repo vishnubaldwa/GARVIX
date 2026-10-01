@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Radio, Download, CheckCircle, ShieldCheck, Printer } from "lucide-react";
 import { ClientQuotationAcceptButton } from "@/components/portal/ClientQuotationAcceptButton";
 import { PrintButton } from "@/components/portal/PrintButton";
+import { getCompanySettings } from "@/lib/settings";
 
 interface Props {
   params: Promise<{ token: string }>;
@@ -11,6 +12,7 @@ interface Props {
 
 export default async function ClientQuotationPage({ params }: Props) {
   const { token } = await params;
+  const company = await getCompanySettings();
 
   const quotation = await prisma.quotation.findUnique({
     where: { token },
@@ -64,12 +66,18 @@ export default async function ClientQuotationPage({ params }: Props) {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-950 border border-cyan-500/40 text-cyan-400">
                   <Radio className="h-5 w-5" />
                 </div>
-                <span className="text-2xl font-black tracking-widest text-white">GARVIX</span>
+                <span className="text-2xl font-black tracking-widest text-white">
+                  {company.name.split(" ")[0] || "GARVIX"}
+                </span>
               </div>
-              <p className="text-xs text-cyan-400 font-semibold mt-1">GARVIX TECHNOLOGIES</p>
-              <p className="text-xs text-slate-400">Cyber Hub, Sector 24, Gurugram, Haryana - 122002</p>
-              <p className="text-xs text-slate-400">Email: contact@garvix.in • Phone: +91 98765 43210</p>
-              <p className="text-xs text-slate-400 font-mono">GSTIN: 06AAACG1234F1Z5 • State: Haryana (06)</p>
+              <p className="text-xs text-cyan-400 font-semibold mt-1">{company.name}</p>
+              <p className="text-xs text-slate-400">{company.address}</p>
+              <p className="text-xs text-slate-400">
+                Email: {company.email} • Phone: {company.phone}
+              </p>
+              <p className="text-xs text-slate-400 font-mono">
+                GSTIN: {company.gstin} • State: {company.state} ({company.stateCode})
+              </p>
             </div>
 
             <div className="text-right sm:text-right space-y-1">
@@ -179,7 +187,7 @@ export default async function ClientQuotationPage({ params }: Props) {
             <div className="text-right">
               <div className="h-10 border-b border-dashed border-slate-700 w-44 mb-1"></div>
               <p className="text-slate-300 font-semibold">Authorized Signatory</p>
-              <p className="text-[11px] text-slate-500">GARVIX TECHNOLOGIES</p>
+              <p className="text-[11px] text-slate-500">{company.name}</p>
             </div>
           </div>
         </div>

@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { Send, CheckCircle2, AlertCircle, Phone, Mail, Building, User, HelpCircle } from "lucide-react";
 
-export function ContactForm() {
+export function ContactForm({
+  companyInfo,
+}: {
+  companyInfo?: { phone?: string; email?: string; state?: string };
+}) {
   const [formData, setFormData] = useState({
     name: "",
     company: "",
@@ -68,7 +72,7 @@ export function ContactForm() {
           Request a Custom <span className="text-cyan-400">Solution & Demo</span>
         </h3>
         <p className="mt-2 text-xs md:text-sm text-slate-400">
-          Tell us about your RFID hardware requirements or custom software needs. Our Haryana engineering desk receives your query in real-time.
+          Tell us about your RFID hardware requirements or custom software needs. Our {companyInfo?.state || "Haryana"} engineering desk receives your query in real-time.
         </p>
       </div>
 
@@ -209,6 +213,37 @@ export function ContactForm() {
             </>
           )}
         </button>
+
+        {companyInfo?.phone && (
+          <div className="mt-4 pt-4 border-t border-cyan-500/20 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
+            <div className="flex items-center gap-2">
+              <Phone className="h-4 w-4 text-cyan-400" />
+              <span>
+                Call Desk:{" "}
+                <a
+                  href={`tel:${companyInfo.phone.replace(/[^0-9+]/g, "")}`}
+                  className="text-white hover:text-cyan-400 font-mono font-bold transition"
+                >
+                  {companyInfo.phone}
+                </a>
+              </span>
+            </div>
+            {companyInfo.email && (
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-cyan-400" />
+                <span>
+                  Email:{" "}
+                  <a
+                    href={`mailto:${companyInfo.email}`}
+                    className="text-white hover:text-cyan-400 font-mono font-bold transition"
+                  >
+                    {companyInfo.email}
+                  </a>
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </form>
     </div>
   );

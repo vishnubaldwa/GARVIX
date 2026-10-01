@@ -3,6 +3,7 @@ import { Navbar } from "@/components/public/Navbar";
 import { Footer } from "@/components/public/Footer";
 import { RoiCalculator } from "@/components/public/RoiCalculator";
 import { ContactForm } from "@/components/public/ContactForm";
+import { getCompanySettings } from "@/lib/settings";
 import {
   Radio,
   Cpu,
@@ -22,7 +23,9 @@ import {
   Gem,
 } from "lucide-react";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const company = await getCompanySettings();
+
   return (
     <div className="min-h-screen bg-[#07090e] bg-cyber-grid bg-cyber-grid-pattern text-slate-100">
       <Navbar />
@@ -309,7 +312,13 @@ export default function HomePage() {
       {/* Section 4: Contact & Demo Lead Capture */}
       <section className="py-20 border-t border-cyan-500/20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <ContactForm />
+          <ContactForm
+            companyInfo={{
+              phone: company.phone,
+              email: company.email,
+              state: company.state,
+            }}
+          />
         </div>
       </section>
 
