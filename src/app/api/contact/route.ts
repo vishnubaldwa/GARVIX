@@ -5,14 +5,36 @@ import { sendTelegramLeadAlert } from "@/lib/telegram";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, company, email, phone, solution, message } = body;
+    const {
+      name,
+      company,
+      email,
+      phone,
+      industry,
+      requirementType,
+      requirementDetails,
+      solution,
+      message,
+    } = body;
 
-    if (!name || !email || !phone || !message) {
+    const details = requirementDetails || message;
+
+    if (!name || !email || !phone || !details) {
       return NextResponse.json(
-        { error: "Please fill in all required fields (Name, Email, Phone, Message)." },
+        { error: "Please fill in all required fields (Name, Email, Phone, Requirements)." },
         { status: 400 }
       );
     }
+
+    const fullMessage = [
+      industry ? `[Industry: ${industry}]` : "",
+      requirementType ? `[Requirement: ${requirementType}]` : "",
+      details,
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+
+    const finalSolution = requirementType || solution || "CUSTOM_SOFTWARE";
 
     // Save lead to database
     const lead = await prisma.lead.create({
@@ -21,8 +43,8 @@ export async function POST(request: Request) {
         company: company?.trim() || null,
         email: email.trim().toLowerCase(),
         phone: phone.trim(),
-        solution: solution || "RFID_JEWELLERY",
-        message: message.trim(),
+        solution: finalSolution,
+        message: fullMessage.trim(),
         status: "NEW",
       },
     });
