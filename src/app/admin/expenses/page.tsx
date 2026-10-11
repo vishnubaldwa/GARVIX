@@ -11,6 +11,7 @@ export default async function AdminExpensesPage() {
   });
 
   const totalExpense = expenses.reduce((s, e) => s + e.amount, 0);
+  const distinctCategories = Array.from(new Set(expenses.map((e) => e.category)));
 
   return (
     <div className="space-y-6">
@@ -31,7 +32,7 @@ export default async function AdminExpensesPage() {
         {/* Form (4 cols) */}
         <div className="lg:col-span-4 admin-card p-6">
           <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Record New Expense</h3>
-          <ExpenseCreateForm />
+          <ExpenseCreateForm initialCustomCategories={distinctCategories} />
         </div>
 
         {/* Expenses Table (8 cols) */}
