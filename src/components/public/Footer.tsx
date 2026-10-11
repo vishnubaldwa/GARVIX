@@ -279,9 +279,6 @@ export async function Footer() {
             <Link href="/contact" className="hover:text-slate-300 transition">
               Consultation Desk
             </Link>
-            <Link href="/admin/login" className="text-cyan-400/80 hover:text-cyan-300 transition">
-              Admin Portal
-            </Link>
           </div>
         </div>
       </div>

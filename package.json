@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "node prisma/seed.js",
+    "clean:demo": "node scripts/clean-demo-data.js",
     "db:postgres": "node scripts/switch-db.js postgres && prisma generate",
     "db:sqlite": "node scripts/switch-db.js sqlite && prisma generate"
   },

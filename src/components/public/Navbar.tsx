@@ -9,7 +9,6 @@ import {
   Menu,
   X,
   ArrowRight,
-  Lock,
   Layers,
   Sparkles,
   ShoppingBag,
@@ -179,15 +178,6 @@ export function Navbar() {
         {/* Action Buttons */}
         <div className="hidden lg:flex items-center gap-3">
           <Link
-            href="/admin/login"
-            className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-[11px] font-medium text-slate-400 transition hover:border-slate-500 hover:text-slate-200"
-            title="Internal Staff & Administration Portal"
-          >
-            <Lock className="h-3 w-3" />
-            <span>Admin</span>
-          </Link>
-
-          <Link
             href="/contact"
             className="group relative flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-black shadow-[0_0_25px_rgba(0,242,254,0.35)] transition-all hover:opacity-95 hover:shadow-[0_0_35px_rgba(0,242,254,0.5)]"
           >
@@ -272,14 +262,6 @@ export function Navbar() {
             >
               <span>Get a Solution</span>
               <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/admin/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 py-2.5 text-xs font-medium text-slate-400"
-            >
-              <Lock className="h-3.5 w-3.5" />
-              <span>Admin Staff Login</span>
             </Link>
           </div>
         </div>
