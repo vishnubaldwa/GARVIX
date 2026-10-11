@@ -19,6 +19,7 @@ export default async function ClientQuotationPage({ params }: Props) {
     include: {
       customer: true,
       items: true,
+      invoices: true,
     },
   });
 
@@ -27,6 +28,7 @@ export default async function ClientQuotationPage({ params }: Props) {
   }
 
   const isAccepted = quotation.status === "ACCEPTED" || quotation.status === "CONVERTED";
+  const proformaInvoice = quotation.invoices?.[0];
 
   return (
     <div className="min-h-screen bg-[#07090e] py-10 px-4 sm:px-6 lg:px-8 text-slate-100">
@@ -46,14 +48,21 @@ export default async function ClientQuotationPage({ params }: Props) {
         </div>
 
         {isAccepted && (
-          <div className="rounded-xl border border-emerald-500/40 bg-emerald-950/40 p-4 text-emerald-300 text-xs flex items-center justify-between no-print">
+          <div className="rounded-xl border border-emerald-500/40 bg-emerald-950/40 p-4 text-emerald-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
             <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-emerald-400" />
+              <CheckCircle className="h-5 w-5 text-emerald-400 shrink-0" />
               <span>
                 <strong>Quotation Accepted!</strong> Signed by {quotation.acceptedSignature || "Authorized Signatory"} on {quotation.acceptedAt ? new Date(quotation.acceptedAt).toLocaleDateString("en-IN") : "Record"}.
               </span>
             </div>
-            <span className="text-[10px] font-mono uppercase bg-emerald-900/60 px-2.5 py-1 rounded">Status: Accepted</span>
+            {proformaInvoice && (
+              <a
+                href={`/portal/invoice/${proformaInvoice.token}`}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-cyan-500 px-3.5 py-1.5 text-xs font-bold text-black hover:bg-cyan-400 transition shrink-0"
+              >
+                <span>View Proforma Invoice (PI) →</span>
+              </a>
+            )}
           </div>
         )}
 

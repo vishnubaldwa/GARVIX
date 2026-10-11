@@ -90,7 +90,17 @@ export async function buildDynamicMenu(role: string) {
   }
   if (row2.length > 0) keyboard.push(row2);
 
-  // 3. Settings & Roles Management Row
+  // 3. Finance Action Row: Payment & Expense
+  const finRow: any[] = [];
+  if (await hasPermission(role, PERMISSIONS.CAN_MANAGE_INVOICES)) {
+    finRow.push({ text: "💳 Record Payment", callback_data: "flow_record_payment" });
+  }
+  if ((await hasPermission(role, PERMISSIONS.CAN_VIEW_FINANCES)) || role === "SUPER_ADMIN" || role === "ACCOUNTS") {
+    finRow.push({ text: "💸 Add Expense", callback_data: "flow_new_expense" });
+  }
+  if (finRow.length > 0) keyboard.push(finRow);
+
+  // 4. Settings & Roles Management Row
   const row3: any[] = [];
   if (await hasPermission(role, PERMISSIONS.CAN_MANAGE_SETTINGS)) {
     row3.push({ text: "⚙️ Company Settings", callback_data: "flow_settings" });
@@ -100,7 +110,7 @@ export async function buildDynamicMenu(role: string) {
   }
   if (row3.length > 0) keyboard.push(row3);
 
-  // 4. View Queries (Quotations, Invoices, Leads, Turnover, Tickets, Stock, Team)
+  // 5. View Queries (Quotations, Invoices, Outstanding, AMC, Leads, Turnover, Tickets, Stock)
   const viewRow1: any[] = [];
   if (await hasPermission(role, PERMISSIONS.CAN_CREATE_QUOTATION)) {
     viewRow1.push({ text: "📋 Recent Quotes", callback_data: "cmd_quotes" });
@@ -111,22 +121,29 @@ export async function buildDynamicMenu(role: string) {
   if (viewRow1.length > 0) keyboard.push(viewRow1);
 
   const viewRow2: any[] = [];
-  if (await hasPermission(role, PERMISSIONS.CAN_VIEW_LEADS)) {
-    viewRow2.push({ text: "👥 Website Leads", callback_data: "cmd_leads" });
+  if (await hasPermission(role, PERMISSIONS.CAN_MANAGE_INVOICES)) {
+    viewRow2.push({ text: "⏰ Outstanding Dues", callback_data: "cmd_outstanding" });
   }
-  if (await hasPermission(role, PERMISSIONS.CAN_VIEW_FINANCES)) {
-    viewRow2.push({ text: "📊 Turnover Report", callback_data: "cmd_summary" });
-  }
-  if (viewRow2.length > 0) keyboard.push(viewRow2);
+  viewRow2.push({ text: "🛠️ AMC Alerts", callback_data: "cmd_amc_alerts" });
+  keyboard.push(viewRow2);
 
   const viewRow3: any[] = [];
-  if (await hasPermission(role, PERMISSIONS.CAN_VIEW_SERVICE)) {
-    viewRow3.push({ text: "🛠️ Service Desk", callback_data: "cmd_tickets" });
+  if (await hasPermission(role, PERMISSIONS.CAN_VIEW_LEADS)) {
+    viewRow3.push({ text: "👥 Website Leads", callback_data: "cmd_leads" });
   }
-  viewRow3.push({ text: "📦 Hardware Stock", callback_data: "cmd_stock" });
-  keyboard.push(viewRow3);
+  if (await hasPermission(role, PERMISSIONS.CAN_VIEW_FINANCES)) {
+    viewRow3.push({ text: "📊 Turnover Report", callback_data: "cmd_summary" });
+  }
+  if (viewRow3.length > 0) keyboard.push(viewRow3);
 
-  // 5. Team link & Web portal
+  const viewRow4: any[] = [];
+  if (await hasPermission(role, PERMISSIONS.CAN_VIEW_SERVICE)) {
+    viewRow4.push({ text: "🛠️ Service Desk", callback_data: "cmd_tickets" });
+  }
+  viewRow4.push({ text: "📦 Hardware Stock", callback_data: "cmd_stock" });
+  keyboard.push(viewRow4);
+
+  // 6. Team link & Web portal
   const botRow: any[] = [];
   if (await hasPermission(role, PERMISSIONS.CAN_MANAGE_TEAM)) {
     botRow.push({ text: "👥 Staff List", callback_data: "cmd_team" });
@@ -290,6 +307,128 @@ Quotation kis client ke liye generate karni hai? Neeche diye gaye client par tap
       return false;
     }
     return showRolesList(chatId);
+  }
+
+  if (flowName === "NEW_EXPENSE") {
+    await setSession(chatId, "NEW_EXPENSE", 1, initialData);
+    const text = `
+💸 <b>Step 1/3: Record Company Expense</b>
+━━━━━━━━━━━━━━━━━━━━
+Kripya expense ki <b>Category</b> chunein:
+    `.trim();
+    await sendTelegramReply(chatId, text, {
+      inline_keyboard: [
+        [
+          { text: "🏢 Office & Rent", callback_data: "exp_cat_OFFICE_SUPPLIES" },
+          { text: "☁️ Cloud & Servers", callback_data: "exp_cat_CLOUD_SERVER" },
+        ],
+        [
+          { text: "👥 Staff Salaries", callback_data: "exp_cat_SALARY" },
+          { text: "📦 Hardware / R&D", callback_data: "exp_cat_HARDWARE_RND" },
+        ],
+        [
+          { text: "📢 Marketing & Ads", callback_data: "exp_cat_MARKETING" },
+          { text: "🚗 Travel & Logistics", callback_data: "exp_cat_TRAVEL" },
+        ],
+        [
+          { text: "📌 Miscellaneous", callback_data: "exp_cat_MISC" },
+          { text: "❌ Cancel", callback_data: "wizard_cancel" },
+        ],
+      ],
+    });
+    return true;
+  }
+
+  if (flowName === "RECORD_PAYMENT") {
+    if (!(await hasPermission(user.role, PERMISSIONS.CAN_MANAGE_INVOICES))) {
+      await sendTelegramReply(
+        chatId,
+        "🔒 <b>Permission Denied:</b> You do not have permission to record payments (`CAN_MANAGE_INVOICES`)."
+      );
+      return false;
+    }
+
+    const unpaidInvoices = await prisma.invoice.findMany({
+      where: { paymentStatus: { in: ["UNPAID", "PARTIAL"] } },
+      take: 6,
+      orderBy: { createdAt: "desc" },
+      include: { customer: true },
+    });
+
+    if (unpaidInvoices.length === 0) {
+      await sendTelegramReply(
+        chatId,
+        "🎉 <b>Sabhi payments clear hain!</b> Koi unpaid ya partial invoice baki nahi mila."
+      );
+      return false;
+    }
+
+    await setSession(chatId, "RECORD_PAYMENT", 1, initialData);
+
+    const keyboard: any[][] = unpaidInvoices.map((inv) => [
+      {
+        text: `🧾 ${inv.invoiceNumber} | Due: ₹${inv.balanceDue.toLocaleString("en-IN")} (${inv.customer.companyName.slice(0, 14)})`,
+        callback_data: `pay_inv_${inv.id}`,
+      },
+    ]);
+    keyboard.push([{ text: "❌ Cancel", callback_data: "wizard_cancel" }]);
+
+    const text = `
+💳 <b>Step 1/3: Record Client Payment</b>
+━━━━━━━━━━━━━━━━━━━━
+Kis invoice ka payment prapt hua hai? Neeche diye gaye invoice par tap karein:
+    `.trim();
+
+    await sendTelegramReply(chatId, text, { inline_keyboard: keyboard });
+    return true;
+  }
+
+  if (flowName === "REVISE_QUOTATION") {
+    if (!initialData.quotationId) {
+      await sendTelegramReply(chatId, "⚠️ Quotation ID missing.");
+      return false;
+    }
+    const quotation = await prisma.quotation.findUnique({
+      where: { id: initialData.quotationId },
+      include: { customer: true, items: true },
+    });
+    if (!quotation) {
+      await sendTelegramReply(chatId, "⚠️ Quotation nahi mila.");
+      return false;
+    }
+
+    let meta: { rev: number; history: any[] } = { rev: 1, history: [] };
+    try {
+      if (quotation.notes && quotation.notes.startsWith("{")) {
+        meta = JSON.parse(quotation.notes);
+      }
+    } catch {}
+
+    initialData.quoteNumber = quotation.quoteNumber;
+    initialData.customerName = quotation.customer.companyName;
+    initialData.currentTotal = quotation.totalAmount;
+    initialData.currentSubtotal = quotation.subtotal;
+    initialData.currentRev = meta.rev || 1;
+    initialData.taxType = quotation.taxType;
+    initialData.stateCode = quotation.customer.stateCode;
+
+    await setSession(chatId, "REVISE_QUOTATION", 1, initialData);
+
+    const text = `
+🔄 <b>Revise Quotation #${quotation.quoteNumber} (Rev ${initialData.currentRev})</b>
+━━━━━━━━━━━━━━━━━━━━
+🏢 Client: <b>${escapeHtml(quotation.customer.companyName)}</b>
+💰 Current Total: <b>₹${quotation.totalAmount.toLocaleString("en-IN")}</b>
+
+<b>Step 1/2: Naya Grand Total Rate (₹)</b>
+Client se negotiate hua naya Grand Total amount type karein:
+<i>(Udaharan: 115000)</i>
+    `.trim();
+
+    await sendTelegramReply(chatId, text, {
+      inline_keyboard: [[{ text: "❌ Cancel", callback_data: "wizard_cancel" }]],
+    });
+    return true;
   }
 
   return false;
@@ -1129,6 +1268,442 @@ Ab aap neeche is role ki permissions ko toggle kar sakte hain:
 
       await sendTelegramReply(chatId, confText);
       return showRolePermissionsEditor(chatId, newRole.id);
+    }
+  }
+
+  // --------------------------------------------------
+  // FLOW: NEW_EXPENSE
+  // --------------------------------------------------
+  if (flow === "NEW_EXPENSE") {
+    if (step === 1) {
+      let category = "";
+      if (callbackData.startsWith("exp_cat_")) {
+        category = callbackData.replace("exp_cat_", "");
+      } else {
+        category = userText.trim().toUpperCase().replace(/\s+/g, "_");
+      }
+
+      if (!category) {
+        await sendTelegramReply(chatId, "⚠️ Kripya valid category select karein:");
+        return true;
+      }
+
+      data.category = category;
+      await setSession(chatId, "NEW_EXPENSE", 2, data);
+
+      const text = `
+💰 <b>Step 2/3: Expense Amount</b>
+━━━━━━━━━━━━━━━━━━━━
+Category: <b>${escapeHtml(category)}</b>
+
+Kitna amount kharch hua hai? Sirf number bhejein:
+<i>(Udaharan: 4500)</i>
+      `.trim();
+
+      await sendTelegramReply(chatId, text, {
+        inline_keyboard: [[{ text: "❌ Cancel", callback_data: "wizard_cancel" }]],
+      });
+      return true;
+    }
+
+    if (step === 2) {
+      const amount = parseFloat(userText.replace(/[^\d.]/g, ""));
+      if (!amount || amount <= 0) {
+        await sendTelegramReply(chatId, "⚠️ Kripya valid amount (number) bhejein:");
+        return true;
+      }
+
+      data.amount = amount;
+      await setSession(chatId, "NEW_EXPENSE", 3, data);
+
+      const text = `
+📝 <b>Step 3/3: Description & Vendor Remarks</b>
+━━━━━━━━━━━━━━━━━━━━
+💰 Amount: <b>₹${amount.toLocaleString("en-IN")}</b>
+🏷️ Category: <b>${escapeHtml(data.category)}</b>
+
+Kharcha kis cheez ka hai? Remarks ya vendor details bhejein:
+<i>(Udaharan: Cloud Server Hosting Renewal - March)</i>
+      `.trim();
+
+      await sendTelegramReply(chatId, text, {
+        inline_keyboard: [[{ text: "❌ Cancel", callback_data: "wizard_cancel" }]],
+      });
+      return true;
+    }
+
+    if (step === 3) {
+      const description = userText.trim() || data.category;
+      const expense = await prisma.expense.create({
+        data: {
+          category: data.category,
+          amount: data.amount,
+          description,
+          paymentMode: "UPI",
+          isTaxDeductible: true,
+        },
+      });
+
+      await prisma.auditLog.create({
+        data: {
+          username: user.name,
+          action: "CREATE",
+          entityType: "EXPENSE",
+          entityId: expense.id,
+          details: `Expense of ₹${data.amount} (${data.category}) recorded via Telegram Bot by ${user.name}`,
+        },
+      });
+
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const monthExpenses = await prisma.expense.aggregate({
+        _sum: { amount: true },
+        where: { expenseDate: { gte: startOfMonth } },
+      });
+
+      await clearSession(chatId);
+
+      const confText = `
+✅ <b>EXPENSE RECORDED SUCCESSFULLY!</b>
+━━━━━━━━━━━━━━━━━━━━
+🏷️ <b>Category:</b> ${escapeHtml(expense.category)}
+💰 <b>Amount:</b> ₹${expense.amount.toLocaleString("en-IN")}
+📝 <b>Remarks:</b> ${escapeHtml(expense.description)}
+💳 <b>Mode:</b> UPI
+📊 <b>Month Total Expenses:</b> ₹${(monthExpenses._sum.amount || 0).toLocaleString("en-IN")}
+━━━━━━━━━━━━━━━━━━━━
+Expense GARVIX Accounts & P&L report me add ho gaya hai.
+      `.trim();
+
+      await sendTelegramReply(chatId, confText, {
+        inline_keyboard: [
+          [{ text: "➕ Add Another Expense", callback_data: "flow_new_expense" }],
+          [{ text: "🔙 Main Menu", callback_data: "cmd_menu" }],
+        ],
+      });
+      return true;
+    }
+  }
+
+  // --------------------------------------------------
+  // FLOW: RECORD_PAYMENT
+  // --------------------------------------------------
+  if (flow === "RECORD_PAYMENT") {
+    if (step === 1) {
+      let invoiceId = "";
+      if (callbackData.startsWith("pay_inv_")) {
+        invoiceId = callbackData.replace("pay_inv_", "");
+      } else {
+        const found = await prisma.invoice.findFirst({
+          where: {
+            OR: [
+              { invoiceNumber: { contains: userText.trim() } },
+              { customer: { companyName: { contains: userText.trim() } } },
+            ],
+            paymentStatus: { in: ["UNPAID", "PARTIAL"] },
+          },
+        });
+        if (found) invoiceId = found.id;
+      }
+
+      if (!invoiceId) {
+        await sendTelegramReply(chatId, "⚠️ Invoice nahi mila. Kripya list me se button dabayein:");
+        return true;
+      }
+
+      const invoice = await prisma.invoice.findUnique({
+        where: { id: invoiceId },
+        include: { customer: true },
+      });
+
+      if (!invoice) return false;
+
+      data.invoiceId = invoice.id;
+      data.invoiceNumber = invoice.invoiceNumber;
+      data.customerName = invoice.customer.companyName;
+      data.customerPhone = invoice.customer.phone;
+      data.balanceDue = invoice.balanceDue;
+      data.totalAmount = invoice.totalAmount;
+      data.token = invoice.token;
+
+      await setSession(chatId, "RECORD_PAYMENT", 2, data);
+
+      const text = `
+💰 <b>Step 2/3: Enter Payment Amount</b>
+━━━━━━━━━━━━━━━━━━━━
+🧾 Invoice: <b>${invoice.invoiceNumber}</b>
+🏢 Client: <b>${escapeHtml(invoice.customer.companyName)}</b>
+💰 Grand Total: ₹${invoice.totalAmount.toLocaleString("en-IN")}
+⚠️ <b>Current Balance Due: ₹${invoice.balanceDue.toLocaleString("en-IN")}</b>
+
+Kitna payment receive hua hai? Button dabayein ya amount type karein:
+      `.trim();
+
+      await sendTelegramReply(chatId, text, {
+        inline_keyboard: [
+          [
+            {
+              text: `💵 Full Due: ₹${invoice.balanceDue.toLocaleString("en-IN")}`,
+              callback_data: "pay_amt_full",
+            },
+          ],
+          [{ text: "❌ Cancel", callback_data: "wizard_cancel" }],
+        ],
+      });
+      return true;
+    }
+
+    if (step === 2) {
+      let amount = 0;
+      if (callbackData === "pay_amt_full") {
+        amount = data.balanceDue;
+      } else {
+        amount = parseFloat(userText.replace(/[^\d.]/g, ""));
+      }
+
+      if (!amount || amount <= 0) {
+        await sendTelegramReply(chatId, "⚠️ Kripya valid payment amount type karein:");
+        return true;
+      }
+
+      data.amount = amount;
+      await setSession(chatId, "RECORD_PAYMENT", 3, data);
+
+      const text = `
+💳 <b>Step 3/3: Payment Mode</b>
+━━━━━━━━━━━━━━━━━━━━
+Amount: <b>₹${amount.toLocaleString("en-IN")}</b>
+Invoice: <b>${data.invoiceNumber}</b>
+
+Payment kis medium se receive hua hai?
+      `.trim();
+
+      await sendTelegramReply(chatId, text, {
+        inline_keyboard: [
+          [
+            { text: "📱 UPI (GPay/PhonePe)", callback_data: "pay_mode_UPI" },
+            { text: "🏦 Bank NEFT/IMPS", callback_data: "pay_mode_NEFT_RTGS" },
+          ],
+          [
+            { text: "💵 Cash", callback_data: "pay_mode_CASH" },
+            { text: "📑 Cheque", callback_data: "pay_mode_CHEQUE" },
+          ],
+          [{ text: "❌ Cancel", callback_data: "wizard_cancel" }],
+        ],
+      });
+      return true;
+    }
+
+    if (step === 3) {
+      let mode = "UPI";
+      if (callbackData.startsWith("pay_mode_")) {
+        mode = callbackData.replace("pay_mode_", "");
+      } else if (userText.trim()) {
+        mode = userText.trim().toUpperCase();
+      }
+
+      const inv = await prisma.invoice.findUnique({
+        where: { id: data.invoiceId },
+      });
+      if (!inv) return false;
+
+      const newAmountPaid = (inv.amountPaid || 0) + data.amount;
+      const newBalanceDue = Math.max(0, inv.totalAmount - newAmountPaid);
+      const newStatus = newBalanceDue <= 0 ? "PAID" : "PARTIAL";
+
+      await prisma.invoice.update({
+        where: { id: inv.id },
+        data: {
+          amountPaid: newAmountPaid,
+          balanceDue: newBalanceDue,
+          paymentStatus: newStatus,
+        },
+      });
+
+      await prisma.payment.create({
+        data: {
+          invoiceId: inv.id,
+          amount: data.amount,
+          paymentMode: mode,
+          notes: `Recorded via Telegram Bot by ${user.name}`,
+        },
+      });
+
+      await prisma.auditLog.create({
+        data: {
+          username: user.name,
+          action: "PAYMENT",
+          entityType: "INVOICE",
+          entityId: inv.id,
+          details: `Payment of ₹${data.amount} via ${mode} recorded on ${inv.invoiceNumber} by ${user.name}`,
+        },
+      });
+
+      await clearSession(chatId);
+
+      const portalUrl = `${SITE_URL}/portal/invoice/${data.token}`;
+      const waMsg = encodeURIComponent(
+        `Dear ${data.customerName},\n\nWe have successfully received your payment of *₹${data.amount.toLocaleString("en-IN")}* for Invoice *#${data.invoiceNumber}* via ${mode}.\nRemaining Balance: *₹${newBalanceDue.toLocaleString("en-IN")}*.\n\n🔗 View Receipt: ${portalUrl}\n\nThank you, GARVIX!`
+      );
+      const waLink = `https://api.whatsapp.com/send?text=${waMsg}`;
+
+      const confText = `
+🎉 <b>PAYMENT RECORDED SUCCESSFULLY!</b>
+━━━━━━━━━━━━━━━━━━━━
+🧾 <b>Invoice:</b> ${data.invoiceNumber}
+🏢 <b>Client:</b> ${escapeHtml(data.customerName)}
+💰 <b>Amount Received:</b> ₹${data.amount.toLocaleString("en-IN")}
+💳 <b>Mode:</b> ${mode}
+⚖️ <b>Remaining Balance:</b> ₹${newBalanceDue.toLocaleString("en-IN")}
+🏷️ <b>Status:</b> ${newStatus === "PAID" ? "✅ FULLY PAID" : "🟡 PARTIALLY PAID"}
+      `.trim();
+
+      await sendTelegramReply(chatId, confText, {
+        inline_keyboard: [
+          [{ text: "📲 WhatsApp Receipt to Client", url: waLink }],
+          [{ text: "🧾 View Invoices & Dues", callback_data: "cmd_invoices" }],
+          [{ text: "🔙 Main Menu", callback_data: "cmd_menu" }],
+        ],
+      });
+      return true;
+    }
+  }
+
+  // --------------------------------------------------
+  // FLOW: REVISE_QUOTATION
+  // --------------------------------------------------
+  if (flow === "REVISE_QUOTATION") {
+    if (step === 1) {
+      const newTotal = parseFloat(userText.replace(/[^\d.]/g, ""));
+      if (!newTotal || newTotal <= 0) {
+        await sendTelegramReply(
+          chatId,
+          "⚠️ Kripya valid Grand Total amount type karein (e.g. 110000):"
+        );
+        return true;
+      }
+
+      data.newTotal = newTotal;
+      await setSession(chatId, "REVISE_QUOTATION", 2, data);
+
+      const text = `
+📝 <b>Step 2/2: Revision Remarks & Reason</b>
+━━━━━━━━━━━━━━━━━━━━
+💰 New Grand Total: <b>₹${newTotal.toLocaleString("en-IN")}</b>
+📄 Quote: <b>${data.quoteNumber}</b>
+
+Revision ka reason ya client conversation note bhejein:
+<i>(Udaharan: Client requested 10% discount for bulk order)</i>
+      `.trim();
+
+      await sendTelegramReply(chatId, text, {
+        inline_keyboard: [[{ text: "❌ Cancel", callback_data: "wizard_cancel" }]],
+      });
+      return true;
+    }
+
+    if (step === 2) {
+      const reason =
+        userText.trim() ||
+        `Negotiation: Rate updated to ₹${data.newTotal.toLocaleString("en-IN")}`;
+
+      const quote = await prisma.quotation.findUnique({
+        where: { id: data.quotationId },
+        include: { items: true, customer: true },
+      });
+
+      if (!quote) return false;
+
+      let meta: { rev: number; history: any[] } = { rev: 1, history: [] };
+      try {
+        if (quote.notes && quote.notes.startsWith("{")) {
+          meta = JSON.parse(quote.notes);
+        }
+      } catch {}
+
+      const oldTotal = quote.totalAmount;
+      const newGrandTotal = data.newTotal;
+      const newSubtotal = Math.round((newGrandTotal / 1.18) * 100) / 100;
+      const taxDetails = computeGst(newSubtotal, quote.customer.stateCode, 18);
+
+      const scaleFactor = quote.subtotal > 0 ? newSubtotal / quote.subtotal : 1;
+      for (const item of quote.items) {
+        const newUnitPrice = Math.round(item.unitPrice * scaleFactor * 100) / 100;
+        const itemSub = newUnitPrice * item.quantity;
+        const itemTax = Math.round(((itemSub * 18) / 100) * 100) / 100;
+        await prisma.quotationItem.update({
+          where: { id: item.id },
+          data: {
+            unitPrice: newUnitPrice,
+            taxAmount: itemTax,
+            totalAmount: itemSub + itemTax,
+          },
+        });
+      }
+
+      const newRev = (meta.rev || 1) + 1;
+      meta.rev = newRev;
+      if (!Array.isArray(meta.history)) meta.history = [];
+      meta.history.push({
+        rev: newRev,
+        date: new Date().toISOString(),
+        oldTotal,
+        newTotal: newGrandTotal,
+        reason,
+        revisedBy: user.name,
+      });
+
+      await prisma.quotation.update({
+        where: { id: quote.id },
+        data: {
+          subtotal: newSubtotal,
+          taxType: taxDetails.taxType,
+          cgstAmount: taxDetails.cgstAmount,
+          sgstAmount: taxDetails.sgstAmount,
+          igstAmount: taxDetails.igstAmount,
+          totalAmount: newGrandTotal,
+          notes: JSON.stringify(meta),
+        },
+      });
+
+      await prisma.auditLog.create({
+        data: {
+          username: user.name,
+          action: "REVISE",
+          entityType: "QUOTATION",
+          entityId: quote.id,
+          details: `Quotation ${quote.quoteNumber} revised to Rev ${newRev} (₹${oldTotal} -> ₹${newGrandTotal}) by ${user.name}`,
+        },
+      });
+
+      await clearSession(chatId);
+
+      const portalUrl = `${SITE_URL}/portal/quotation/${quote.token}`;
+      const waMsg = encodeURIComponent(
+        `Dear ${quote.customer.companyName},\n\nYour Quotation #${quote.quoteNumber} has been revised (Rev ${newRev}) to *₹${newGrandTotal.toLocaleString("en-IN")}*.\n\n🔗 View & Approve: ${portalUrl}\n\nThank you, GARVIX!`
+      );
+      const waLink = `https://api.whatsapp.com/send?text=${waMsg}`;
+
+      const confText = `
+🎉 <b>QUOTATION REVISED TO REV ${newRev}!</b>
+━━━━━━━━━━━━━━━━━━━━
+📄 Quote: <b>${quote.quoteNumber}</b>
+🏢 Client: <b>${escapeHtml(quote.customer.companyName)}</b>
+💰 Previous Rate: <s>₹${oldTotal.toLocaleString("en-IN")}</s>
+✨ <b>New Grand Total: ₹${newGrandTotal.toLocaleString("en-IN")}</b>
+📝 Reason: <i>${escapeHtml(reason)}</i>
+
+🔗 <a href="${portalUrl}">Open Revised Quotation Portal</a>
+      `.trim();
+
+      await sendTelegramReply(chatId, confText, {
+        inline_keyboard: [
+          [{ text: "📲 WhatsApp to Client", url: waLink }],
+          [{ text: "📋 View Quotations", callback_data: "cmd_quotes" }],
+          [{ text: "🔙 Main Menu", callback_data: "cmd_menu" }],
+        ],
+      });
+      return true;
     }
   }
 

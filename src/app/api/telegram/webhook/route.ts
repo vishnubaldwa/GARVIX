@@ -286,6 +286,19 @@ Naye role ka code bhejein (Capital letters only, e.g. <code>MANAGER</code>, <cod
         await convertQuotationFromTelegram(chatId, quoteId, user);
         return NextResponse.json({ ok: true });
       }
+      if (callbackData === "flow_new_expense") {
+        await startWizard(chatId, "NEW_EXPENSE", user);
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData === "flow_record_payment") {
+        await startWizard(chatId, "RECORD_PAYMENT", user);
+        return NextResponse.json({ ok: true });
+      }
+      if (callbackData.startsWith("q_revise_")) {
+        const quoteId = callbackData.replace("q_revise_", "");
+        await startWizard(chatId, "REVISE_QUOTATION", user, { quotationId: quoteId });
+        return NextResponse.json({ ok: true });
+      }
     }
 
     // ----------------------------------------------------
@@ -343,6 +356,24 @@ Naye role ka code bhejein (Capital letters only, e.g. <code>MANAGER</code>, <cod
       await startWizard(chatId, "MANAGE_ROLES", user);
       return NextResponse.json({ ok: true });
     }
+    if (
+      cleanInput === "new expense" ||
+      cleanInput === "add expense" ||
+      cleanInput === "expense" ||
+      cleanInput === "kharcha"
+    ) {
+      await startWizard(chatId, "NEW_EXPENSE", user);
+      return NextResponse.json({ ok: true });
+    }
+    if (
+      cleanInput === "record payment" ||
+      cleanInput === "add payment" ||
+      cleanInput === "payment" ||
+      cleanInput === "payment entry"
+    ) {
+      await startWizard(chatId, "RECORD_PAYMENT", user);
+      return NextResponse.json({ ok: true });
+    }
 
     // ----------------------------------------------------
     // 9. QUERY COMMANDS (QUOTATIONS, INVOICES, LEADS, ETC.)
@@ -379,6 +410,8 @@ Naye role ka code bhejein (Capital letters only, e.g. <code>MANAGER</code>, <cod
       }
 
       let text = `📋 <b>Latest Quotations (${role}):</b>\n━━━━━━━━━━━━━━━━━━━━\n`;
+      const keyboard: any[][] = [];
+
       quotes.forEach((q, idx) => {
         const date = q.createdAt.toLocaleDateString("en-IN", {
           day: "2-digit",
@@ -392,16 +425,43 @@ Naye role ka code bhejein (Capital letters only, e.g. <code>MANAGER</code>, <cod
             ? "💜 CONVERTED TO INVOICE"
             : `🟡 ${q.status}`;
 
-        text += `<b>${idx + 1}. ${escapeHtml(q.quoteNumber)}</b>\n`;
+        let revBadge = "";
+        try {
+          if (q.notes?.startsWith("{")) {
+            const parsed = JSON.parse(q.notes);
+            if (parsed.rev && parsed.rev > 1) {
+              revBadge = ` [Rev ${parsed.rev}]`;
+            }
+          }
+        } catch {}
+
+        text += `<b>${idx + 1}. ${escapeHtml(q.quoteNumber)}${revBadge}</b>\n`;
         text += `🏢 <b>Client:</b> ${escapeHtml(q.customer.companyName)}\n`;
         text += `💰 <b>Amount:</b> ₹${q.totalAmount.toLocaleString("en-IN")}\n`;
         text += `🏷️ <b>Status:</b> ${statusBadge}\n`;
         text += `📦 <b>Items:</b> ${q.items.length} line items | 📅 ${date}\n`;
         text += `🔗 <a href="${SITE_URL}/portal/quotation/${q.token}">Open Quotation Portal</a>\n\n`;
+
+        const row: any[] = [
+          { text: `🔄 Revise #${q.quoteNumber.slice(-3)}`, callback_data: `q_revise_${q.id}` },
+        ];
+        if (q.status !== "CONVERTED") {
+          row.push({ text: `🧾 Convert #${q.quoteNumber.slice(-3)}`, callback_data: `q_conv_${q.id}` });
+        }
+        keyboard.push(row);
       });
       text += `━━━━━━━━━━━━━━━━━━━━\n<i>Showing last ${quotes.length} quotations</i>`;
 
-      await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_quotes"));
+      keyboard.push([
+        { text: "➕ New Quote", callback_data: "flow_new_quote" },
+        { text: "🔄 Refresh", callback_data: "cmd_quotes" },
+      ]);
+      keyboard.push([
+        { text: "🔙 Main Menu", callback_data: "cmd_menu" },
+        { text: "🌐 Open Web ERP", url: `${SITE_URL}/admin` },
+      ]);
+
+      await sendTelegramReply(chatId, text, { inline_keyboard: keyboard });
       return NextResponse.json({ ok: true });
     }
 
@@ -409,8 +469,7 @@ Naye role ka code bhejein (Capital letters only, e.g. <code>MANAGER</code>, <cod
     if (
       cleanInput === "cmd_invoices" ||
       cleanInput.includes("inv") ||
-      cleanInput.includes("bill") ||
-      cleanInput.includes("payment")
+      cleanInput.includes("bill")
     ) {
       if (!(await hasPermission(role, PERMISSIONS.CAN_MANAGE_INVOICES))) {
         await sendTelegramReply(
@@ -460,6 +519,119 @@ Naye role ka code bhejein (Capital letters only, e.g. <code>MANAGER</code>, <cod
       text += `━━━━━━━━━━━━━━━━━━━━\n<i>Tap link to open instant UPI QR</i>`;
 
       await sendTelegramReply(chatId, text, getSubMenuKeyboard("cmd_invoices"));
+      return NextResponse.json({ ok: true });
+    }
+
+    // Outstanding Receivables Query
+    if (
+      cleanInput === "cmd_outstanding" ||
+      cleanInput.includes("outstanding") ||
+      cleanInput.includes("due")
+    ) {
+      const unpaidInvoices = await prisma.invoice.findMany({
+        where: { paymentStatus: { in: ["UNPAID", "PARTIAL"] } },
+        orderBy: { createdAt: "desc" },
+        include: { customer: true },
+      });
+
+      const totalReceivable = unpaidInvoices.reduce((sum, inv) => sum + inv.balanceDue, 0);
+
+      if (unpaidInvoices.length === 0) {
+        await sendTelegramReply(
+          chatId,
+          "🎉 <b>Outstanding Clear!</b> Sabhi invoices ka payment prapt ho chuka hai.",
+          getSubMenuKeyboard("cmd_outstanding")
+        );
+        return NextResponse.json({ ok: true });
+      }
+
+      let text = `⏰ <b>Outstanding Receivables & Dues:</b>\n━━━━━━━━━━━━━━━━━━━━\n`;
+      text += `💰 <b>Total Market Outstanding:</b> ₹${totalReceivable.toLocaleString("en-IN")}\n`;
+      text += `📊 <b>Pending Invoices:</b> ${unpaidInvoices.length}\n━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+      const keyboard: any[][] = [];
+
+      unpaidInvoices.slice(0, 5).forEach((inv, idx) => {
+        const portalUrl = `${SITE_URL}/portal/invoice/${inv.token}`;
+        const waMsg = encodeURIComponent(
+          `Dear ${inv.customer.companyName},\n\nThis is a gentle payment reminder for Invoice *#${inv.invoiceNumber}* with outstanding balance of *₹${inv.balanceDue.toLocaleString("en-IN")}*.\n\n🔗 View & Pay Online: ${portalUrl}\n\nThank you, GARVIX!`
+        );
+        const waLink = `https://api.whatsapp.com/send?text=${waMsg}`;
+
+        text += `<b>${idx + 1}. ${escapeHtml(inv.customer.companyName)}</b>\n`;
+        text += `🧾 Invoice: <code>${inv.invoiceNumber}</code>\n`;
+        text += `⚠️ Balance Due: <b>₹${inv.balanceDue.toLocaleString("en-IN")}</b> (Total: ₹${inv.totalAmount.toLocaleString("en-IN")})\n\n`;
+
+        keyboard.push([
+          { text: `📲 WhatsApp: ${inv.customer.companyName.slice(0, 16)}`, url: waLink },
+          { text: `💳 Record Payment`, callback_data: `flow_record_payment` },
+        ]);
+      });
+
+      keyboard.push([
+        { text: "🔄 Refresh", callback_data: "cmd_outstanding" },
+        { text: "🔙 Main Menu", callback_data: "cmd_menu" },
+      ]);
+
+      await sendTelegramReply(chatId, text, { inline_keyboard: keyboard });
+      return NextResponse.json({ ok: true });
+    }
+
+    // AMC Alerts Query
+    if (
+      cleanInput === "cmd_amc_alerts" ||
+      cleanInput === "amc" ||
+      cleanInput.includes("amc alert")
+    ) {
+      const now = new Date();
+      const in30Days = new Date();
+      in30Days.setDate(in30Days.getDate() + 30);
+
+      const expiringAmcs = await prisma.aMCContract.findMany({
+        where: {
+          endDate: { lte: in30Days },
+          status: { not: "EXPIRED" },
+        },
+        orderBy: { endDate: "asc" },
+        include: { customer: true },
+      });
+
+      if (expiringAmcs.length === 0) {
+        await sendTelegramReply(
+          chatId,
+          "🛡️ <b>AMC Contracts All Good!</b> Agle 30 dino me koi bhi AMC contract expire nahi ho raha hai.",
+          getSubMenuKeyboard("cmd_amc_alerts")
+        );
+        return NextResponse.json({ ok: true });
+      }
+
+      let text = `🛠️ <b>AMC Expiry & Renewal Alerts:</b>\n━━━━━━━━━━━━━━━━━━━━\n`;
+      const keyboard: any[][] = [];
+
+      expiringAmcs.forEach((amc, idx) => {
+        const daysLeft = Math.ceil((new Date(amc.endDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        const renewalWaMsg = encodeURIComponent(
+          `Dear ${amc.customer.companyName},\n\nYour AMC Contract *#${amc.contractNumber}* (${amc.title}) with GARVIX is expiring in ${daysLeft} days.\nAnnual Contract Value: ₹${amc.contractValue.toLocaleString("en-IN")}.\n\nPlease let us know if we should issue your renewal quote!\n\nThank you, GARVIX!`
+        );
+        const waLink = `https://api.whatsapp.com/send?text=${renewalWaMsg}`;
+
+        text += `<b>${idx + 1}. ${escapeHtml(amc.customer.companyName)}</b>\n`;
+        text += `📜 Contract: <code>${amc.contractNumber}</code> (${amc.title})\n`;
+        text += `⏳ Status: <b>${daysLeft <= 0 ? "EXPIRED" : `${daysLeft} Days Remaining`}</b>\n`;
+        text += `💰 Annual Value: ₹${amc.contractValue.toLocaleString("en-IN")}\n\n`;
+
+        keyboard.push([
+          { text: `➕ Renewal Quote`, callback_data: `q_sel_client_${amc.customerId}` },
+          { text: `📲 WhatsApp Notice`, url: waLink },
+        ]);
+      });
+
+      keyboard.push([
+        { text: "🔄 Refresh", callback_data: "cmd_amc_alerts" },
+        { text: "🔙 Main Menu", callback_data: "cmd_menu" },
+      ]);
+
+      await sendTelegramReply(chatId, text, { inline_keyboard: keyboard });
       return NextResponse.json({ ok: true });
     }
 

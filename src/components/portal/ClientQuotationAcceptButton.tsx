@@ -30,7 +30,11 @@ export function ClientQuotationAcceptButton({ token }: { token: string }) {
       const data = await res.json();
       if (res.ok) {
         setModalOpen(false);
-        router.refresh();
+        if (data.piToken) {
+          router.push(`/portal/invoice/${data.piToken}`);
+        } else {
+          router.refresh();
+        }
       } else {
         setError(data.error || "Failed to record acceptance.");
       }

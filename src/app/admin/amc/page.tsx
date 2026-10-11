@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
 import { Clock, ShieldCheck, Wrench, CheckCircle2, AlertTriangle } from "lucide-react";
+import Link from "next/link";
+import { WhatsAppShareButton } from "@/components/admin/WhatsAppShareButton";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +42,7 @@ export default async function AdminAmcPage() {
                   <th className="py-3 px-4 text-center">Frequency</th>
                   <th className="py-3 px-4 text-right">Value (₹)</th>
                   <th className="py-3 px-4 text-center">Status</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-mono">
@@ -78,6 +81,26 @@ export default async function AdminAmcPage() {
                             <ShieldCheck className="h-3 w-3" /> Active
                           </span>
                         )}
+                      </td>
+                      <td className="py-3.5 px-4 text-right font-sans">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <WhatsAppShareButton
+                            phone={c.customer.phone}
+                            clientName={c.customer.companyName}
+                            documentType="AMC Renewal"
+                            documentNumber={c.contractNumber}
+                            amount={c.contractValue}
+                            portalUrl={`https://garvix.in/admin/quotations/create`}
+                            customLabel="Renewal Alert"
+                          />
+                          <Link
+                            href={`/admin/quotations/create`}
+                            className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] font-bold text-blue-700 hover:bg-blue-100 transition shadow-sm"
+                            title="Generate Renewal Quotation"
+                          >
+                            <span>Renew Quote</span>
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );

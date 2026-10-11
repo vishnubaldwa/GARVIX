@@ -5,6 +5,7 @@ import { PlusCircle, ExternalLink } from "lucide-react";
 import { ConvertQuotationButton } from "@/components/admin/ConvertQuotationButton";
 import { CopyPortalLinkButton } from "@/components/admin/CopyPortalLinkButton";
 import { WhatsAppShareButton } from "@/components/admin/WhatsAppShareButton";
+import { QuotationReviseModal } from "@/components/admin/QuotationReviseModal";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,24 @@ export default async function AdminQuotationsPage() {
               {quotations.map((quote) => (
                 <tr key={quote.id} className="hover:bg-slate-50 transition">
                   <td className="py-3.5 px-4 font-bold text-blue-600">
-                    {quote.quoteNumber}
+                    <div className="flex items-center gap-1.5">
+                      <span>{quote.quoteNumber}</span>
+                      {(() => {
+                        try {
+                          if (quote.notes?.startsWith("{")) {
+                            const parsed = JSON.parse(quote.notes);
+                            if (parsed.rev && parsed.rev > 1) {
+                              return (
+                                <span className="rounded bg-amber-100 border border-amber-300 px-1.5 py-0.5 text-[9px] font-bold text-amber-800 font-sans" title={`Revision ${parsed.rev}`}>
+                                  Rev {parsed.rev}
+                                </span>
+                              );
+                            }
+                          }
+                        } catch {}
+                        return null;
+                      })()}
+                    </div>
                   </td>
 
                   <td className="py-3.5 px-4 font-sans">
@@ -99,6 +117,8 @@ export default async function AdminQuotationsPage() {
 
                   <td className="py-3.5 px-4 text-right font-sans">
                     <div className="flex items-center justify-end gap-2">
+                      <QuotationReviseModal quote={quote} />
+
                       <WhatsAppShareButton
                         phone={quote.customer.phone}
                         clientName={quote.customer.companyName}

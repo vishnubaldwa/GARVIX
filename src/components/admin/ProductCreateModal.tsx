@@ -13,7 +13,15 @@ const CATEGORIES = [
   { value: "AMC_SUPPORT", label: "AMC & Maintenance Contract (Service)", defaultHsn: "998315", unit: "YEAR" },
 ];
 
-export function ProductCreateModal() {
+export function ProductCreateModal({
+  onCreated,
+  buttonLabel = "Add New Item / Solution",
+  buttonClassName,
+}: {
+  onCreated?: (newProduct: any) => void;
+  buttonLabel?: string;
+  buttonClassName?: string;
+} = {}) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -78,6 +86,9 @@ export function ProductCreateModal() {
         setPurchasePrice("");
         setSellingPrice("");
         setDescription("");
+        if (onCreated) {
+          onCreated(data.product);
+        }
         router.refresh();
       } else {
         setError(data.error || "Failed to create item.");
@@ -94,9 +105,12 @@ export function ProductCreateModal() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition"
+        className={
+          buttonClassName ||
+          "flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-700 transition"
+        }
       >
-        <PackagePlus className="h-4 w-4" /> Add New Item / Solution
+        <PackagePlus className="h-4 w-4" /> {buttonLabel}
       </button>
 
       {open && (

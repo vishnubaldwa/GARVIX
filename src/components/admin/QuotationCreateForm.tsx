@@ -6,6 +6,26 @@ import { formatINR, HARYANA_STATE_CODE } from "@/lib/gst";
 import { Plus, Trash2, ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { ClientCreateModal } from "./ClientCreateModal";
+import { ProductCreateModal } from "./ProductCreateModal";
+
+const TERMS_TEMPLATES = {
+  SOFTWARE: `1. 50% Advance with official Purchase Order, 50% on UAT sign-off.
+2. 30-Day complimentary post-deployment bug fixing support.
+3. Hosting and third-party API costs billed on actuals.
+4. Subject to Haryana Jurisdiction.`,
+  HARDWARE: `1. 100% Payment against delivery / 50% Advance & balance on installation.
+2. 1-Year Comprehensive Manufacturer Warranty.
+3. Physical damage, liquid spillage, or power surge not covered under warranty.
+4. Subject to Haryana Jurisdiction.`,
+  AMC: `1. 100% Advance payment for the annual contract period.
+2. Includes scheduled preventive maintenance visits and unlimited remote ticket support.
+3. Hardware component replacements billed separately.
+4. Subject to Haryana Jurisdiction.`,
+  GENERAL: `1. 50% Advance along with order confirmation, balance upon completion.
+2. Taxes as applicable (18% GST).
+3. Invoices due within 7 days of generation.
+4. Subject to Haryana Jurisdiction.`,
+};
 
 interface CustomerOption {
   id: string;
@@ -31,11 +51,11 @@ export function QuotationCreateForm({
 }) {
   const router = useRouter();
   const [customerList, setCustomerList] = useState<CustomerOption[]>(customers);
+  const [productList, setProductList] = useState<ProductOption[]>(products);
   const [customerId, setCustomerId] = useState(customers[0]?.id || "");
   const [validUntilDays, setValidUntilDays] = useState(15);
-  const [terms, setTerms] = useState(
-    "1. 50% Advance with official Purchase Order, 50% on installation.\n2. 1-Year Comprehensive Warranty on hardware.\n3. Haryana Jurisdiction."
-  );
+  const [selectedTemplate, setSelectedTemplate] = useState("GENERAL");
+  const [terms, setTerms] = useState(TERMS_TEMPLATES.GENERAL);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -61,7 +81,7 @@ export function QuotationCreateForm({
   ]);
 
   const handleProductSelect = (index: number, pId: string) => {
-    const prod = products.find((p) => p.id === pId);
+    const prod = productList.find((p) => p.id === pId);
     if (!prod) return;
     const newItems = [...items];
     newItems[index] = {
@@ -80,16 +100,16 @@ export function QuotationCreateForm({
     setItems(newItems);
   };
 
-  const addItemRow = () => {
-    const defaultProd = products[0];
+  const addItemRow = (preselectedProduct?: ProductOption) => {
+    const p = preselectedProduct || productList[0];
     setItems([
       ...items,
       {
-        productId: defaultProd?.id || "",
-        description: defaultProd?.name || "Custom Line Item",
-        hsnCode: defaultProd?.hsnCode || "998314",
+        productId: p?.id || "",
+        description: p?.name || "Custom Line Item",
+        hsnCode: p?.hsnCode || "998314",
         quantity: 1,
-        unitPrice: defaultProd?.sellingPrice || 1000,
+        unitPrice: p?.sellingPrice || 1000,
       },
     ]);
   };
@@ -211,15 +231,25 @@ export function QuotationCreateForm({
 
       {/* Line Items Card */}
       <div className="admin-card p-6 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Line Items</h3>
-          <button
-            type="button"
-            onClick={addItemRow}
-            className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-semibold"
-          >
-            <Plus className="h-4 w-4" /> Add Item Row
-          </button>
+          <div className="flex items-center gap-3">
+            <ProductCreateModal
+              buttonLabel="+ New Product / Service"
+              buttonClassName="text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1"
+              onCreated={(newP) => {
+                setProductList((prev) => [newP, ...prev]);
+                addItemRow(newP);
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => addItemRow()}
+              className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-semibold"
+            >
+              <Plus className="h-4 w-4" /> Add Item Row
+            </button>
+          </div>
         </div>
 
         <div className="space-y-3">
@@ -229,14 +259,14 @@ export function QuotationCreateForm({
               className="grid grid-cols-12 gap-3 items-center rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-xs"
             >
               <div className="col-span-12 sm:col-span-4">
-                <label className="block text-[10px] text-slate-500 mb-1">Product / Preset</label>
+                <label className="block text-[10px] text-slate-500 mb-1">Product / Service</label>
                 <select
                   value={item.productId}
                   onChange={(e) => handleProductSelect(idx, e.target.value)}
                   className="w-full admin-input py-1.5 px-2 text-xs"
                 >
                   <option value="">-- Custom Description --</option>
-                  {products.map((p) => (
+                  {productList.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
                     </option>
@@ -328,12 +358,33 @@ export function QuotationCreateForm({
 
       {/* Terms Card */}
       <div className="admin-card p-6 space-y-3">
-        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Terms & Conditions</h3>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Terms & Conditions</h3>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-slate-500 font-medium">Load Template:</span>
+            <select
+              value={selectedTemplate}
+              onChange={(e) => {
+                const key = e.target.value as keyof typeof TERMS_TEMPLATES;
+                setSelectedTemplate(key);
+                if (TERMS_TEMPLATES[key]) {
+                  setTerms(TERMS_TEMPLATES[key]);
+                }
+              }}
+              className="admin-input py-1 px-2.5 text-xs font-semibold text-slate-700 bg-white"
+            >
+              <option value="GENERAL">📄 General Trading & Service</option>
+              <option value="SOFTWARE">💻 Software / Web Application</option>
+              <option value="HARDWARE">🖥️ Hardware & RFID Equipment</option>
+              <option value="AMC">🛠️ Annual Maintenance Contract (AMC)</option>
+            </select>
+          </div>
+        </div>
         <textarea
-          rows={3}
+          rows={4}
           value={terms}
           onChange={(e) => setTerms(e.target.value)}
-          className="w-full admin-input p-3 text-xs leading-relaxed"
+          className="w-full admin-input p-3 text-xs leading-relaxed font-mono"
         ></textarea>
       </div>
     </form>

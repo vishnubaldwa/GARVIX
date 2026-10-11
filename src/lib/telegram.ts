@@ -141,26 +141,45 @@ ${params.portalUrl ? `🔗 <b>Client Portal:</b> <a href="${params.portalUrl}">V
   return sendTelegramMessage(text);
 }
 
-// 3. Quotation Digitally Accepted Alert
+// 3. Quotation Digitally Accepted & Auto PI Alert
 export async function sendTelegramQuotationAcceptedAlert(params: {
   quoteNumber: string;
   customerName: string;
   totalAmount: number;
   signature: string;
+  piNumber?: string;
+  piUrl?: string;
+  customerPhone?: string;
 }): Promise<boolean> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return false;
+
   const text = `
-🎉 <b>QUOTATION ACCEPTED BY CLIENT!</b>
+🎉 <b>QUOTATION ACCEPTED & PROFORMA INVOICE GENERATED!</b>
 ━━━━━━━━━━━━━━━━━━━━
 🔢 <b>Quote #:</b> <code>${escapeHtml(params.quoteNumber)}</code>
+${params.piNumber ? `📄 <b>Proforma Invoice #:</b> <code>${escapeHtml(params.piNumber)}</code>` : ""}
 🏢 <b>Client:</b> ${escapeHtml(params.customerName)}
-💰 <b>Amount:</b> ₹${params.totalAmount.toLocaleString("en-IN")}
+💰 <b>Total Amount:</b> ₹${params.totalAmount.toLocaleString("en-IN")}
 ✍️ <b>Signed By:</b> <b>${escapeHtml(params.signature)}</b>
-✅ <i>Status: READY FOR TAX INVOICE CONVERSION</i>
+⚡ <i>Auto-PI generated with payment QR code.</i>
 ━━━━━━━━━━━━━━━━━━━━
 🕒 <i>${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST</i>
   `.trim();
 
-  return sendTelegramMessage(text);
+  const keyboard: any[][] = [];
+  const row1: any[] = [];
+  if (params.piUrl) {
+    row1.push({ text: "📄 Open Proforma Invoice", url: params.piUrl });
+  }
+  if (params.customerPhone && params.piUrl) {
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(`Greetings from GARVIX! Proforma Invoice #${params.piNumber || ""} has been generated for ${params.customerName}. View & Pay: ${params.piUrl}`)}`;
+    row1.push({ text: "💬 WhatsApp to Client", url: waUrl });
+  }
+  if (row1.length > 0) keyboard.push(row1);
+
+  return sendTelegramReply(chatId, text, keyboard.length > 0 ? { inline_keyboard: keyboard } : undefined);
 }
 
 // 4. New Tax Invoice Alert

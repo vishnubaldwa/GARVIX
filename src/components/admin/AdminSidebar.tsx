@@ -27,23 +27,67 @@ import {
 import { useState } from "react";
 import { AuthSession } from "@/lib/auth";
 
-const navItems = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/leads", label: "Leads & CRM", icon: Users },
-  { href: "/admin/clients", label: "Clients & Accounts", icon: Building2 },
-  { href: "/admin/inventory", label: "Hardware Products", icon: Package },
-  { href: "/admin/inventory/serials", label: "Serial & IMEI Tracker", icon: Barcode },
-  { href: "/admin/quotations", label: "Quotations", icon: FileSpreadsheet },
-  { href: "/admin/challans", label: "Delivery Challans", icon: Truck },
-  { href: "/admin/invoices", label: "Tax Invoices", icon: Receipt },
-  { href: "/admin/purchases", label: "Purchases & ITC", icon: ShoppingCart },
-  { href: "/admin/expenses", label: "Expense Tracker", icon: Wallet },
-  { href: "/admin/amc", label: "AMC & Service", icon: Clock },
-  { href: "/admin/gst-returns", label: "1-Click CA Return", icon: Download, highlight: true },
-  { href: "/admin/team", label: "Team & Staff", icon: UserCog, adminOnly: true },
-  { href: "/admin/roles", label: "Roles & Permissions", icon: Shield, adminOnly: true },
-  { href: "/admin/settings", label: "Settings & Profile", icon: Settings },
-  { href: "/admin/audit", label: "Audit Logs", icon: ShieldCheck, adminOnly: true },
+interface NavItem {
+  href: string;
+  label: string;
+  icon: any;
+  highlight?: boolean;
+  adminOnly?: boolean;
+  badge?: string;
+}
+
+interface NavSection {
+  title?: string;
+  items: NavItem[];
+}
+
+const navSections: NavSection[] = [
+  {
+    items: [
+      { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+    ],
+  },
+  {
+    title: "1. Sales & Clients",
+    items: [
+      { href: "/admin/clients", label: "Parties & Clients", icon: Building2 },
+      { href: "/admin/quotations", label: "Quotations & Proposals", icon: FileSpreadsheet },
+      { href: "/admin/leads", label: "Website Leads & CRM", icon: Users },
+    ],
+  },
+  {
+    title: "2. Billing & Dispatch",
+    items: [
+      { href: "/admin/invoices", label: "Invoices & Proforma (PI)", icon: Receipt },
+      { href: "/admin/outstanding", label: "Outstanding & Payments", icon: Clock },
+      { href: "/admin/challans", label: "Delivery Challans & E-Way", icon: Truck },
+    ],
+  },
+  {
+    title: "3. Catalog & Contracts",
+    items: [
+      { href: "/admin/inventory", label: "Hardware & Products", icon: Package },
+      { href: "/admin/inventory/serials", label: "Serial & IMEI Tracker", icon: Barcode },
+      { href: "/admin/amc", label: "AMC Support Contracts", icon: ShieldCheck },
+    ],
+  },
+  {
+    title: "4. Accounts & Finance",
+    items: [
+      { href: "/admin/expenses", label: "Business Expenses", icon: Wallet },
+      { href: "/admin/gst-returns", label: "1-Click CA Return", icon: Download, highlight: true },
+      { href: "/admin/purchases", label: "Vendor Purchases & ITC", icon: ShoppingCart },
+    ],
+  },
+  {
+    title: "5. System & Staff",
+    items: [
+      { href: "/admin/team", label: "Team & Staff", icon: UserCog, adminOnly: true },
+      { href: "/admin/roles", label: "Roles & Permissions", icon: Shield, adminOnly: true },
+      { href: "/admin/settings", label: "Settings & Profile", icon: Settings },
+      { href: "/admin/audit", label: "Audit Security Logs", icon: ShieldCheck, adminOnly: true },
+    ],
+  },
 ];
 
 export function AdminSidebar({ session }: { session: AuthSession | null }) {
@@ -73,6 +117,7 @@ export function AdminSidebar({ session }: { session: AuthSession | null }) {
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="rounded p-1.5 text-slate-600 hover:bg-slate-100"
+          aria-label="Toggle navigation menu"
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -80,84 +125,106 @@ export function AdminSidebar({ session }: { session: AuthSession | null }) {
 
       {/* Sidebar Content */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 transform border-r border-slate-800 bg-[#0f172a] p-4 transition-transform duration-200 md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 transform border-r border-slate-800 bg-[#0f172a] p-4 transition-transform duration-200 md:static md:translate-x-0 flex flex-col justify-between overflow-y-auto ${
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
-        <div className="flex flex-col h-full justify-between">
-          <div>
-            {/* Logo */}
-            <div className="flex items-center justify-between pb-6 border-b border-slate-800">
-              <Link href="/admin" className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md">
-                  <Radio className="h-5 w-5" />
-                </div>
-                <div>
-                  <span className="text-lg font-black tracking-widest text-white">GARVIX</span>
-                  <span className="block text-[9px] font-bold uppercase tracking-wider text-blue-400">
-                    Enterprise ERP • HR (06)
-                  </span>
-                </div>
-              </Link>
-              <button
-                onClick={() => setMobileOpen(false)}
-                className="md:hidden text-slate-400 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Navigation links */}
-            <nav className="mt-4 space-y-1">
-              {navItems
-                .filter((item) => !item.adminOnly || session?.role === "SUPER_ADMIN")
-                .map((item) => {
-                const isActive = pathname === item.href;
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold transition ${
-                      isActive
-                        ? "bg-blue-600 text-white shadow-sm"
-                        : item.highlight
-                        ? "text-emerald-400 hover:bg-slate-800/80 hover:text-emerald-300"
-                        : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
-                    }`}
-                  >
-                    <Icon className={`h-4 w-4 ${isActive ? "text-white" : item.highlight ? "text-emerald-400" : "text-slate-400"}`} />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-
-          {/* User profile & Logout */}
-          <div className="border-t border-slate-800 pt-4 mt-6">
-            <div className="flex items-center justify-between mb-3 px-1">
-              <div>
-                <p className="text-xs font-bold text-white truncate max-w-[130px]">
-                  {session?.name || "Vishnu Baldwa"}
-                </p>
-                <p className="text-[10px] text-blue-400 font-mono">
-                  {session?.email || "admin@garvix.in"}
-                </p>
+        <div>
+          {/* Logo */}
+          <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+            <Link href="/admin" className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md">
+                <Radio className="h-5 w-5" />
               </div>
-              <span className="rounded bg-slate-800 border border-slate-700 px-1.5 py-0.5 text-[9px] font-mono font-bold text-slate-300">
-                {session?.role || "ADMIN"}
-              </span>
-            </div>
-
+              <div>
+                <span className="text-lg font-black tracking-widest text-white">GARVIX</span>
+                <span className="block text-[9px] font-bold uppercase tracking-wider text-blue-400">
+                  Enterprise ERP • HR (06)
+                </span>
+              </div>
+            </Link>
             <button
-              onClick={handleLogout}
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-800 bg-slate-900/60 py-2 text-xs font-semibold text-slate-400 hover:text-rose-400 hover:bg-slate-850 transition"
+              onClick={() => setMobileOpen(false)}
+              className="md:hidden text-slate-400 hover:text-white"
             >
-              <LogOut className="h-3.5 w-3.5" /> Sign Out
+              <X className="h-5 w-5" />
             </button>
           </div>
+
+          {/* Grouped Navigation Links */}
+          <nav className="mt-4 space-y-4">
+            {navSections.map((section, sIdx) => {
+              const visibleItems = section.items.filter(
+                (item) => !item.adminOnly || session?.role === "SUPER_ADMIN"
+              );
+
+              if (visibleItems.length === 0) return null;
+
+              return (
+                <div key={sIdx} className="space-y-1">
+                  {section.title && (
+                    <div className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                      {section.title}
+                    </div>
+                  )}
+
+                  {visibleItems.map((item) => {
+                    const isActive = pathname === item.href;
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className={`flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                          isActive
+                            ? "bg-blue-600 text-white shadow-sm font-bold"
+                            : item.highlight
+                            ? "text-emerald-400 hover:bg-slate-800/80 hover:text-emerald-300"
+                            : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
+                        }`}
+                      >
+                        <Icon
+                          className={`h-4 w-4 shrink-0 ${
+                            isActive
+                              ? "text-white"
+                              : item.highlight
+                              ? "text-emerald-400"
+                              : "text-slate-400"
+                          }`}
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* User profile & Logout */}
+        <div className="border-t border-slate-800 pt-4 mt-6 shrink-0">
+          <div className="flex items-center justify-between mb-3 px-1">
+            <div>
+              <p className="text-xs font-bold text-white truncate max-w-[130px]">
+                {session?.name || "Vishnu Baldwa"}
+              </p>
+              <p className="text-[10px] text-blue-400 font-mono">
+                {session?.email || "admin@garvix.in"}
+              </p>
+            </div>
+            <span className="rounded bg-slate-800 border border-slate-700 px-1.5 py-0.5 text-[9px] font-mono font-bold text-slate-300">
+              {session?.role || "ADMIN"}
+            </span>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-800 bg-slate-900/60 py-2 text-xs font-semibold text-slate-400 hover:text-rose-400 hover:bg-slate-850 transition"
+          >
+            <LogOut className="h-3.5 w-3.5" /> Sign Out
+          </button>
         </div>
       </aside>
     </>
