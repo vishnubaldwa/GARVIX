@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET || "garvix-super-secure-enterprise-jwt-key-2026";
@@ -59,8 +59,25 @@ export function verifyShareAccessToken(
 }
 
 export async function getSession(): Promise<AuthSession | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
+  let token: string | undefined;
+
+  // 1. Check Authorization: Bearer <jwt> header (Flutter Mobile App / API clients)
+  try {
+    const headerStore = await headers();
+    const authHeader = headerStore.get("authorization") || headerStore.get("Authorization");
+    if (authHeader && authHeader.toLowerCase().startsWith("bearer ")) {
+      token = authHeader.slice(7).trim();
+    }
+  } catch {
+    // Ignore when called outside request header context
+  }
+
+  // 2. Fall back to HttpOnly cookie (Web Admin Panel)
+  if (!token) {
+    const cookieStore = await cookies();
+    token = cookieStore.get(COOKIE_NAME)?.value;
+  }
+
   if (!token) return null;
   const decoded = verifyToken(token);
   if (!decoded) return null;

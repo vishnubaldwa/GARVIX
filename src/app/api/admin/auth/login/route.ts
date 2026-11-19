@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { comparePassword, cleanGarvixEmail, signToken, AUTH_COOKIE_NAME } from "@/lib/auth";
+import { getPermissionsForRole } from "@/lib/permissions";
 import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
@@ -67,13 +68,18 @@ export async function POST(request: Request) {
       },
     });
 
+    const permissions = await getPermissionsForRole(user.role);
+
     return NextResponse.json({
       success: true,
+      token,
       user: {
         id: user.id,
+        username: user.username,
         email: user.email,
         name: user.name,
         role: user.role,
+        permissions,
       },
     });
   } catch (err: any) {
