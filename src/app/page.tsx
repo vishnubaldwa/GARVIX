@@ -22,11 +22,13 @@ import {
   MessageCircle,
   Truck,
   Check,
-  X,
   ChevronRight,
   TrendingUp,
   Sliders,
   BellRing,
+  PackageCheck,
+  Car,
+  Shirt,
 } from "lucide-react";
 
 export default async function HomePage() {
@@ -36,28 +38,29 @@ export default async function HomePage() {
     <div className="min-h-screen bg-[#ffffff] text-slate-900 selection:bg-blue-600 selection:text-white font-sans antialiased">
       <Navbar />
 
-      {/* 1. Hero Section (Apple-Style Clean & Grand) */}
+      {/* 1. Hero Section (Apple-Style Clean with Real Product Showcase) */}
       <section className="relative overflow-hidden pt-12 pb-20 md:pt-20 md:pb-28 bg-[#fbfbfd]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           {/* Eyebrow Pill */}
           <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold text-slate-700 shadow-sm mb-6">
             <Radio className="h-3.5 w-3.5 text-blue-600 animate-pulse" />
-            <span>GARVIX AUTOMATION ECOSYSTEM</span>
+            <span>GARVIX SMART RETAIL & RFID HARDWARE</span>
             <span className="text-slate-300">•</span>
-            <span className="text-blue-600 font-medium">WPC 865–867 MHz Compliant</span>
+            <span className="text-blue-600 font-medium">Bespoke Enterprise Software</span>
           </div>
 
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.08] max-w-4xl mx-auto">
-            Enterprise Precision.{" "}
+            Real Hardware.{" "}
             <span className="bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-600 bg-clip-text text-transparent">
-              Engineered for Speed.
-            </span>
+              Intelligent Software.
+            </span>{" "}
+            Engineered as One.
           </h1>
 
           {/* Subtitle */}
           <p className="mt-6 text-base sm:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            From sub-second jewellery tray scanning to warehouse dock-door portals and bespoke cloud ERPs. We design, manufacture, and integrate complete RFID hardware and custom software built for Indian enterprise operations.
+            We manufacture certified UHF RFID tags, inlays, and hard security tags — and engineer the bespoke cloud ERPs, smart counters, and handheld scanner apps that power them across retail, manufacturing, logistics, and healthcare.
           </p>
 
           {/* Action CTAs */}
@@ -66,12 +69,12 @@ export default async function HomePage() {
               href="#contact"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-black px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:shadow"
             >
-              <span>Request On-Site Demo</span>
+              <span>Request Product Sample Kit</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
 
             <a
-              href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20would%20like%20to%20schedule%20a%20live%20RFID%20and%20Software%20demonstration"
+              href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20would%20like%20to%20discuss%20RFID%20tags%20and%20custom%20software"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 bg-white hover:bg-slate-50 px-8 py-3.5 text-sm font-semibold text-slate-800 shadow-sm transition"
@@ -81,10 +84,10 @@ export default async function HomePage() {
             </a>
 
             <Link
-              href="#solutions"
+              href="#products"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-3 text-sm font-medium text-blue-600 hover:underline"
             >
-              <span>Explore Solutions</span>
+              <span>Explore Products & Software</span>
               <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
@@ -93,81 +96,85 @@ export default async function HomePage() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500">
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="h-4 w-4 text-emerald-600" />
-              <span>In-House Hardware & Software</span>
+              <span>Direct Manufacturer & Software Author</span>
             </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 className="h-4 w-4 text-blue-600" />
-              <span>Haryana GST (06) Certified Engine</span>
+              <span>WPC Indian Band (865–867 MHz) Certified</span>
             </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 className="h-4 w-4 text-blue-600" />
-              <span>Pan-India On-Site Implementation</span>
+              <span>Haryana GST (06) Auto Tax Compliance</span>
             </div>
           </div>
 
-          {/* Keynote Visual Mockup: JewelTrack™ Smart Scanning Tray Simulation */}
-          <div className="mt-14 max-w-4xl mx-auto rounded-3xl border border-slate-200/90 bg-white p-5 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.06)] text-left">
-            <div className="flex flex-wrap items-center justify-between pb-5 border-b border-slate-100 gap-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 border border-amber-200 text-amber-700">
-                  <Gem className="h-5 w-5" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900">
-                    Garvix JewelTrack™ • Smart Velvet Scanning Tray
-                  </h4>
-                  <p className="text-xs text-slate-500">
-                    Active UHF Sensor Grid (WPC 865.7 MHz) • Real-Time Inventory Telemetry
-                  </p>
-                </div>
+          {/* Floating Product Collage Preview */}
+          <div className="mt-14 max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
+            <div className="group rounded-3xl border border-slate-200/90 bg-white p-3 shadow-sm hover:shadow-lg transition-all">
+              <div className="aspect-square rounded-2xl overflow-hidden bg-slate-50">
+                <img
+                  src="/images/products/jewellery-rfid-tag.jpg"
+                  alt="Garvix Jewellery RFID Tags"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700">
-                  <span className="h-2 w-2 rounded-full bg-emerald-600 animate-ping"></span>
-                  SCAN COMPLETE (0.18s)
+              <div className="p-2.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+                  Jewellery RFID
                 </span>
+                <h4 className="text-xs font-bold text-slate-900 mt-1.5">JewelTrack™ Smart Tags</h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">500 items in 0.18s</p>
               </div>
             </div>
 
-            {/* Simulated Live Scan Specs */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-b border-slate-100">
-              <div className="rounded-2xl bg-[#f8fafc] p-3.5 border border-slate-100">
-                <div className="text-[11px] font-medium text-slate-500">Items Scanned</div>
-                <div className="text-2xl font-black text-slate-900 mt-0.5">512 pcs</div>
-                <div className="text-[10px] text-emerald-600 font-semibold mt-0.5">100% Detected</div>
+            <div className="group rounded-3xl border border-slate-200/90 bg-white p-3 shadow-sm hover:shadow-lg transition-all">
+              <div className="aspect-square rounded-2xl overflow-hidden bg-slate-50">
+                <img
+                  src="/images/products/garment-tag.jpg"
+                  alt="Garvix Garment RFID Hang Tags"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
-
-              <div className="rounded-2xl bg-[#f8fafc] p-3.5 border border-slate-100">
-                <div className="text-[11px] font-medium text-slate-500">Scan Latency</div>
-                <div className="text-2xl font-black text-blue-600 mt-0.5">0.18 sec</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Sub-second RF burst</div>
-              </div>
-
-              <div className="rounded-2xl bg-[#f8fafc] p-3.5 border border-slate-100">
-                <div className="text-[11px] font-medium text-slate-500">Stock Mismatch</div>
-                <div className="text-2xl font-black text-emerald-600 mt-0.5">0 Errors</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Exact gold weight match</div>
-              </div>
-
-              <div className="rounded-2xl bg-[#f8fafc] p-3.5 border border-slate-100">
-                <div className="text-[11px] font-medium text-slate-500">Anti-Theft Status</div>
-                <div className="text-2xl font-black text-slate-900 mt-0.5">ARMED</div>
-                <div className="text-[10px] text-emerald-600 font-semibold mt-0.5">Exit gates synced</div>
+              <div className="p-2.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
+                  Apparel Retail
+                </span>
+                <h4 className="text-xs font-bold text-slate-900 mt-1.5">Fashion Hang Tags</h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">Instant basket checkout</p>
               </div>
             </div>
 
-            {/* Tray Mockup Graphic Representation */}
-            <div className="pt-5 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-600 gap-3">
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-blue-600"></span>
-                <span>Tray Sensor #04: Active on Diamond Counter 1</span>
+            <div className="group rounded-3xl border border-slate-200/90 bg-white p-3 shadow-sm hover:shadow-lg transition-all">
+              <div className="aspect-square rounded-2xl overflow-hidden bg-slate-50">
+                <img
+                  src="/images/products/laundry-textile-tag.jpg"
+                  alt="Garvix Textile RFID Laundry Tags"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
-              <div className="flex items-center gap-4 text-xs font-mono text-slate-500">
-                <span>TX Power: 30 dBm</span>
-                <span>•</span>
-                <span>Antenna: Circular Polarized</span>
-                <span>•</span>
-                <span>ERP Synced: 2 ms ago</span>
+              <div className="p-2.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded-full">
+                  Hospital & Hotel
+                </span>
+                <h4 className="text-xs font-bold text-slate-900 mt-1.5">Textile Laundry Tags</h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">200+ wash cycles</p>
+              </div>
+            </div>
+
+            <div className="group rounded-3xl border border-slate-200/90 bg-white p-3 shadow-sm hover:shadow-lg transition-all">
+              <div className="aspect-square rounded-2xl overflow-hidden bg-slate-50">
+                <img
+                  src="/images/products/anti-metal-tag.jpg"
+                  alt="Garvix Anti-Metal RFID Tags"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="p-2.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full">
+                  Machinery & Plant
+                </span>
+                <h4 className="text-xs font-bold text-slate-900 mt-1.5">Anti-Metal Tags</h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">IP68 rugged mount</p>
               </div>
             </div>
           </div>
@@ -183,406 +190,668 @@ export default async function HomePage() {
                 99.9<span className="text-blue-600">%</span>
               </div>
               <div className="text-xs sm:text-sm font-semibold text-slate-800 mt-2">
-                Audit Accuracy
+                Scan Accuracy Rate
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Zero missed items or barcode human fatigue
+                Zero missed items or manual human fatigue
               </p>
             </div>
 
             <div>
               <div className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
-                0.2<span className="text-blue-600">s</span>
+                0.18<span className="text-blue-600">s</span>
               </div>
               <div className="text-xs sm:text-sm font-semibold text-slate-800 mt-2">
-                Tag Read Speed
+                Sub-Second Read Latency
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Bulk read 500+ RFID tags in a single second
+                Bulk read 500+ tags on a single tray
               </p>
             </div>
 
             <div>
               <div className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
-                10<span className="text-blue-600">x</span>
+                12<span className="text-blue-600">m</span>
               </div>
               <div className="text-xs sm:text-sm font-semibold text-slate-800 mt-2">
-                Faster Stock Audits
+                Long-Range Portals
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Complete 2-day store audits in under 15 minutes
+                Dock door reading without opening cartons
               </p>
             </div>
 
             <div>
               <div className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
-                100<span className="text-blue-600">%</span>
+                200<span className="text-blue-600">+</span>
               </div>
               <div className="text-xs sm:text-sm font-semibold text-slate-800 mt-2">
-                Workflow Adaptive
+                Wash Cycles Guaranteed
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Custom software engineered to fit your business
+                High-temperature industrial laundry ready
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. Solutions Showcase (Apple Bento Product Grid) */}
-      <section id="solutions" className="py-24 bg-[#fbfbfd]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+      {/* 3. Core Solutions: Real Products + Dedicated Software Pairings */}
+      <section id="products" className="py-24 bg-[#fbfbfd]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-24">
+          <div className="text-center max-w-3xl mx-auto">
             <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
-              Complete Technology Suite
+              The Product & Software Ecosystem
             </span>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mt-2">
-              Engineered for Every Operational Scale
+              Every Smart Tag Powered by Custom Software
             </h2>
             <p className="mt-4 text-base text-slate-600 leading-relaxed">
-              Explore how GARVIX integrates specialized RFID hardware, tamper-evident smart tags, and custom cloud ERP platforms to eliminate manual bottlenecks.
+              We do not just sell tags. We manufacture the physical RFID hardware and develop the complete custom software applications that run your daily operations.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Bento Card 1: 💎 Garvix JewelTrack™ (Large 7 Cols) */}
-            <div
-              id="jewellery"
-              className="lg:col-span-7 rounded-3xl border border-slate-200/80 bg-white p-8 sm:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-bold text-amber-700">
-                    <Gem className="h-3.5 w-3.5" />
-                    JEWELLERY AUTOMATION
-                  </span>
-                  <span className="text-xs font-mono font-medium text-slate-400">
-                    JewelTrack™ v3.2
-                  </span>
+          {/* PAIR 1: 💎 Jewellery RFID Smart Tags + JewelTrack™ ERP */}
+          <div
+            id="jewellery"
+            className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+          >
+            <div className="lg:col-span-6 space-y-5">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-bold text-amber-800">
+                <Gem className="h-3.5 w-3.5" />
+                <span>JEWELLERY RFID HARDWARE & SOFTWARE</span>
+              </div>
+
+              <h3 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                GARVIX JewelTrack™ Tags & Smart Velvet Tray ERP
+              </h3>
+
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Replace 4-hour manual piece counts with sub-second automation. Our custom-manufactured non-scratch loop & dumbbell tags attach securely to 22K/24K gold rings, diamond pendants, bangles, and chains with zero surface damage.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-blue-600" />
+                    500 Items in 0.18s
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    Place an entire velvet tray on the counter reader; all pieces are counted instantly.
+                  </p>
                 </div>
 
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  Scan 500 Gold Ornaments in Under 2 Seconds.
-                </h3>
-                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                  Eliminate exhausting 4-hour daily manual piece counts. Place an entire velvet tray of rings, bangles, or diamond necklaces directly over the smart reader. Every tag is read simultaneously with zero surface scratches.
-                </p>
-
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-4">
-                    <h5 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <CheckCircle2 className="h-4 w-4 text-blue-600" />
-                      Instant Missing Item Alerts
-                    </h5>
-                    <p className="text-xs text-slate-500 mt-1 leading-snug">
-                      Immediate acoustic buzzer and red screen warning if any piece is missing from the counter tray.
-                    </p>
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                    Missing Piece Acoustic Buzzer
                   </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    Instant red alert on screen and buzzer if an ornament is swapped or removed from the tray.
+                  </p>
+                </div>
 
-                  <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-4">
-                    <h5 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                      Anti-Theft Exit Gate Portals
-                    </h5>
-                    <p className="text-xs text-slate-500 mt-1 leading-snug">
-                      Discreet ceiling or pillar RFID antennas instantly detect unbilled items passing showroom exits.
-                    </p>
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <Zap className="h-4 w-4 text-amber-600" />
+                    Anti-Theft Exit Gate Portals
                   </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    Discreet ceiling or pillar antennas sound an alarm within 0.1s if an unbilled item passes exits.
+                  </p>
+                </div>
 
-                  <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-4">
-                    <h5 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <Zap className="h-4 w-4 text-amber-600" />
-                      Non-Scratch Micro Tags
-                    </h5>
-                    <p className="text-xs text-slate-500 mt-1 leading-snug">
-                      Ultra-thin, residue-free UHF labels designed specifically for fine hallmarked 22K/24K gold and platinum.
-                    </p>
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <Sliders className="h-4 w-4 text-purple-600" />
+                    Hallmark & Gold Weight Sync
                   </div>
-
-                  <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-4">
-                    <h5 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <Sliders className="h-4 w-4 text-purple-600" />
-                      Live Handheld Audit Gun
-                    </h5>
-                    <p className="text-xs text-slate-500 mt-1 leading-snug">
-                      Audit wall showcases, lockers, and safe vaults by simply waving the handheld RFID reader.
-                    </p>
-                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    Direct sync with custom Garvix Cloud ERP for gross/net weight and HUID verification.
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
-                <span className="text-xs text-slate-500 font-medium">
-                  Used by premium jewelers across Haryana, Delhi NCR, and Rajasthan.
-                </span>
+              <div className="pt-4 flex flex-wrap items-center gap-3">
                 <a
-                  href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20am%20interested%20in%20Jewellery%20RFID%20for%20my%20showroom"
+                  href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20am%20interested%20in%20JewelTrack%20RFID%20tags%20and%20software%20for%20my%20showroom"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline"
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 hover:bg-black px-6 py-2.5 text-xs font-semibold text-white shadow-sm transition"
                 >
-                  <span>Request Showroom Trial</span>
+                  <span>Request Jewellery Sample Kit</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </a>
               </div>
             </div>
 
-            {/* Bento Card 2: 🏭 Warehouse & Logistics Portals (5 Cols) */}
-            <div
-              id="warehouse"
-              className="lg:col-span-5 rounded-3xl border border-slate-200/80 bg-white p-8 sm:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-200 px-3 py-1 text-xs font-bold text-blue-700">
-                    <Boxes className="h-3.5 w-3.5" />
-                    SUPPLY CHAIN & LOGISTICS
+            <div className="lg:col-span-6">
+              <div className="rounded-3xl border border-slate-200/90 overflow-hidden shadow-lg bg-white">
+                <img
+                  src="/images/products/jewellery-rfid-tag.jpg"
+                  alt="Garvix Smart Retail Jewellery RFID Tags"
+                  className="w-full h-auto object-cover hover:scale-102 transition-transform duration-500"
+                />
+                <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                  <span className="font-semibold text-slate-900">
+                    Product: GARVIX Smart Retail Jewellery Tags
                   </span>
-                  <span className="text-xs font-mono font-medium text-slate-400">
-                    DockShield™
-                  </span>
-                </div>
-
-                <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                  Dock Door Bulk Verification. Zero Carton Opening.
-                </h3>
-                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                  Forklifts pass through dock door portals; all 2,000+ cartons on a pallet are verified in 3 seconds against ERP Dispatch Orders without breaking tamper seals.
-                </p>
-
-                <div className="mt-6 space-y-3.5 text-xs text-slate-600">
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-slate-900 font-semibold">12-Meter Long Range UHF:</strong> Fixed portal arrays read moving pallets seamlessly at forklift speeds.
-                    </span>
-                  </div>
-
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-slate-900 font-semibold">Zero Wrong Dispatches:</strong> Automated green/red dock signal lights prevent loading incorrect SKU shipments.
-                    </span>
-                  </div>
-
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-slate-900 font-semibold">Rugged Android Handhelds:</strong> IP65 drop-proof scanners with 2D barcode + RFID hybrid scanning.
-                    </span>
-                  </div>
+                  <span className="font-mono text-blue-600">GVX-JWL-001 / 002</span>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs text-slate-500">Automated E-Way Bill integration</span>
-                <Link
-                  href="#contact"
-                  className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline"
-                >
-                  <span>Explore Warehouse Spec</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
+          {/* PAIR 2: 👕 Garment Hang Tags & Hard Tags + FashionFlow™ POS */}
+          <div
+            id="apparel"
+            className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+          >
+            <div className="lg:col-span-6 order-2 lg:order-1">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-3xl border border-slate-200/90 overflow-hidden shadow-sm bg-white">
+                  <img
+                    src="/images/products/garment-tag.jpg"
+                    alt="Garvix UHF RFID Garment Hang Tag"
+                    className="w-full h-auto object-cover hover:scale-102 transition-transform duration-500"
+                  />
+                  <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
+                    <span className="text-[11px] font-bold text-slate-800">
+                      UHF Garment Hang Tag
+                    </span>
+                  </div>
+                </div>
+
+                <div className="rounded-3xl border border-slate-200/90 overflow-hidden shadow-sm bg-white">
+                  <img
+                    src="/images/products/hard-security-tag.jpg"
+                    alt="Garvix Anti-Theft EAS Hard Tag"
+                    className="w-full h-auto object-cover hover:scale-102 transition-transform duration-500"
+                  />
+                  <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
+                    <span className="text-[11px] font-bold text-slate-800">
+                      EAS + RFID Hard Tag
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Bento Card 3: 💻 Custom Enterprise Software & Cloud ERP (5 Cols) */}
-            <div
-              id="software"
-              className="lg:col-span-5 rounded-3xl border border-slate-200/80 bg-white p-8 sm:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 border border-purple-200 px-3 py-1 text-xs font-bold text-purple-700">
-                    <Cpu className="h-3.5 w-3.5" />
-                    BESPOKE ENTERPRISE SOFTWARE
-                  </span>
-                  <span className="text-xs font-mono font-medium text-slate-400">
-                    Garvix ERP Engine
+            <div className="lg:col-span-6 space-y-5 order-1 lg:order-2">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-200 px-3 py-1 text-xs font-bold text-blue-800">
+                <Shirt className="h-3.5 w-3.5" />
+                <span>APPAREL & FASHION RETAIL ECOSYSTEM</span>
+              </div>
+
+              <h3 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Garment Hang Tags, Hard Tags & FashionFlow™ POS
+              </h3>
+
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Transform apparel retail from slow single-barcode scanning to instant bulk billing and anti-shoplifting security. Designed with premium black matte cardstock, gold foil logo, and embedded high-sensitivity UHF RFID inlays.
+              </p>
+
+              <div className="space-y-3 text-xs text-slate-600 pt-1">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">Instant Basket Checkout:</strong> Drop a shopping basket with 10 garments onto the POS reader; all items are billed simultaneously in 1 second.
                   </span>
                 </div>
 
-                <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                  Software That Adapts to You. Not Vice-Versa.
-                </h3>
-                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                  Off-the-shelf software forces you to change your workflow. GARVIX crafts custom cloud applications, REST APIs, and edge middlewares tailor-made for your unique operation.
-                </p>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">Whole-Rack Stocktaking:</strong> Staff walks along clothing aisles with a handheld RFID reader; 1,000 garments are audited in 30 seconds.
+                  </span>
+                </div>
 
-                <div className="mt-6 space-y-3.5 text-xs text-slate-600">
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-slate-900 font-semibold">Native Auto GST (Haryana 06):</strong> Automatic CGST, SGST, IGST calculation and 1-click CA tax export.
-                    </span>
-                  </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">Dual Anti-Theft Security:</strong> Reusable magnetic hard tags with high-strength pins protect against store shoplifting at overhead gate portals.
+                  </span>
+                </div>
 
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-slate-900 font-semibold">Telegram & WhatsApp Push Alerts:</strong> Real-time staff notifications for invoices, receipts, and low stock.
-                    </span>
-                  </div>
-
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-slate-900 font-semibold">Offline-First Local Sync:</strong> Factory floor keeps running during internet downtime; auto-syncs to cloud.
-                    </span>
-                  </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">Custom In-House Tag Branding:</strong> Available with your company logo, custom MRP barcode formatting, and encoded EPC chips.
+                  </span>
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs text-slate-500">PostgreSQL • Next.js • Python</span>
-                <Link
-                  href="#contact"
-                  className="inline-flex items-center gap-1 text-xs font-bold text-purple-600 hover:text-purple-700 hover:underline"
-                >
-                  <span>Build Custom App</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Bento Card 4: 🏷️ Hardware & Smart Tags Ecosystem (7 Cols) */}
-            <div
-              id="hardware"
-              className="lg:col-span-7 rounded-3xl border border-slate-200/80 bg-white p-8 sm:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-700">
-                    <Layers className="h-3.5 w-3.5" />
-                    HARDWARE & SMART TAGS
-                  </span>
-                  <span className="text-xs font-mono font-medium text-slate-400">
-                    WPC 865–867 MHz
-                  </span>
-                </div>
-
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  Industrial-Grade Readers & Specialized Tags.
-                </h3>
-                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                  We supply, configure, and calibrate certified RFID hardware engineered to withstand dusty Indian factory environments, electrical noise, and high temperatures.
-                </p>
-
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-4">
-                    <h5 className="text-xs font-bold text-slate-900">Fixed UHF Readers</h5>
-                    <p className="text-xs text-slate-500 mt-1">
-                      4-port and 8-port high-sensitivity readers compatible with Impinj Indy R2000 / E710 chips.
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-4">
-                    <h5 className="text-xs font-bold text-slate-900">Anti-Metal On-Metal Tags</h5>
-                    <p className="text-xs text-slate-500 mt-1">
-                      Shielded ceramic and ABS tags for metal racks, engines, and heavy industrial machinery.
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-4">
-                    <h5 className="text-xs font-bold text-slate-900">Washable Linen Tags</h5>
-                    <p className="text-xs text-slate-500 mt-1">
-                      Flexible fabric tags that survive 200+ industrial laundry cycles for hospitals and hotels.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
-                <span className="text-xs text-slate-500">
-                  Ready stock available for readers, antennas, handheld guns, and tags.
-                </span>
+              <div className="pt-4 flex flex-wrap items-center gap-3">
                 <a
-                  href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20need%20quotation%20for%20RFID%20hardware%20and%20tags"
+                  href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20need%20Garment%20RFID%20tags%20and%20Apparel%20POS%20software"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-800 hover:underline"
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 hover:bg-black px-6 py-2.5 text-xs font-semibold text-white shadow-sm transition"
                 >
-                  <span>Request Hardware Catalog</span>
+                  <span>Inquire for Apparel Brand</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* PAIR 3: 🧺 Textile RFID Laundry Tags + LinenTrack™ ERP */}
+          <div
+            id="laundry"
+            className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+          >
+            <div className="lg:col-span-6 space-y-5">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-cyan-50 border border-cyan-200 px-3 py-1 text-xs font-bold text-cyan-800">
+                <Radio className="h-3.5 w-3.5" />
+                <span>HOSPITAL & HOTEL LAUNDRY AUTOMATION</span>
+              </div>
+
+              <h3 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Textile Laundry Tags & LinenTrack™ Cloud ERP
+              </h3>
+
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Engineered specifically for commercial laundry operations in hospitals, luxury hotels, and railway linens. Flexible fabric and silicone tags withstand 200+ high-temperature washing cycles, 60-bar water extraction presses, and 200°C ironing.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-cyan-600" />
+                    Bulk Laundry Bag Scan
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    Scan 500 soiled towels or sheets through an RFID portal without opening bags.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                    Wash Life Cycle Counter
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    ERP automatically tracks wash counts and alerts when linen quality nears end-of-life.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <Zap className="h-4 w-4 text-amber-600" />
+                    Ward & Room Dispatch
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    Exact dispatch tracking per hospital ward or hotel floor eliminates linen shrinkage.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <Sliders className="h-4 w-4 text-blue-600" />
+                    Sew-In or Heat-Seal Tags
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    Soft, skin-safe edges that do not irritate patients or hotel guests.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 flex flex-wrap items-center gap-3">
+                <a
+                  href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20am%20interested%20in%20Textile%20Laundry%20RFID%20tags%20and%20LinenTrack%20software"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 hover:bg-black px-6 py-2.5 text-xs font-semibold text-white shadow-sm transition"
+                >
+                  <span>Request Laundry Tag Samples</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </a>
               </div>
             </div>
 
-            {/* Bento Card 5: 🛠️ AMC & 24/7 Enterprise Support (Full Width 12 Cols) */}
-            <div
-              id="amc"
-              className="lg:col-span-12 rounded-3xl border border-slate-200/80 bg-white p-8 sm:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)]"
-            >
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white shrink-0">
-                    <Wrench className="h-6 w-6 text-blue-400" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
-                      LIFECYCLE MANAGEMENT
-                    </span>
-                    <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-                      Annual Maintenance Contracts (AMC) & Pan-India Support
-                    </h3>
-                  </div>
+            <div className="lg:col-span-6">
+              <div className="rounded-3xl border border-slate-200/90 overflow-hidden shadow-lg bg-white">
+                <img
+                  src="/images/products/laundry-textile-tag.jpg"
+                  alt="Garvix Textile RFID Laundry Tag"
+                  className="w-full h-auto object-cover hover:scale-102 transition-transform duration-500"
+                />
+                <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                  <span className="font-semibold text-slate-900">
+                    Product: Textile RFID Laundry Tags
+                  </span>
+                  <span className="font-mono text-cyan-600">Washable • 200+ Cycles</span>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <a
-                  href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20want%20to%20discuss%20AMC%20support%20for%20our%20RFID%20installation"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white hover:bg-slate-50 px-5 py-2.5 text-xs font-semibold text-slate-800 shadow-sm transition shrink-0"
-                >
-                  <MessageCircle className="h-4 w-4 text-emerald-600" />
-                  <span>Connect with Support Lead</span>
-                </a>
+          {/* PAIR 4: ⚙️ Anti-Metal Industrial RFID Tags + AssetCore™ ERP */}
+          <div
+            id="anti-metal"
+            className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+          >
+            <div className="lg:col-span-6 order-2 lg:order-1">
+              <div className="rounded-3xl border border-slate-200/90 overflow-hidden shadow-lg bg-white">
+                <img
+                  src="/images/products/anti-metal-tag.jpg"
+                  alt="Garvix Anti-Metal Industrial RFID Tag"
+                  className="w-full h-auto object-cover hover:scale-102 transition-transform duration-500"
+                />
+                <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                  <span className="font-semibold text-slate-900">
+                    Product: Heavy-Duty Anti-Metal Tags
+                  </span>
+                  <span className="font-mono text-slate-800">IP68 Rugged • Metal Shielded</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-6 space-y-5 order-1 lg:order-2">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 border border-slate-300 px-3 py-1 text-xs font-bold text-slate-800">
+                <Wrench className="h-3.5 w-3.5" />
+                <span>HEAVY MACHINERY & ASSET TRACKING</span>
               </div>
 
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xs text-slate-600">
-                <div className="space-y-1.5">
-                  <h5 className="font-bold text-slate-900 flex items-center gap-2 text-sm">
-                    <Clock className="h-4 w-4 text-blue-600" /> Guaranteed SLAs
-                  </h5>
-                  <p className="leading-relaxed">
-                    Rapid response times with advance hardware replacement so your showroom or warehouse never halts.
+              <h3 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Anti-Metal Tags & AssetCore™ Enterprise ERP
+              </h3>
+
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Standard RFID tags fail when mounted on metal due to radio signal interference. GARVIX Anti-Metal tags feature specialized internal RF shielding, high-impact ABS encapsulation, and screw or rivet holes for permanent mounting on machinery, IT racks, and tools.
+              </p>
+
+              <div className="space-y-3 text-xs text-slate-600 pt-1">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">10-Meter Read Range on Metal:</strong> Reads through metal racks, steel pallets, and industrial engines effortlessly.
+                  </span>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">Plant Maintenance Logging:</strong> Field engineers scan tags with handheld guns to log oil changes, calibration, and repair tickets.
+                  </span>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">IT Server Room Audits:</strong> Complete physical audit of 500 server blades and switches in minutes without human error.
+                  </span>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">IP68 Weatherproof & Heatproof:</strong> Withstands heavy oil, grease, outdoor rain, and high ambient factory temperatures.
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-4 flex flex-wrap items-center gap-3">
+                <a
+                  href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20need%20Anti-Metal%20RFID%20tags%20and%20AssetCore%20software"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 hover:bg-black px-6 py-2.5 text-xs font-semibold text-white shadow-sm transition"
+                >
+                  <span>Inquire for Plant Machinery</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* PAIR 5: 🚗 Vehicle RFID Passes + ParkGuard™ Boom Barrier */}
+          <div
+            id="vehicle"
+            className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+          >
+            <div className="lg:col-span-6 space-y-5">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-800">
+                <Car className="h-3.5 w-3.5" />
+                <span>VEHICLE AUTOMATION & PARKING BOOM BARRIERS</span>
+              </div>
+
+              <h3 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Vehicle Windshield Passes & ParkGuard™ Access System
+              </h3>
+
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Seamless, hands-free vehicle entry for residential societies, corporate IT parks, toll plazas, and logistics hubs. Transparent tamper-evident windshield stickers permanently self-destruct if peeled, preventing tag transfer between vehicles.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                    8-Meter Hands-Free Opening
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    Overhead directional antenna reads the moving vehicle tag and lifts the boom barrier automatically.
                   </p>
                 </div>
 
-                <div className="space-y-1.5">
-                  <h5 className="font-bold text-slate-900 flex items-center gap-2 text-sm">
-                    <Zap className="h-4 w-4 text-amber-600" /> On-Site Calibration
-                  </h5>
-                  <p className="leading-relaxed">
-                    Scheduled quarterly antenna recalibration and RF signal tuning to maintain peak 99.9% read rates.
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-blue-600" />
+                    Tamper-Evident Security
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    Tag antenna breaks if peeled off glass, eliminating tag sharing and unauthorized entry.
                   </p>
                 </div>
 
-                <div className="space-y-1.5">
-                  <h5 className="font-bold text-slate-900 flex items-center gap-2 text-sm">
-                    <ShieldCheck className="h-4 w-4 text-emerald-600" /> Firmware & Cloud Updates
-                  </h5>
-                  <p className="leading-relaxed">
-                    Regular feature releases, security patches, and regulatory compliance updates included.
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <Zap className="h-4 w-4 text-amber-600" />
+                    Fleet Logistics In-Out Time
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    Automated vehicle timestamp logging with linked driver details and electronic challans.
                   </p>
                 </div>
 
-                <div className="space-y-1.5">
-                  <h5 className="font-bold text-slate-900 flex items-center gap-2 text-sm">
-                    <BellRing className="h-4 w-4 text-purple-600" /> Dedicated Hotline
-                  </h5>
-                  <p className="leading-relaxed">
-                    Direct access to senior hardware and software engineers via phone and WhatsApp.
+                <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-3.5">
+                  <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <Sliders className="h-4 w-4 text-purple-600" />
+                    Telegram & WhatsApp Alerts
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                    Residents or plant managers receive instant push alerts whenever their vehicle enters or exits.
                   </p>
                 </div>
+              </div>
+
+              <div className="pt-4 flex flex-wrap items-center gap-3">
+                <a
+                  href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20need%20Vehicle%20RFID%20passes%20and%20Boom%20Barrier%20automation"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 hover:bg-black px-6 py-2.5 text-xs font-semibold text-white shadow-sm transition"
+                >
+                  <span>Request Vehicle Pass Samples</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </div>
+
+            <div className="lg:col-span-6">
+              <div className="rounded-3xl border border-slate-200/90 overflow-hidden shadow-lg bg-white">
+                <img
+                  src="/images/products/vehicle-rfid-pass.jpg"
+                  alt="Garvix Vehicle RFID Pass Windshield Sticker"
+                  className="w-full h-auto object-cover hover:scale-102 transition-transform duration-500"
+                />
+                <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                  <span className="font-semibold text-slate-900">
+                    Product: Vehicle RFID Windshield Pass
+                  </span>
+                  <span className="font-mono text-emerald-600">Tamper-Proof • 8m Range</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* PAIR 6: 🧻 Printable RFID Label Rolls & Clear Inlays + TagMaster™ */}
+          <div
+            id="rolls"
+            className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+          >
+            <div className="lg:col-span-6 order-2 lg:order-1">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-3xl border border-slate-200/90 overflow-hidden shadow-sm bg-white">
+                  <img
+                    src="/images/products/rfid-label-roll.jpg"
+                    alt="Garvix Printable Roll of UHF RFID Barcode Labels"
+                    className="w-full h-auto object-cover hover:scale-102 transition-transform duration-500"
+                  />
+                  <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
+                    <span className="text-[11px] font-bold text-slate-800">
+                      Printable RFID Label Rolls
+                    </span>
+                  </div>
+                </div>
+
+                <div className="rounded-3xl border border-slate-200/90 overflow-hidden shadow-sm bg-white">
+                  <img
+                    src="/images/products/rfid-inlay.jpg"
+                    alt="Garvix UHF RFID Inlays"
+                    className="w-full h-auto object-cover hover:scale-102 transition-transform duration-500"
+                  />
+                  <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
+                    <span className="text-[11px] font-bold text-slate-800">
+                      Clear UHF RFID Inlays
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-6 space-y-5 order-1 lg:order-2">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 border border-purple-200 px-3 py-1 text-xs font-bold text-purple-800">
+                <Barcode className="h-3.5 w-3.5" />
+                <span>HIGH-SPEED ENCODING & PRINTING MIDDLEWARE</span>
+              </div>
+
+              <h3 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Printable RFID Rolls, Inlays & TagMaster™
+              </h3>
+
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Direct thermal and thermal-transfer printable adhesive rolls with integrated UHF RFID inlays. Encode memory and print high-resolution barcodes simultaneously using Zebra, TSC, or Postek RFID printer encoders.
+              </p>
+
+              <div className="space-y-3 text-xs text-slate-600 pt-1">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">1-Click Bulk Serialization:</strong> Automatically generate GS1-compliant serialized EPC codes directly from your ERP invoice or packing list.
+                  </span>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">Pre-Printed or Blank Rolls:</strong> Order blank rolls for on-demand printing or pre-printed, pre-encoded tags with your company logo.
+                  </span>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">Adhesive Wet Inlays:</strong> Peel-and-stick clear inlays to embed RFID intelligence into your own carton boxes, plastic containers, or brand tags.
+                  </span>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
+                  <span>
+                    <strong className="text-slate-900 font-semibold">Direct Integration with Tally & SAP:</strong> Our TagMaster™ middleware bridges your existing accounting database with RFID encoding hardware.
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-4 flex flex-wrap items-center gap-3">
+                <a
+                  href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20need%20RFID%20Label%20Rolls%20and%20TagMaster%20middleware"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 hover:bg-black px-6 py-2.5 text-xs font-semibold text-white shadow-sm transition"
+                >
+                  <span>Order Label Rolls & Inlays</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </a>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. Comparison Matrix: Legacy Barcode vs GARVIX RFID (Apple Clean Style) */}
+      {/* 4. Complete Turnkey Solution (The 4 Pillars) */}
       <section className="py-20 border-t border-slate-200/80 bg-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+              Turnkey Accountability
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-2">
+              Hardware + Software + On-Site Execution
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-slate-600">
+              Most vendors sell hardware and blame software, or sell software and blame hardware. At GARVIX, you have a single partner for the entire lifecycle.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="rounded-3xl border border-slate-200/80 bg-[#fbfbfd] p-6 space-y-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-700 font-bold">
+                1
+              </div>
+              <h4 className="text-base font-bold text-slate-900">Custom Smart Tags</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Jewellery loop tags, garment hang tags, washable linen tags, and anti-metal tags custom manufactured with your brand identity.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200/80 bg-[#fbfbfd] p-6 space-y-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 font-bold">
+                2
+              </div>
+              <h4 className="text-base font-bold text-slate-900">Enterprise Readers</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                4-port / 8-port fixed readers, circular polarized antennas, and rugged IP65 Android handheld guns compliant with Indian WPC frequencies.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200/80 bg-[#fbfbfd] p-6 space-y-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-purple-700 font-bold">
+                3
+              </div>
+              <h4 className="text-base font-bold text-slate-900">Bespoke Cloud ERP</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Custom software engineered to fit your exact workflow with native Auto GST (Haryana 06), Telegram push bots, and offline edge sync.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200/80 bg-[#fbfbfd] p-6 space-y-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 font-bold">
+                4
+              </div>
+              <h4 className="text-base font-bold text-slate-900">Pan-India AMC & SLAs</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                On-site engineering installation, quarterly antenna recalibration, advance hardware replacement, and 24/7 dedicated support.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Apple-Style Comparison Matrix */}
+      <section className="py-20 border-t border-slate-200/80 bg-[#fbfbfd]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-14">
             <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
@@ -592,11 +861,11 @@ export default async function HomePage() {
               Why Forward-Thinking Businesses Replace Barcodes
             </h2>
             <p className="mt-3 text-sm sm:text-base text-slate-600">
-              Comparing manual 1D/2D barcode operations with GARVIX autonomous RFID precision.
+              Comparing manual barcode scanning with GARVIX autonomous RFID precision.
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+          <div className="max-w-4xl mx-auto rounded-3xl border border-slate-200 overflow-hidden shadow-sm bg-white">
             <div className="grid grid-cols-12 bg-slate-900 text-white text-xs font-bold p-4 sm:p-5">
               <div className="col-span-5 sm:col-span-4 uppercase tracking-wider text-slate-400">
                 Operational Metric
@@ -680,15 +949,15 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 5. Interactive ROI Calculator */}
-      <section className="py-20 border-t border-slate-200/80 bg-[#fbfbfd]">
+      {/* 6. Interactive ROI Calculator */}
+      <section className="py-20 border-t border-slate-200/80 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <RoiCalculator />
         </div>
       </section>
 
-      {/* 6. Contact & Consultation Section */}
-      <section className="py-20 border-t border-slate-200/80 bg-white">
+      {/* 7. Contact & Product Inquiry Section */}
+      <section className="py-20 border-t border-slate-200/80 bg-[#fbfbfd]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ContactForm
             companyInfo={{
@@ -700,7 +969,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 7. Corporate Apple-Style Footer */}
+      {/* 8. Corporate Apple-Style Footer */}
       <Footer />
     </div>
   );

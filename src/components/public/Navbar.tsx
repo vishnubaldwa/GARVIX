@@ -63,7 +63,7 @@ export function Navbar() {
             Overview
           </Link>
 
-          {/* Solutions Dropdown */}
+          {/* Products & Software Dropdown */}
           <div
             className="relative"
             onMouseEnter={() => setSolutionsDropdownOpen(true)}
@@ -73,7 +73,7 @@ export function Navbar() {
               type="button"
               className="flex items-center gap-1 hover:text-slate-950 transition-colors py-2"
             >
-              <span>Solutions</span>
+              <span>Products & Software</span>
               <ChevronDown
                 className={`h-3.5 w-3.5 transition-transform duration-200 ${
                   solutionsDropdownOpen ? "rotate-180 text-blue-600" : ""
@@ -82,72 +82,89 @@ export function Navbar() {
             </button>
 
             {solutionsDropdownOpen && (
-              <div className="absolute left-0 top-full pt-2 w-80">
-                <div className="rounded-2xl border border-slate-200 bg-white/98 p-2 shadow-xl backdrop-blur-xl space-y-1">
+              <div className="absolute left-0 top-full pt-2 w-88 z-50">
+                <div className="rounded-2xl border border-slate-200 bg-white/98 p-2.5 shadow-xl backdrop-blur-xl space-y-1 w-80">
                   <Link
                     href="/#jewellery"
-                    className="flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-slate-50 group"
+                    className="flex items-start gap-3 rounded-xl p-2 transition hover:bg-slate-50 group"
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
                       <Gem className="h-4 w-4" />
                     </div>
                     <div>
                       <div className="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
-                        Jewellery RFID (JewelTrack™)
+                        Jewellery RFID & JewelTrack™
                       </div>
                       <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                        Sub-second tray scan, anti-theft, 500+ items in 2 seconds.
+                        500 items in 0.18s, missing item buzzer, velvet tray counter.
                       </p>
                     </div>
                   </Link>
 
                   <Link
-                    href="/#warehouse"
-                    className="flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-slate-50 group"
+                    href="/#apparel"
+                    className="flex items-start gap-3 rounded-xl p-2 transition hover:bg-slate-50 group"
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
                       <Boxes className="h-4 w-4" />
                     </div>
                     <div>
                       <div className="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
-                        Warehouse & Logistics Portals
+                        Garment Hang Tags & Hard Tags
                       </div>
                       <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                        Dock-door pallet readers, 12m range, zero carton opening.
+                        Apparel POS, basket checkout, rack audit, anti-theft pin tags.
                       </p>
                     </div>
                   </Link>
 
                   <Link
-                    href="/#software"
-                    className="flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-slate-50 group"
+                    href="/#laundry"
+                    className="flex items-start gap-3 rounded-xl p-2 transition hover:bg-slate-50 group"
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
-                      <Cpu className="h-4 w-4" />
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-cyan-700">
+                      <Radio className="h-4 w-4" />
                     </div>
                     <div>
                       <div className="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
-                        Bespoke Enterprise Software
+                        Textile & Laundry RFID Tags
                       </div>
                       <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                        Workflow-first ERP, Auto GST (06), Telegram real-time bot.
+                        Washable linen tags (200+ cycles) for hospitals & hotels.
                       </p>
                     </div>
                   </Link>
 
                   <Link
-                    href="/#hardware"
-                    className="flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-slate-50 group"
+                    href="/#anti-metal"
+                    className="flex items-start gap-3 rounded-xl p-2 transition hover:bg-slate-50 group"
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-800">
+                      <Wrench className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
+                        Anti-Metal Industrial Tags
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                        Rugged screw-mount tags for plant machinery & IT assets.
+                      </p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/#vehicle"
+                    className="flex items-start gap-3 rounded-xl p-2 transition hover:bg-slate-50 group"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
                       <Layers className="h-4 w-4" />
                     </div>
                     <div>
                       <div className="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
-                        Hardware & Smart Tags
+                        Vehicle Windshield RFID Passes
                       </div>
                       <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                        Fixed Impinj/Zebra readers, handhelds, on-metal tags.
+                        Automated boom barrier & parking access management.
                       </p>
                     </div>
                   </Link>
@@ -160,35 +177,42 @@ export function Navbar() {
             href="/#jewellery"
             className="hover:text-slate-950 transition-colors"
           >
-            Jewellery RFID
+            Jewellery Tags
           </Link>
 
           <Link
-            href="/#warehouse"
+            href="/#apparel"
             className="hover:text-slate-950 transition-colors"
           >
-            Warehouse Portals
+            Garment & Fashion
           </Link>
 
           <Link
-            href="/#software"
+            href="/#laundry"
             className="hover:text-slate-950 transition-colors"
           >
-            Custom Software
+            Laundry Tags
           </Link>
 
           <Link
-            href="/#amc"
+            href="/#anti-metal"
             className="hover:text-slate-950 transition-colors"
           >
-            AMC & Support
+            Anti-Metal
           </Link>
 
           <Link
-            href="/#roi-calculator"
+            href="/#vehicle"
             className="hover:text-slate-950 transition-colors"
           >
-            ROI Calculator
+            Vehicle Pass
+          </Link>
+
+          <Link
+            href="/#rolls"
+            className="hover:text-slate-950 transition-colors"
+          >
+            Printable Rolls
           </Link>
         </nav>
 
@@ -243,36 +267,44 @@ export function Navbar() {
               <span>Jewellery RFID (JewelTrack™)</span>
             </Link>
             <Link
-              href="/#warehouse"
+              href="/#apparel"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-2 hover:text-blue-600"
             >
               <Boxes className="h-4 w-4 text-blue-500" />
-              <span>Warehouse & Logistics Portals</span>
+              <span>Garment Hang Tags & Hard Tags</span>
             </Link>
             <Link
-              href="/#software"
+              href="/#laundry"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-2 hover:text-blue-600"
             >
-              <Cpu className="h-4 w-4 text-purple-500" />
-              <span>Bespoke Enterprise Software</span>
+              <Radio className="h-4 w-4 text-cyan-600" />
+              <span>Textile Laundry RFID Tags</span>
             </Link>
             <Link
-              href="/#hardware"
+              href="/#anti-metal"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-2 hover:text-blue-600"
             >
-              <Layers className="h-4 w-4 text-emerald-500" />
-              <span>Hardware & Smart Tags</span>
+              <Wrench className="h-4 w-4 text-slate-700" />
+              <span>Anti-Metal Industrial Tags</span>
             </Link>
             <Link
-              href="/#amc"
+              href="/#vehicle"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-2 hover:text-blue-600"
             >
-              <Wrench className="h-4 w-4 text-slate-500" />
-              <span>AMC & Enterprise Support</span>
+              <Layers className="h-4 w-4 text-emerald-600" />
+              <span>Vehicle Windshield Passes</span>
+            </Link>
+            <Link
+              href="/#rolls"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 hover:text-blue-600"
+            >
+              <Radio className="h-4 w-4 text-purple-600" />
+              <span>Printable RFID Rolls & Inlays</span>
             </Link>
             <Link
               href="/#roi-calculator"

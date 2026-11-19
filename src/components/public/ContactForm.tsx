@@ -217,12 +217,15 @@ export function ContactForm({
                 onChange={(e) => setFormData({ ...formData, requirementType: e.target.value })}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs font-semibold text-blue-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
               >
-                <option value="Jewellery RFID">Garvix JewelTrack™ (Jewellery RFID)</option>
-                <option value="Warehouse RFID">Warehouse Dock Door Portal & Handhelds</option>
-                <option value="Custom Software">Bespoke Enterprise Software & ERP</option>
-                <option value="Hardware Tags">RFID Hardware & Specialized Tags</option>
-                <option value="AMC Support">AMC & Preventive Maintenance</option>
-                <option value="Other">Complete Turnkey Solution</option>
+                <option value="Jewellery RFID">Jewellery RFID Tags & JewelTrack™ ERP</option>
+                <option value="Garment Tags">Garment Hang Tags & Apparel Retail POS</option>
+                <option value="Hard Security Tags">EAS Hard Tags & Anti-Theft Gates</option>
+                <option value="Laundry RFID">Textile Laundry Tags & LinenTrack™ ERP</option>
+                <option value="Anti-Metal Tags">Anti-Metal Tags & Plant Machinery ERP</option>
+                <option value="Vehicle Pass">Vehicle Windshield Pass & Boom Barrier</option>
+                <option value="Printable Rolls">Printable RFID Rolls & Clear Inlays</option>
+                <option value="Custom Software">Bespoke Enterprise Software & Cloud ERP</option>
+                <option value="Complete Solution">Complete Turnkey Hardware + Software Solution</option>
               </select>
             </div>
           </div>
