@@ -39,3 +39,6 @@ next-env.d.ts
 
 # Private Document Vault (never commit confidential KYC / MCA docs)
 /private-vault/
+
+# Compiled Mobile APKs (uploaded directly to VPS, keep git lightweight)
+/downloads/

@@ -24,6 +24,7 @@ import {
   UserCog,
   Shield,
   FolderLock,
+  Smartphone,
 } from "lucide-react";
 import { useState } from "react";
 import { AuthSession } from "@/lib/auth";
@@ -280,6 +281,14 @@ export function AdminSidebar({
               {session?.role || "USER"}
             </span>
           </div>
+
+          <Link
+            href="/download-app"
+            target="_blank"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-blue-200/80 bg-blue-50/70 hover:bg-blue-100/70 py-2 text-xs font-medium text-[#0071e3] transition"
+          >
+            <Smartphone className="h-3.5 w-3.5" /> Android App (.apk)
+          </Link>
 
           <button
             onClick={handleLogout}

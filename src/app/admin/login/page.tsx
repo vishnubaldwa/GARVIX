@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Radio, Lock, User, ArrowRight, AlertCircle, ShieldCheck } from "lucide-react";
+import { Radio, Lock, User, ArrowRight, AlertCircle, ShieldCheck, Smartphone } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminLoginPage() {
@@ -138,7 +138,15 @@ export default function AdminLoginPage() {
           </div>
         </div>
 
-        <div className="mt-6 text-center">
+        <div className="mt-5 flex flex-col items-center gap-3 text-center">
+          <Link
+            href="/download-app"
+            className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-white hover:bg-[#fbfbfd] px-4 py-2 text-xs font-medium text-[#1d1d1f] shadow-xs transition"
+          >
+            <Smartphone className="h-3.5 w-3.5 text-[#0071e3]" />
+            <span>Download Android App (.apk)</span>
+          </Link>
+
           <Link
             href="/"
             className="text-xs font-medium text-[#86868b] hover:text-[#1d1d1f] transition"
