@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission, isFullAdminRole } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +32,10 @@ export async function POST(request: Request) {
 
     if (target.email === session.email && !isActive) {
       return NextResponse.json({ error: "You cannot deactivate your own logged-in account." }, { status: 400 });
+    }
+
+    if (isFullAdminRole(target.role) && !isActive) {
+      return NextResponse.json({ error: "The primary Super Admin account cannot be deactivated." }, { status: 400 });
     }
 
     const updated = await prisma.user.update({

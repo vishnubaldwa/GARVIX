@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission, isFullAdminRole } from "@/lib/permissions";
 import bcrypt from "bcryptjs";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +27,18 @@ export async function POST(request: Request) {
 
     if (newPassword.length < 6) {
       return NextResponse.json({ error: "New password must be at least 6 characters long." }, { status: 400 });
+    }
+
+    const target = await prisma.user.findUnique({ where: { id } });
+    if (!target) {
+      return NextResponse.json({ error: "Employee not found." }, { status: 404 });
+    }
+
+    if (isFullAdminRole(target.role) && !isFullAdminRole(session.role)) {
+      return NextResponse.json(
+        { error: "Only the Super Admin can reset the Super Admin password." },
+        { status: 403 }
+      );
     }
 
     const passwordHash = await bcrypt.hash(newPassword, 10);

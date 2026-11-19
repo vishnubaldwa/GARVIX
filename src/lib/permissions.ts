@@ -114,6 +114,17 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, PermissionCode[]> = {
     "CAN_VIEW_DOCUMENTS",
     "CAN_MANAGE_DOCUMENTS",
   ],
+  DIRECTOR: [
+    "CAN_CREATE_CLIENT",
+    "CAN_CREATE_PRODUCT",
+    "CAN_CREATE_QUOTATION",
+    "CAN_MANAGE_INVOICES",
+    "CAN_VIEW_FINANCES",
+    "CAN_VIEW_LEADS",
+    "CAN_VIEW_SERVICE",
+    "CAN_VIEW_DOCUMENTS",
+    "CAN_MANAGE_DOCUMENTS",
+  ],
   SALES: [
     "CAN_CREATE_CLIENT",
     "CAN_CREATE_QUOTATION",
@@ -140,6 +151,10 @@ const DEFAULT_ROLE_META: Record<string, { displayName: string; description: stri
   SUPER_ADMIN: {
     displayName: "👑 Super Admin",
     description: "Full unrestricted platform access, financial turnover, and company settings.",
+  },
+  DIRECTOR: {
+    displayName: "🏛️ Director",
+    description: "Company Director access: full business operations, financials, and Company Vault management. Customizable by Super Admin.",
   },
   SALES: {
     displayName: "💼 Sales Executive",

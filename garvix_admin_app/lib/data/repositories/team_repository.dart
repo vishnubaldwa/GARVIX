@@ -71,6 +71,10 @@ class TeamRepository {
     );
   }
 
+  Future<void> deleteEmployee(String id) async {
+    await _apiClient.delete('/api/admin/employees?id=${Uri.encodeComponent(id)}');
+  }
+
   Future<List<RoleItem>> fetchRoles() async {
     final data = await _apiClient.get('/api/admin/roles');
     return ((data['roles'] as List?) ?? const [])

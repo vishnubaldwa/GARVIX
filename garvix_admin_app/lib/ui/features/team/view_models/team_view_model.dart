@@ -109,6 +109,18 @@ class TeamViewModel extends ChangeNotifier {
     await loadAll();
   }
 
+  Future<void> deleteEmployee(String id) async {
+    _isMutating = true;
+    notifyListeners();
+    try {
+      await _repository.deleteEmployee(id);
+      await loadAll();
+    } finally {
+      _isMutating = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> createRole({
     required String displayName,
     String? description,

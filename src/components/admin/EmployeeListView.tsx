@@ -13,6 +13,7 @@ import {
   Search,
   Filter,
   Edit3,
+  Trash2,
 } from "lucide-react";
 
 interface Employee {
@@ -26,10 +27,23 @@ interface Employee {
   createdAt: string;
 }
 
+interface RoleOption {
+  name: string;
+  displayName: string;
+}
+
 const roleBadgeConfig: Record<string, { label: string; badge: string }> = {
   SUPER_ADMIN: {
     label: "👑 Super Admin",
     badge: "bg-purple-50 text-purple-700 border-purple-200",
+  },
+  ADMIN: {
+    label: "👑 Super Admin",
+    badge: "bg-purple-50 text-purple-700 border-purple-200",
+  },
+  DIRECTOR: {
+    label: "🏛️ Director",
+    badge: "bg-indigo-50 text-indigo-700 border-indigo-200",
   },
   SALES: {
     label: "💼 Sales Executive",
@@ -43,18 +57,44 @@ const roleBadgeConfig: Record<string, { label: string; badge: string }> = {
     label: "🛠️ Service Engineer",
     badge: "bg-amber-50 text-amber-700 border-amber-200",
   },
+  DOCUMENT_VIEWER: {
+    label: "🏦 External Viewer",
+    badge: "bg-slate-100 text-slate-700 border-slate-300",
+  },
 };
 
-export function EmployeeListView({ initialEmployees }: { initialEmployees: Employee[] }) {
+function isSuperAdminRole(roleName: string): boolean {
+  const upper = roleName.toUpperCase();
+  return upper === "SUPER_ADMIN" || upper === "ADMIN";
+}
+
+export function EmployeeListView({
+  initialEmployees,
+  initialRoles,
+  currentUserEmail,
+}: {
+  initialEmployees: Employee[];
+  initialRoles?: RoleOption[];
+  currentUserEmail?: string;
+}) {
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("ALL");
-  const [availableRoles, setAvailableRoles] = useState<{ name: string; displayName: string }[]>([
-    { name: "SUPER_ADMIN", displayName: "👑 Super Admin" },
-    { name: "SALES", displayName: "💼 Sales Executive" },
-    { name: "ACCOUNTS", displayName: "🧾 Accounts Officer" },
-    { name: "SERVICE", displayName: "🛠️ Service Engineer" },
-  ]);
+  const [availableRoles, setAvailableRoles] = useState<RoleOption[]>(
+    initialRoles && initialRoles.length > 0
+      ? initialRoles
+      : [
+          { name: "SUPER_ADMIN", displayName: "👑 Super Admin" },
+          { name: "DIRECTOR", displayName: "🏛️ Director" },
+          { name: "SALES", displayName: "💼 Sales Executive" },
+          { name: "ACCOUNTS", displayName: "🧾 Accounts Officer" },
+          { name: "SERVICE", displayName: "🛠️ Service Engineer" },
+          { name: "DOCUMENT_VIEWER", displayName: "🏦 External Viewer (Banker / CA)" },
+        ]
+  );
+
+  // Only 1 Super Admin is allowed, so non-Super-Admin roles are assignable for new/other accounts
+  const assignableRoles = availableRoles.filter((r) => !isSuperAdminRole(r.name));
 
   useEffect(() => {
     fetch("/api/admin/roles")
@@ -76,7 +116,7 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
-  const [role, setRole] = useState("SALES");
+  const [role, setRole] = useState("DIRECTOR");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [creating, setCreating] = useState(false);
@@ -167,7 +207,7 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
         setCreateModalOpen(false);
         setName("");
         setUsername("");
-        setRole("SALES");
+        setRole("DIRECTOR");
         setPhone("");
         setPassword("");
         showToast(`Staff account created for ${data.employee.name}!`);
@@ -197,6 +237,31 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
         showToast(`${emp.name} has been ${nextStatus ? "activated" : "deactivated"}.`);
       } else {
         alert(data.error || "Failed to update status.");
+      }
+    } catch {
+      alert("Network error.");
+    }
+  };
+
+  const handleDeleteEmployee = async (emp: Employee) => {
+    if (
+      !confirm(
+        `Are you sure you want to permanently delete "${emp.name}" (${emp.email})? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/employees?id=${encodeURIComponent(emp.id)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setEmployees(employees.filter((e) => e.id !== emp.id));
+        showToast(`${emp.name} deleted permanently.`);
+      } else {
+        alert(data.error || "Failed to delete account.");
       }
     } catch {
       alert("Network error.");
@@ -294,10 +359,11 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
               className="text-xs font-semibold text-slate-700 bg-transparent outline-none cursor-pointer"
             >
               <option value="ALL">All Roles ({employees.length})</option>
-              <option value="SUPER_ADMIN">Super Admin</option>
-              <option value="SALES">Sales</option>
-              <option value="ACCOUNTS">Accounts</option>
-              <option value="SERVICE">Service Engineer</option>
+              {availableRoles.map((r) => (
+                <option key={r.name} value={r.name}>
+                  {r.displayName}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -331,10 +397,13 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                 </tr>
               ) : (
                 filtered.map((emp) => {
+                  const matchedRole = availableRoles.find((r) => r.name === emp.role);
                   const roleConfig = roleBadgeConfig[emp.role] || {
-                    label: emp.role,
+                    label: matchedRole?.displayName || emp.role,
                     badge: "bg-slate-100 text-slate-700 border-slate-200",
                   };
+                  const isProtectedSuperAdmin = isSuperAdminRole(emp.role);
+                  const isSelf = !!currentUserEmail && emp.email === currentUserEmail;
 
                   return (
                     <tr key={emp.id} className="hover:bg-slate-50/70 transition">
@@ -392,21 +461,33 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                             <KeyRound className="h-3.5 w-3.5" />
                           </button>
 
-                          <button
-                            onClick={() => handleToggleStatus(emp)}
-                            title={emp.isActive ? "Deactivate Account" : "Activate Account"}
-                            className={`p-1.5 rounded-lg border transition ${
-                              emp.isActive
-                                ? "border-slate-200 bg-white text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200"
-                                : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                            }`}
-                          >
-                            {emp.isActive ? (
-                              <UserX className="h-3.5 w-3.5" />
-                            ) : (
-                              <UserCheck className="h-3.5 w-3.5" />
-                            )}
-                          </button>
+                          {!isProtectedSuperAdmin && !isSelf && (
+                            <button
+                              onClick={() => handleToggleStatus(emp)}
+                              title={emp.isActive ? "Deactivate Account" : "Activate Account"}
+                              className={`p-1.5 rounded-lg border transition ${
+                                emp.isActive
+                                  ? "border-slate-200 bg-white text-slate-600 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200"
+                                  : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                              }`}
+                            >
+                              {emp.isActive ? (
+                                <UserX className="h-3.5 w-3.5" />
+                              ) : (
+                                <UserCheck className="h-3.5 w-3.5" />
+                              )}
+                            </button>
+                          )}
+
+                          {!isProtectedSuperAdmin && !isSelf && (
+                            <button
+                              onClick={() => handleDeleteEmployee(emp)}
+                              title="Delete Account Permanently"
+                              className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -479,21 +560,21 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                     onChange={(e) => setRole(e.target.value)}
                     className="w-full admin-input py-2 px-3 text-xs font-semibold cursor-pointer"
                   >
-                    <option value="SALES">💼 Sales Executive</option>
-                    <option value="ACCOUNTS">🧾 Accounts Officer</option>
-                    <option value="SERVICE">🛠️ Service Engineer</option>
-                    <option value="SUPER_ADMIN">👑 Super Admin</option>
+                    {assignableRoles.map((r) => (
+                      <option key={r.name} value={r.name}>
+                        {r.displayName}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
-                  Mobile Number *
+                  Mobile Number (Optional)
                 </label>
                 <input
                   type="tel"
-                  required
                   placeholder="e.g. 9876543210"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -588,10 +669,11 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                   <label className="block font-semibold text-slate-700 mb-1">Assigned Role *</label>
                   <select
                     value={editRole}
+                    disabled={isSuperAdminRole(editingEmp.role)}
                     onChange={(e) => setEditRole(e.target.value)}
-                    className="w-full admin-input py-2 px-3 text-xs font-semibold cursor-pointer"
+                    className="w-full admin-input py-2 px-3 text-xs font-semibold cursor-pointer disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
                   >
-                    {availableRoles.map((r) => (
+                    {(isSuperAdminRole(editingEmp.role) ? availableRoles : assignableRoles).map((r) => (
                       <option key={r.name} value={r.name}>
                         {r.displayName}
                       </option>
@@ -602,11 +684,10 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
 
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
-                  Mobile Number *
+                  Mobile Number (Optional)
                 </label>
                 <input
                   type="tel"
-                  required
                   placeholder="e.g. 9876543210"
                   value={editPhone}
                   onChange={(e) => setEditPhone(e.target.value)}
@@ -618,8 +699,9 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                 <label className="block font-semibold text-slate-700 mb-1">Account Status</label>
                 <select
                   value={editIsActive ? "ACTIVE" : "INACTIVE"}
+                  disabled={isSuperAdminRole(editingEmp.role)}
                   onChange={(e) => setEditIsActive(e.target.value === "ACTIVE")}
-                  className="w-full admin-input py-2 px-3 text-xs font-semibold cursor-pointer"
+                  className="w-full admin-input py-2 px-3 text-xs font-semibold cursor-pointer disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
                 >
                   <option value="ACTIVE">🟢 Active (Access Allowed)</option>
                   <option value="INACTIVE">🔴 Inactive (Account Suspended)</option>

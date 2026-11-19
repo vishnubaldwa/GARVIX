@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission, isFullAdminRole } from "@/lib/permissions";
 import bcrypt from "bcryptjs";
 
 export const dynamic = "force-dynamic";
@@ -72,6 +72,22 @@ export async function POST(request: Request) {
         { error: "Password must be at least 6 characters long." },
         { status: 400 }
       );
+    }
+
+    // Enforce Single Super Admin rule
+    if (isFullAdminRole(role)) {
+      const existingSuperAdmin = await prisma.user.findFirst({
+        where: { role: { in: ["SUPER_ADMIN", "ADMIN"] } },
+      });
+      if (existingSuperAdmin) {
+        return NextResponse.json(
+          {
+            error:
+              "Only 1 Super Admin account is allowed. Please assign the 'Director' role instead.",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     const cleanUsername = username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
@@ -183,6 +199,44 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Employee not found." }, { status: 404 });
     }
 
+    // Protect single Super Admin account & prevent creating a second Super Admin
+    if (isFullAdminRole(existingEmp.role)) {
+      if (!isFullAdminRole(session.role)) {
+        return NextResponse.json(
+          { error: "Only the Super Admin can modify the Super Admin profile." },
+          { status: 403 }
+        );
+      }
+      if (!isFullAdminRole(role)) {
+        return NextResponse.json(
+          { error: "The primary Super Admin account role cannot be downgraded." },
+          { status: 400 }
+        );
+      }
+      if (isActive === false) {
+        return NextResponse.json(
+          { error: "The primary Super Admin account cannot be deactivated." },
+          { status: 400 }
+        );
+      }
+    } else if (isFullAdminRole(role)) {
+      const existingSuperAdmin = await prisma.user.findFirst({
+        where: {
+          role: { in: ["SUPER_ADMIN", "ADMIN"] },
+          id: { not: id },
+        },
+      });
+      if (existingSuperAdmin) {
+        return NextResponse.json(
+          {
+            error:
+              "Only 1 Super Admin account is allowed. Please assign the 'Director' role instead.",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     const cleanPhone = phone ? phone.trim().replace(/\s+/g, "") : null;
 
     // Check phone uniqueness if changed
@@ -234,6 +288,88 @@ export async function PATCH(request: Request) {
     });
 
     return NextResponse.json({ success: true, employee: updatedUser });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
+// DELETE: Permanently delete a staff / external viewer account (with strict safety guards)
+export async function DELETE(request: Request) {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const allowed =
+      isFullAdminRole(session.role) ||
+      (await hasPermission(session.role, "CAN_MANAGE_TEAM"));
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Access denied. Team management permission required." },
+        { status: 403 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    let id = searchParams.get("id");
+    if (!id) {
+      try {
+        const body = await request.json();
+        id = body?.id;
+      } catch {
+        // No JSON body
+      }
+    }
+
+    if (!id) {
+      return NextResponse.json({ error: "Employee ID is required." }, { status: 400 });
+    }
+
+    const target = await prisma.user.findUnique({ where: { id } });
+    if (!target) {
+      return NextResponse.json({ error: "Employee not found." }, { status: 404 });
+    }
+
+    if (target.email === session.email) {
+      return NextResponse.json(
+        { error: "You cannot delete your own currently logged-in account." },
+        { status: 400 }
+      );
+    }
+
+    if (isFullAdminRole(target.role)) {
+      return NextResponse.json(
+        { error: "The primary Super Admin account cannot be deleted." },
+        { status: 400 }
+      );
+    }
+
+    // Preserve immutable audit log history while removing FK link before deleting user
+    await prisma.$transaction([
+      prisma.auditLog.updateMany({
+        where: { userId: id },
+        data: { userId: null },
+      }),
+      prisma.user.delete({
+        where: { id },
+      }),
+    ]);
+
+    await prisma.auditLog.create({
+      data: {
+        username: session.username,
+        action: "DELETE",
+        entityType: "USER",
+        entityId: id,
+        details: `Permanently deleted staff account '${target.name}' (${target.email}, role: ${target.role})`,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Account '${target.name}' deleted permanently.`,
+    });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

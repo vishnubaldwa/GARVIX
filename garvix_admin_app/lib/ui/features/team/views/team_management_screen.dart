@@ -28,24 +28,45 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
     widget.viewModel.loadAll();
   }
 
-  List<String> get _availableRoleCodes {
-    if (widget.viewModel.roles.isNotEmpty) {
-      return widget.viewModel.roles.map((r) => r.name).toList();
-    }
-    return const [
-      'SUPER_ADMIN',
-      'SALES',
-      'ACCOUNTS',
-      'SERVICE',
-      'DOCUMENT_VIEWER',
-    ];
+  bool _isSuperAdminRole(String code) {
+    final upper = code.toUpperCase();
+    return upper == 'SUPER_ADMIN' || upper == 'ADMIN';
+  }
+
+  List<String> get _assignableRoleCodes {
+    final all = widget.viewModel.roles.isNotEmpty
+        ? widget.viewModel.roles.map((r) => r.name).toList()
+        : const [
+            'DIRECTOR',
+            'SALES',
+            'ACCOUNTS',
+            'SERVICE',
+            'DOCUMENT_VIEWER',
+          ];
+    return all.where((code) => !_isSuperAdminRole(code)).toList();
   }
 
   String _roleLabel(String code) {
     for (final r in widget.viewModel.roles) {
       if (r.name == code) return r.displayName;
     }
-    return code;
+    switch (code.toUpperCase()) {
+      case 'SUPER_ADMIN':
+      case 'ADMIN':
+        return '👑 Super Admin';
+      case 'DIRECTOR':
+        return '🏛️ Director';
+      case 'SALES':
+        return '💼 Sales Executive';
+      case 'ACCOUNTS':
+        return '🧾 Accounts Officer';
+      case 'SERVICE':
+        return '🛠️ Service Engineer';
+      case 'DOCUMENT_VIEWER':
+        return '🏦 External Viewer';
+      default:
+        return code;
+    }
   }
 
   Future<void> _showAddEmployeeSheet() async {
@@ -53,9 +74,9 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
     final usernameCtrl = TextEditingController();
     final phoneCtrl = TextEditingController();
     final passCtrl = TextEditingController();
-    final roleOptions = _availableRoleCodes;
+    final roleOptions = _assignableRoleCodes;
     String selectedRole =
-        roleOptions.contains('SALES') ? 'SALES' : roleOptions.first;
+        roleOptions.contains('DIRECTOR') ? 'DIRECTOR' : roleOptions.first;
     bool submitting = false;
 
     await showModalBottomSheet<void>(
@@ -218,7 +239,10 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
   Future<void> _showEditEmployeeSheet(EmployeeItem emp) async {
     final nameCtrl = TextEditingController(text: emp.name);
     final phoneCtrl = TextEditingController(text: emp.phone ?? '');
-    final roleOptions = {..._availableRoleCodes, emp.role}.toList();
+    final isSuper = _isSuperAdminRole(emp.role);
+    final roleOptions = isSuper
+        ? <String>[emp.role]
+        : {..._assignableRoleCodes, emp.role}.toList();
     String selectedRole = emp.role;
     bool isActive = emp.isActive;
     bool submitting = false;
@@ -278,22 +302,24 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                         ),
                       )
                       .toList(),
-                  onChanged: (v) {
-                    if (v != null) setModalState(() => selectedRole = v);
-                  },
+                  onChanged: isSuper
+                      ? null
+                      : (v) {
+                          if (v != null) setModalState(() => selectedRole = v);
+                        },
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: phoneCtrl,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(labelText: 'Phone Number'),
+                  decoration: const InputDecoration(labelText: 'Phone Number (Optional)'),
                 ),
                 const SizedBox(height: 8),
                 SwitchListTile.adaptive(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Account Active'),
                   value: isActive,
-                  onChanged: emp.email == widget.currentUser.email
+                  onChanged: isSuper || emp.email == widget.currentUser.email
                       ? null
                       : (v) => setModalState(() => isActive = v),
                 ),
@@ -385,6 +411,44 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
     }
   }
 
+  Future<void> _confirmDeleteEmployee(EmployeeItem emp) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Account Permanently?'),
+        content: Text(
+          'Permanently delete "${emp.name}" (${emp.email})? This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppleColors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) {
+      try {
+        await widget.viewModel.deleteEmployee(emp.id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${emp.name} deleted permanently.')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(e.toString())));
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -431,6 +495,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
               itemBuilder: (context, index) {
                 final emp = employees[index];
                 final isSelf = emp.email == widget.currentUser.email;
+                final isSuper = _isSuperAdminRole(emp.role);
                 return AppleCard(
                   padding: const EdgeInsets.all(14),
                   child: Column(
@@ -479,7 +544,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                           ),
                           Switch.adaptive(
                             value: emp.isActive,
-                            onChanged: isSelf
+                            onChanged: isSelf || isSuper
                                 ? null
                                 : (_) async {
                                     try {
@@ -519,7 +584,9 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      Row(
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
                         children: [
                           OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
@@ -530,9 +597,8 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                             ),
                             onPressed: () => _showEditEmployeeSheet(emp),
                             icon: const Icon(Icons.edit_outlined, size: 15),
-                            label: const Text('Edit Role'),
+                            label: Text(isSuper ? 'Edit Profile' : 'Edit Role'),
                           ),
-                          const SizedBox(width: 8),
                           OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
@@ -544,6 +610,25 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                             icon: const Icon(Icons.key_outlined, size: 15),
                             label: const Text('Reset Pass'),
                           ),
+                          if (!isSelf && !isSuper)
+                            OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppleColors.red,
+                                side: const BorderSide(
+                                  color: Color(0x33BE123C),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                              ),
+                              onPressed: () => _confirmDeleteEmployee(emp),
+                              icon: const Icon(
+                                Icons.delete_outline_rounded,
+                                size: 15,
+                              ),
+                              label: const Text('Delete'),
+                            ),
                         ],
                       ),
                     ],
