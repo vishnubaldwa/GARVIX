@@ -16,12 +16,12 @@ export default async function AdminLayout({
     : [];
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#f5f5f7] text-[#1d1d1f] flex flex-col md:flex-row antialiased">
       <AdminSidebar session={session} permissions={permissions} />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <AdminHeader session={session} />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#f8fafc]">
-          {children}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#f5f5f7]">
+          <div className="mx-auto max-w-7xl">{children}</div>
         </main>
       </div>
     </div>

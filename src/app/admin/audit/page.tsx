@@ -1,9 +1,19 @@
 import { prisma } from "@/lib/prisma";
-import { ShieldCheck, Clock, User, Activity } from "lucide-react";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminAuditPage() {
+  const session = await getSession();
+  if (!session) {
+    redirect("/admin/login");
+  }
+  if (!isFullAdminRole(session.role)) {
+    redirect("/admin");
+  }
+
   const logs = await prisma.auditLog.findMany({
     orderBy: { createdAt: "desc" },
     take: 50,

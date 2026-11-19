@@ -2,9 +2,29 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { AuthSession } from "@/lib/auth";
-import { ExternalLink, ShieldCheck, LogOut, User, Users, ShieldAlert } from "lucide-react";
+import { ExternalLink, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+
+const PAGE_TITLES: Record<string, string> = {
+  "/admin": "Overview",
+  "/admin/clients": "Parties & Clients",
+  "/admin/quotations": "Quotations & Proposals",
+  "/admin/leads": "Website Leads & CRM",
+  "/admin/invoices": "Invoices & Proforma",
+  "/admin/outstanding": "Outstanding & Payments",
+  "/admin/challans": "Delivery Challans & E-Way",
+  "/admin/inventory": "Hardware & Products",
+  "/admin/inventory/serials": "Serial & IMEI Tracker",
+  "/admin/amc": "AMC Support Contracts",
+  "/admin/expenses": "Business Expenses",
+  "/admin/gst-returns": "1-Click CA Return",
+  "/admin/purchases": "Vendor Purchases & ITC",
+  "/admin/team": "Team & Staff Management",
+  "/admin/roles": "Roles & Permissions",
+  "/admin/settings": "Settings & Profile",
+  "/admin/audit": "Audit Security Logs",
+};
 
 export function AdminHeader({ session }: { session: AuthSession | null }) {
   const pathname = usePathname();
@@ -29,75 +49,80 @@ export function AdminHeader({ session }: { session: AuthSession | null }) {
   };
 
   const getRoleBadge = (role?: string) => {
-    switch (role) {
+    const upper = (role || "").toUpperCase();
+    switch (upper) {
       case "SUPER_ADMIN":
-        return "bg-rose-50 text-rose-700 border-rose-200";
       case "ADMIN":
-        return "bg-purple-50 text-purple-700 border-purple-200";
+        return "bg-blue-50 text-[#0071e3] border-blue-200/80";
       case "SALES":
-        return "bg-blue-50 text-blue-700 border-blue-200";
+        return "bg-indigo-50 text-indigo-700 border-indigo-200/80";
       case "ACCOUNTS":
-        return "bg-emerald-50 text-emerald-700 border-emerald-200";
+        return "bg-emerald-50 text-emerald-700 border-emerald-200/80";
       case "SERVICE":
-        return "bg-amber-50 text-amber-700 border-amber-200";
+        return "bg-amber-50 text-amber-700 border-amber-200/80";
       default:
-        return "bg-slate-100 text-slate-700 border-slate-200";
+        return "bg-[#f5f5f7] text-[#424245] border-black/[0.08]";
     }
   };
 
+  const currentTitle =
+    PAGE_TITLES[pathname] ||
+    Object.entries(PAGE_TITLES).find(
+      ([path]) => path !== "/admin" && pathname.startsWith(path + "/")
+    )?.[1] ||
+    "GARVIX ERP";
+
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur px-4 sm:px-6 shadow-sm">
-      <div className="flex items-center gap-3">
-        <span className="text-xs font-mono font-bold text-slate-800 tracking-tight">
-          GARVIX ERP <span className="text-blue-600 font-semibold">v2.6</span>
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-black/[0.06] bg-white/80 backdrop-blur-xl px-4 sm:px-6">
+      <div className="flex items-center gap-3 min-w-0">
+        <span className="text-sm font-semibold text-[#1d1d1f] tracking-tight truncate">
+          {currentTitle}
         </span>
-        <span className="hidden sm:inline text-slate-300">|</span>
-        <span className="hidden sm:flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-0.5 text-[11px] font-medium text-blue-700">
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse"></span>
-          State: Haryana (06) • Auto GST Engine
+        <span className="hidden md:inline text-black/15">•</span>
+        <span className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-[#f5f5f7] border border-black/[0.06] px-2.5 py-0.5 text-[11px] font-medium text-[#424245]">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+          Haryana (06) Auto GST
         </span>
       </div>
 
-      <div className="flex items-center gap-2.5 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
         <Link
           href="/"
           target="_blank"
-          className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700 hover:text-blue-600 hover:border-blue-300 transition"
+          className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white hover:bg-[#f5f5f7] px-3 py-1.5 text-xs font-medium text-[#1d1d1f] transition"
         >
-          <span>View Public Site</span>
-          <ExternalLink className="h-3 w-3" />
+          <span className="hidden sm:inline">View Site</span>
+          <ExternalLink className="h-3 w-3 text-[#86868b]" />
         </Link>
 
         {session && (
           <div className="flex items-center gap-2">
             <Link
               href="/admin/settings"
-              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 text-xs text-slate-700 transition"
+              className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-[#f5f5f7] hover:bg-black/[0.06] pl-2.5 pr-2 py-1 text-xs text-[#1d1d1f] transition"
               title="Account Settings"
             >
-              <User className="h-3.5 w-3.5 text-slate-500" />
-              <div className="flex items-center gap-1.5">
-                <span className="truncate max-w-[110px] font-medium text-slate-800">
-                  {session.name || session.username}
-                </span>
-                <span
-                  className={`text-[9px] font-bold uppercase px-1.5 py-0.2 rounded border ${getRoleBadge(
-                    session.role
-                  )}`}
-                >
-                  {session.role}
-                </span>
-              </div>
+              <User className="h-3.5 w-3.5 text-[#86868b]" />
+              <span className="truncate max-w-[110px] font-medium">
+                {session.name || session.username}
+              </span>
+              <span
+                className={`text-[9px] font-semibold uppercase px-2 py-0.5 rounded-full border ${getRoleBadge(
+                  session.role
+                )}`}
+              >
+                {session.role}
+              </span>
             </Link>
 
             <button
               onClick={handleLogout}
               disabled={loggingOut}
-              className="flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700 transition disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 px-3 py-1.5 text-xs font-medium text-[#424245] transition disabled:opacity-50"
               title="Sign Out"
             >
               <LogOut className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Logout</span>
+              <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
         )}

@@ -164,10 +164,19 @@ export async function ensureDefaultRoles() {
 }
 
 /**
+ * Returns true if the role represents a full-access administrator (SUPER_ADMIN or legacy ADMIN).
+ */
+export function isFullAdminRole(roleName?: string | null): boolean {
+  if (!roleName) return false;
+  const normalized = roleName.toUpperCase();
+  return normalized === "SUPER_ADMIN" || normalized === "ADMIN";
+}
+
+/**
  * Returns granted permission strings for a given role name.
  */
 export async function getPermissionsForRole(roleName: string): Promise<PermissionCode[]> {
-  if (roleName === "SUPER_ADMIN") {
+  if (isFullAdminRole(roleName)) {
     return Object.keys(PERMISSIONS) as PermissionCode[];
   }
 
@@ -193,7 +202,7 @@ export async function hasPermission(
   roleName: string,
   permission: PermissionCode
 ): Promise<boolean> {
-  if (roleName === "SUPER_ADMIN") return true;
+  if (isFullAdminRole(roleName)) return true;
   const permissions = await getPermissionsForRole(roleName);
   return permissions.includes(permission);
 }

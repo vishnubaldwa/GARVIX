@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendTelegramLeadAlert } from "@/lib/telegram";
+import { sendLeadEmail } from "@/lib/mailer";
 
 export async function POST(request: Request) {
   try {
@@ -49,15 +50,26 @@ export async function POST(request: Request) {
       },
     });
 
-    // Send Telegram alert
-    const notified = await sendTelegramLeadAlert({
-      name: lead.name,
-      company: lead.company,
-      email: lead.email,
-      phone: lead.phone,
-      solution: lead.solution,
-      message: lead.message,
-    });
+    // Send Email to info@garvix.in & Telegram alert in parallel
+    const [emailResult, notified] = await Promise.all([
+      sendLeadEmail({
+        name: lead.name,
+        company: lead.company,
+        email: lead.email,
+        phone: lead.phone,
+        industry,
+        solution: lead.solution,
+        message: details.trim(),
+      }),
+      sendTelegramLeadAlert({
+        name: lead.name,
+        company: lead.company,
+        email: lead.email,
+        phone: lead.phone,
+        solution: lead.solution,
+        message: lead.message,
+      }),
+    ]);
 
     if (notified) {
       await prisma.lead.update({
@@ -68,8 +80,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Enquiry received successfully! Our solutions engineer will contact you shortly.",
+      message:
+        "Thank you! Your enquiry has been sent to info@garvix.in. Our team will connect with you shortly.",
       leadId: lead.id,
+      emailSent: emailResult.sent,
       telegramNotified: notified,
     });
   } catch (err: any) {

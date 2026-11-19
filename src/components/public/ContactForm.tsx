@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Send,
   CheckCircle2,
@@ -10,14 +10,12 @@ import {
   Building,
   User,
   Layers,
-  Briefcase,
   MessageSquare,
-  MessageCircle,
 } from "lucide-react";
 
 export function ContactForm({
   companyInfo,
-  defaultRequirement = "Jewellery RFID",
+  defaultRequirement = "Custom Software",
 }: {
   companyInfo?: { phone?: string; email?: string; state?: string };
   defaultRequirement?: string;
@@ -27,12 +25,34 @@ export function ContactForm({
     company: "",
     email: "",
     phone: "",
-    industry: "Retail & Jewellery",
     requirementType: defaultRequirement,
     requirementDetails: "",
   });
   const [loading, setLoading] = useState(false);
-  const [responseMsg, setResponseMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [highlighted, setHighlighted] = useState(false);
+  const [responseMsg, setResponseMsg] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const handleSelectSolution = (event: Event) => {
+      const customEvent = event as CustomEvent<{ solution: string }>;
+      if (customEvent.detail?.solution) {
+        setFormData((prev) => ({
+          ...prev,
+          requirementType: customEvent.detail.solution,
+        }));
+        setHighlighted(true);
+        setTimeout(() => setHighlighted(false), 1800);
+      }
+    };
+
+    window.addEventListener("garvix:select-solution", handleSelectSolution);
+    return () => {
+      window.removeEventListener("garvix:select-solution", handleSelectSolution);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,27 +70,26 @@ export function ContactForm({
       if (res.ok) {
         setResponseMsg({
           type: "success",
-          text: "Thank you! Your inquiry has been received. Our solutions engineering team will reach out within 2 hours.",
+          text: "Thank you! Your enquiry has been sent to info@garvix.in. Our team will contact you shortly.",
         });
         setFormData({
           name: "",
           company: "",
           email: "",
           phone: "",
-          industry: "Retail & Jewellery",
-          requirementType: "Jewellery RFID",
+          requirementType: "Custom Software",
           requirementDetails: "",
         });
       } else {
         setResponseMsg({
           type: "error",
-          text: data.error || "Submission failed. Please check your inputs and try again.",
+          text: data.error || "Submission failed. Please check your details and try again.",
         });
       }
     } catch {
       setResponseMsg({
         type: "error",
-        text: "Network error occurred. Please try again or chat directly on WhatsApp.",
+        text: "Network error. Please try again or email us directly at info@garvix.in.",
       });
     } finally {
       setLoading(false);
@@ -80,17 +99,28 @@ export function ContactForm({
   return (
     <div
       id="contact"
-      className="mx-auto max-w-4xl rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-10 shadow-[0_12px_45px_rgba(0,0,0,0.05)] relative overflow-hidden"
+      className={`mx-auto max-w-3xl rounded-3xl border bg-white p-6 sm:p-10 shadow-[0_12px_45px_rgba(0,0,0,0.04)] transition-all duration-300 scroll-mt-24 ${
+        highlighted
+          ? "border-[#0071e3] ring-4 ring-[#0071e3]/15"
+          : "border-black/[0.08]"
+      }`}
     >
-      <div className="text-center max-w-xl mx-auto mb-8">
-        <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/70 px-3.5 py-1 text-xs font-semibold text-blue-700 mb-3">
-          <span>Schedule On-Site Consultation</span>
-        </div>
-        <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-          Request a Custom Proposal & Live Demo
+      <div className="text-center max-w-lg mx-auto mb-8">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[#0071e3]">
+          Get in Touch
+        </p>
+        <h3 className="mt-2 text-2xl sm:text-4xl font-bold text-[#1d1d1f] tracking-tight">
+          Tell us what you need.
         </h3>
-        <p className="mt-2 text-xs sm:text-sm text-slate-500 leading-relaxed">
-          Tell us about your operations. We will demonstrate how GARVIX RFID and tailored software eliminate manual errors and streamline your workflows.
+        <p className="mt-2.5 text-sm text-[#86868b]">
+          Request RFID samples, pricing, or discuss custom software tailored to your workflow. Enquiries go directly to{" "}
+          <a
+            href="mailto:info@garvix.in"
+            className="text-[#1d1d1f] font-medium hover:text-[#0071e3] underline underline-offset-2"
+          >
+            info@garvix.in
+          </a>
+          .
         </p>
       </div>
 
@@ -114,34 +144,34 @@ export function ContactForm({
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1.5">
+            <label className="block text-xs font-medium text-[#424245] mb-1.5">
               Full Name <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <User className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+              <User className="absolute left-3.5 top-3 h-4 w-4 text-[#86868b]" />
               <input
                 type="text"
                 required
-                placeholder="e.g. Rahul Sharma"
+                placeholder="Your name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                className="w-full rounded-xl border border-black/[0.1] bg-[#f5f5f7]/60 py-2.5 pl-10 pr-3 text-sm text-[#1d1d1f] placeholder:text-[#86868b] focus:bg-white focus:outline-none focus:ring-3 focus:ring-[#0071e3]/15 focus:border-[#0071e3] transition"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1.5">
+            <label className="block text-xs font-medium text-[#424245] mb-1.5">
               Company / Business Name
             </label>
             <div className="relative">
-              <Building className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+              <Building className="absolute left-3.5 top-3 h-4 w-4 text-[#86868b]" />
               <input
                 type="text"
-                placeholder="e.g. Sharma Jewellers & Exports"
+                placeholder="Company name"
                 value={formData.company}
                 onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                className="w-full rounded-xl border border-black/[0.1] bg-[#f5f5f7]/60 py-2.5 pl-10 pr-3 text-sm text-[#1d1d1f] placeholder:text-[#86868b] focus:bg-white focus:outline-none focus:ring-3 focus:ring-[#0071e3]/15 focus:border-[#0071e3] transition"
               />
             </div>
           </div>
@@ -149,162 +179,117 @@ export function ContactForm({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1.5">
-              Work Email Address <span className="text-rose-500">*</span>
+            <label className="block text-xs font-medium text-[#424245] mb-1.5">
+              Email Address <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+              <Mail className="absolute left-3.5 top-3 h-4 w-4 text-[#86868b]" />
               <input
                 type="email"
                 required
-                placeholder="rahul@sharmajewellers.com"
+                placeholder="you@company.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                className="w-full rounded-xl border border-black/[0.1] bg-[#f5f5f7]/60 py-2.5 pl-10 pr-3 text-sm text-[#1d1d1f] placeholder:text-[#86868b] focus:bg-white focus:outline-none focus:ring-3 focus:ring-[#0071e3]/15 focus:border-[#0071e3] transition"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1.5">
-              Phone / WhatsApp Number <span className="text-rose-500">*</span>
+            <label className="block text-xs font-medium text-[#424245] mb-1.5">
+              Phone Number <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <Phone className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+              <Phone className="absolute left-3.5 top-3 h-4 w-4 text-[#86868b]" />
               <input
                 type="tel"
                 required
-                placeholder="+91 99507 18876"
+                placeholder="+91 98765 43210"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-mono"
+                className="w-full rounded-xl border border-black/[0.1] bg-[#f5f5f7]/60 py-2.5 pl-10 pr-3 text-sm text-[#1d1d1f] placeholder:text-[#86868b] focus:bg-white focus:outline-none focus:ring-3 focus:ring-[#0071e3]/15 focus:border-[#0071e3] transition font-mono"
               />
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1.5">
-              Industry Domain <span className="text-rose-500">*</span>
-            </label>
-            <div className="relative">
-              <Briefcase className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
-              <select
-                value={formData.industry}
-                onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
-              >
-                <option value="Retail & Jewellery">Jewellery & Gemstones</option>
-                <option value="Warehousing & Logistics">Warehousing & Logistics</option>
-                <option value="Manufacturing & WIP">Manufacturing & Factory Assembly</option>
-                <option value="Education & Schools">Education & Campus RFID</option>
-                <option value="Corporate Offices & IT">Corporate Asset Tracking</option>
-                <option value="Healthcare & Hospitals">Healthcare & Linen Tracking</option>
-                <option value="Other">Other Enterprise Workflow</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1.5">
-              Primary Solution Needed <span className="text-rose-500">*</span>
-            </label>
-            <div className="relative">
-              <Layers className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
-              <select
-                value={formData.requirementType}
-                onChange={(e) => setFormData({ ...formData, requirementType: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs font-semibold text-blue-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
-              >
-                <option value="Jewellery RFID">Jewellery RFID Tags & JewelTrack™ ERP</option>
-                <option value="Garment Tags">Garment Hang Tags & Apparel Retail POS</option>
-                <option value="Hard Security Tags">EAS Hard Tags & Anti-Theft Gates</option>
-                <option value="Laundry RFID">Textile Laundry Tags & LinenTrack™ ERP</option>
-                <option value="Anti-Metal Tags">Anti-Metal Tags & Plant Machinery ERP</option>
-                <option value="Vehicle Pass">Vehicle Windshield Pass & Boom Barrier</option>
-                <option value="Printable Rolls">Printable RFID Rolls & Clear Inlays</option>
-                <option value="Custom Software">Bespoke Enterprise Software & Cloud ERP</option>
-                <option value="Complete Solution">Complete Turnkey Hardware + Software Solution</option>
-              </select>
             </div>
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-slate-700 mb-1.5">
-            Operational Overview & Pain Points <span className="text-rose-500">*</span>
+          <label className="block text-xs font-medium text-[#424245] mb-1.5">
+            What are you looking for? <span className="text-rose-500">*</span>
           </label>
           <div className="relative">
-            <MessageSquare className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+            <Layers className="absolute left-3.5 top-3 h-4 w-4 text-[#86868b]" />
+            <select
+              value={formData.requirementType}
+              onChange={(e) => setFormData({ ...formData, requirementType: e.target.value })}
+              className="w-full rounded-xl border border-black/[0.1] bg-[#f5f5f7]/60 py-2.5 pl-10 pr-3 text-sm font-medium text-[#1d1d1f] focus:bg-white focus:outline-none focus:ring-3 focus:ring-[#0071e3]/15 focus:border-[#0071e3] transition"
+            >
+              <option value="Custom Software">Custom Software Development (ERP / App / Web)</option>
+              <option value="Jewellery RFID">Jewellery RFID Tags & Software</option>
+              <option value="Garment RFID">Garment Hang Tags, Hard Tags & Retail POS</option>
+              <option value="Laundry RFID">Textile Laundry RFID Tags & Software</option>
+              <option value="Anti-Metal RFID">Anti-Metal Industrial Tags & Asset Software</option>
+              <option value="Vehicle RFID">Vehicle RFID Pass & Boom Barrier Software</option>
+              <option value="Printable Rolls & Inlays">Printable RFID Label Rolls & Inlays</option>
+              <option value="Complete Hardware + Software">Complete Turnkey Hardware + Software</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-[#424245] mb-1.5">
+            Requirement Details <span className="text-rose-500">*</span>
+          </label>
+          <div className="relative">
+            <MessageSquare className="absolute left-3.5 top-3 h-4 w-4 text-[#86868b]" />
             <textarea
               required
               rows={3}
-              placeholder="Tell us about your current audit process, number of inventory items or locations, and what challenges you want to eliminate..."
+              placeholder="Briefly tell us about your requirement, quantity, or software workflow..."
               value={formData.requirementDetails}
               onChange={(e) => setFormData({ ...formData, requirementDetails: e.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+              className="w-full rounded-xl border border-black/[0.1] bg-[#f5f5f7]/60 py-2.5 pl-10 pr-3 text-sm text-[#1d1d1f] placeholder:text-[#86868b] focus:bg-white focus:outline-none focus:ring-3 focus:ring-[#0071e3]/15 focus:border-[#0071e3] transition"
             ></textarea>
           </div>
         </div>
 
-        <div className="pt-2 flex flex-col sm:flex-row gap-3">
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 flex items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-black py-3 px-6 text-xs font-semibold text-white shadow-sm transition disabled:opacity-50"
-          >
-            {loading ? (
-              <span>Submitting Details...</span>
-            ) : (
-              <>
-                <span>Submit Inquiry to Engineering Team</span>
-                <Send className="h-3.5 w-3.5" />
-              </>
-            )}
-          </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] py-3.5 px-6 text-sm font-medium text-white shadow-[0_4px_14px_rgba(0,113,227,0.3)] transition disabled:opacity-50"
+        >
+          {loading ? (
+            <span>Sending Enquiry...</span>
+          ) : (
+            <>
+              <span>Send Enquiry</span>
+              <Send className="h-4 w-4" />
+            </>
+          )}
+        </button>
 
-          <a
-            href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20would%20like%20to%20schedule%20a%20live%20RFID%20and%20Software%20demonstration"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white hover:bg-slate-50 py-3 px-6 text-xs font-semibold text-slate-800 shadow-sm transition"
-          >
-            <MessageCircle className="h-4 w-4 text-emerald-600" />
-            <span>Chat Directly on WhatsApp</span>
-          </a>
-        </div>
-
-        {companyInfo?.phone && (
-          <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500">
-            <div className="flex items-center gap-2">
-              <Phone className="h-3.5 w-3.5 text-slate-400" />
-              <span>
-                Direct Line:{" "}
-                <a
-                  href={`tel:${companyInfo.phone.replace(/[^0-9+]/g, "")}`}
-                  className="text-slate-900 hover:text-blue-600 font-mono font-medium transition"
-                >
-                  {companyInfo.phone}
-                </a>
-              </span>
-            </div>
-            {companyInfo.email && (
-              <div className="flex items-center gap-2">
-                <Mail className="h-3.5 w-3.5 text-slate-400" />
-                <span>
-                  Email:{" "}
-                  <a
-                    href={`mailto:${companyInfo.email}`}
-                    className="text-slate-900 hover:text-blue-600 font-mono font-medium transition"
-                  >
-                    {companyInfo.email}
-                  </a>
-                </span>
-              </div>
-            )}
+        <div className="pt-4 border-t border-black/[0.06] flex flex-wrap items-center justify-center gap-6 text-xs text-[#86868b]">
+          <div className="flex items-center gap-2">
+            <Mail className="h-3.5 w-3.5 text-[#0071e3]" />
+            <a
+              href="mailto:info@garvix.in"
+              className="text-[#1d1d1f] hover:text-[#0071e3] font-medium transition"
+            >
+              info@garvix.in
+            </a>
           </div>
-        )}
+          {companyInfo?.phone && (
+            <div className="flex items-center gap-2">
+              <Phone className="h-3.5 w-3.5 text-[#0071e3]" />
+              <a
+                href={`tel:${companyInfo.phone.replace(/[^0-9+]/g, "")}`}
+                className="text-[#1d1d1f] hover:text-[#0071e3] font-mono font-medium transition"
+              >
+                {companyInfo.phone}
+              </a>
+            </div>
+          )}
+        </div>
       </form>
     </div>
   );
