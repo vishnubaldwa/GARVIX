@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
 import { getSession } from "@/lib/auth";
+import { isFullAdminRole, hasPermission } from "@/lib/permissions";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
@@ -22,6 +23,29 @@ export default async function AdminDashboardPage() {
   const session = await getSession();
   if (!session) {
     redirect("/admin/login");
+  }
+
+  // External document viewers (e.g. Bankers / CA Guests) go directly to the Document Vault
+  if (
+    !isFullAdminRole(session.role) &&
+    session.role === "DOCUMENT_VIEWER"
+  ) {
+    redirect("/admin/documents");
+  }
+
+  // Also if user only has vault viewing permission and no finance/sales permissions, route to vault
+  const canViewDocs = await hasPermission(session.role, "CAN_VIEW_DOCUMENTS");
+  const canViewFinances = await hasPermission(session.role, "CAN_VIEW_FINANCES");
+  const canCreateClient = await hasPermission(session.role, "CAN_CREATE_CLIENT");
+  const canManageInvoices = await hasPermission(session.role, "CAN_MANAGE_INVOICES");
+  if (
+    !isFullAdminRole(session.role) &&
+    canViewDocs &&
+    !canViewFinances &&
+    !canCreateClient &&
+    !canManageInvoices
+  ) {
+    redirect("/admin/documents");
   }
 
   const [invoices, purchases, expenses, leads, lowStockProducts, amcContracts] = await Promise.all([

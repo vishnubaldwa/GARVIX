@@ -8,6 +8,7 @@ import { useState } from "react";
 
 const PAGE_TITLES: Record<string, string> = {
   "/admin": "Overview",
+  "/admin/documents": "Company Vault & Docs",
   "/admin/clients": "Parties & Clients",
   "/admin/quotations": "Quotations & Proposals",
   "/admin/leads": "Website Leads & CRM",

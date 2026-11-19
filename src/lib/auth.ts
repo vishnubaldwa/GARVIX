@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET || "garvix-super-secure-enterprise-jwt-key-2026";
 const COOKIE_NAME = "garvix_admin_token";
@@ -33,11 +34,64 @@ export function verifyToken(token: string): AuthSession | null {
   }
 }
 
+export function signShareAccessToken(shareToken: string): string {
+  return jwt.sign({ shareToken, type: "VAULT_SHARE" }, JWT_SECRET, {
+    expiresIn: "12h",
+  });
+}
+
+export function verifyShareAccessToken(
+  signedCookie: string,
+  expectedShareToken: string
+): boolean {
+  try {
+    const decoded = jwt.verify(signedCookie, JWT_SECRET) as {
+      shareToken?: string;
+      type?: string;
+    };
+    return (
+      decoded?.type === "VAULT_SHARE" &&
+      decoded?.shareToken === expectedShareToken
+    );
+  } catch {
+    return false;
+  }
+}
+
 export async function getSession(): Promise<AuthSession | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
-  return verifyToken(token);
+  const decoded = verifyToken(token);
+  if (!decoded) return null;
+
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        name: true,
+        role: true,
+        isActive: true,
+        expiresAt: true,
+      },
+    });
+
+    if (!dbUser || !dbUser.isActive) return null;
+    if (dbUser.expiresAt && new Date() > dbUser.expiresAt) return null;
+
+    return {
+      userId: dbUser.id,
+      username: dbUser.username,
+      email: dbUser.email,
+      name: dbUser.name,
+      role: dbUser.role,
+    };
+  } catch {
+    return decoded;
+  }
 }
 
 export async function hashPassword(password: string): Promise<string> {

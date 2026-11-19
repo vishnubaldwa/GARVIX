@@ -23,6 +23,7 @@ import {
   Settings,
   UserCog,
   Shield,
+  FolderLock,
 } from "lucide-react";
 import { useState } from "react";
 import { AuthSession } from "@/lib/auth";
@@ -34,6 +35,7 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
   highlight?: boolean;
   adminOnly?: boolean;
+  hideForViewer?: boolean;
   requiredPermission?: PermissionCode;
 }
 
@@ -45,7 +47,8 @@ interface NavSection {
 const navSections: NavSection[] = [
   {
     items: [
-      { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/admin", label: "Dashboard", icon: LayoutDashboard, hideForViewer: true },
+      { href: "/admin/documents", label: "Company Vault & Docs", icon: FolderLock, requiredPermission: "CAN_VIEW_DOCUMENTS" },
     ],
   },
   {
@@ -85,7 +88,7 @@ const navSections: NavSection[] = [
     items: [
       { href: "/admin/team", label: "Team & Staff", icon: UserCog, requiredPermission: "CAN_MANAGE_TEAM" },
       { href: "/admin/roles", label: "Roles & Permissions", icon: Shield, requiredPermission: "CAN_MANAGE_ROLES" },
-      { href: "/admin/settings", label: "Settings & Profile", icon: Settings },
+      { href: "/admin/settings", label: "Settings & Profile", icon: Settings, hideForViewer: true },
       { href: "/admin/audit", label: "Audit Security Logs", icon: ShieldCheck, adminOnly: true },
     ],
   },
@@ -117,6 +120,7 @@ export function AdminSidebar({
   };
 
   const fullAccess = isFullAdmin(session?.role);
+  const isViewerOnly = session?.role?.toUpperCase() === "DOCUMENT_VIEWER";
 
   const initials = (session?.name || session?.username || "G")
     .split(" ")
@@ -190,6 +194,7 @@ export function AdminSidebar({
             {navSections.map((section, sIdx) => {
               const visibleItems = section.items.filter((item) => {
                 if (fullAccess) return true;
+                if (isViewerOnly && item.hideForViewer) return false;
                 if (item.adminOnly) return false;
                 if (item.requiredPermission) {
                   return permissions.includes(item.requiredPermission);

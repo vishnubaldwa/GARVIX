@@ -11,6 +11,8 @@ export const PERMISSIONS = {
   CAN_MANAGE_SETTINGS: "CAN_MANAGE_SETTINGS",
   CAN_VIEW_LEADS: "CAN_VIEW_LEADS",
   CAN_VIEW_SERVICE: "CAN_VIEW_SERVICE",
+  CAN_VIEW_DOCUMENTS: "CAN_VIEW_DOCUMENTS",
+  CAN_MANAGE_DOCUMENTS: "CAN_MANAGE_DOCUMENTS",
 } as const;
 
 export type PermissionCode = keyof typeof PERMISSIONS;
@@ -83,6 +85,18 @@ export const ALL_PERMISSIONS: PermissionDefinition[] = [
     category: "OPERATIONS",
     description: "View and update hardware complaint tickets, warranty audits, and RMA dispatch.",
   },
+  {
+    code: "CAN_VIEW_DOCUMENTS",
+    label: "View & Download Company Vault",
+    category: "OPERATIONS",
+    description: "Access permitted incorporation, KYC, banking, and legal documents in the Vault.",
+  },
+  {
+    code: "CAN_MANAGE_DOCUMENTS",
+    label: "Manage Company Vault & Share Access",
+    category: "SETTINGS",
+    description: "Upload/delete documents, rename folders, assign banker/CA access, and generate share links.",
+  },
 ];
 
 export const DEFAULT_ROLE_PERMISSIONS: Record<string, PermissionCode[]> = {
@@ -97,6 +111,8 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, PermissionCode[]> = {
     "CAN_MANAGE_SETTINGS",
     "CAN_VIEW_LEADS",
     "CAN_VIEW_SERVICE",
+    "CAN_VIEW_DOCUMENTS",
+    "CAN_MANAGE_DOCUMENTS",
   ],
   SALES: [
     "CAN_CREATE_CLIENT",
@@ -109,10 +125,14 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, PermissionCode[]> = {
     "CAN_VIEW_FINANCES",
     "CAN_CREATE_CLIENT",
     "CAN_CREATE_QUOTATION",
+    "CAN_VIEW_DOCUMENTS",
   ],
   SERVICE: [
     "CAN_VIEW_SERVICE",
     "CAN_CREATE_PRODUCT",
+  ],
+  DOCUMENT_VIEWER: [
+    "CAN_VIEW_DOCUMENTS",
   ],
 };
 
@@ -132,6 +152,10 @@ const DEFAULT_ROLE_META: Record<string, { displayName: string; description: stri
   SERVICE: {
     displayName: "🛠️ Service Engineer",
     description: "On-site RFID reader installations, RMA repairs, and hardware maintenance.",
+  },
+  DOCUMENT_VIEWER: {
+    displayName: "🏦 External Viewer (Banker / CA)",
+    description: "Read-only & download access strictly limited to granted Company Vault folders.",
   },
 };
 

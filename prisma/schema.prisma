@@ -8,18 +8,20 @@ datasource db {
 }
 
 model User {
-  id             String     @id @default(cuid())
-  username       String     @unique
-  email          String     @unique
+  id             String              @id @default(cuid())
+  username       String              @unique
+  email          String              @unique
   passwordHash   String
   name           String
-  role           String     @default("SUPER_ADMIN") // SUPER_ADMIN, SALES, ACCOUNTS, SERVICE
+  role           String              @default("SUPER_ADMIN") // SUPER_ADMIN, ADMIN, SALES, ACCOUNTS, SERVICE, DOCUMENT_VIEWER
   phone          String?
-  telegramChatId String?    @unique
-  isActive       Boolean    @default(true)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  telegramChatId String?             @unique
+  isActive       Boolean             @default(true)
+  expiresAt      DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
   auditLogs      AuditLog[]
+  vaultAccess    VaultFolderAccess[]
 }
 
 model Lead {
@@ -373,5 +375,62 @@ model CompanySetting {
   ifscCode  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model VaultFolder {
+  id          String              @id @default(cuid())
+  slug        String              @unique
+  name        String
+  description String?
+  icon        String              @default("folder")
+  sortOrder   Int                 @default(0)
+  isDefault   Boolean             @default(false)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  documents   VaultDocument[]
+  userAccess  VaultFolderAccess[]
+}
+
+model VaultDocument {
+  id            String      @id @default(cuid())
+  folderId      String
+  folder        VaultFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  title         String
+  originalName  String
+  storedName    String      @unique
+  mimeType      String
+  fileSize      Int
+  notes         String?
+  expiryDate    DateTime?
+  uploadedBy    String?
+  downloadCount Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model VaultFolderAccess {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folderId  String
+  folder    VaultFolder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  createdAt DateTime    @default(now())
+
+  @@unique([userId, folderId])
+}
+
+model VaultShareLink {
+  id           String    @id @default(cuid())
+  token        String    @unique @default(uuid())
+  label        String
+  recipient    String?
+  folderIds    String    // JSON array of VaultFolder IDs
+  pinHash      String?
+  expiresAt    DateTime
+  isActive     Boolean   @default(true)
+  createdBy    String?
+  accessCount  Int       @default(0)
+  lastAccessAt DateTime?
+  createdAt    DateTime  @default(now())
 }
 

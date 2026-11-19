@@ -10,6 +10,9 @@ export default async function AdminSettingsPage() {
   if (!session) {
     redirect("/admin/login");
   }
+  if (session.role.toUpperCase() === "DOCUMENT_VIEWER") {
+    redirect("/admin/documents");
+  }
 
   const companyInfo = await getCompanySettings();
 

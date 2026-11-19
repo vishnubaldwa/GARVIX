@@ -24,6 +24,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
     }
 
+    if (user.expiresAt && new Date() > user.expiresAt) {
+      return NextResponse.json(
+        { error: "Your temporary access account has expired. Please contact GARVIX Admin." },
+        { status: 403 }
+      );
+    }
+
     const isValid = await comparePassword(password, user.passwordHash);
     if (!isValid) {
       return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });

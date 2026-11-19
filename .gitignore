@@ -36,3 +36,6 @@ dev.db-journal
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Private Document Vault (never commit confidential KYC / MCA docs)
+/private-vault/
