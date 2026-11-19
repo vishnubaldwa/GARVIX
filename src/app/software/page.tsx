@@ -27,6 +27,8 @@ export const metadata: Metadata = {
     "Tailor-made enterprise software, bespoke ERP systems, school management engines, POS billing, and handheld Android scanner applications built around your exact business workflow.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function SoftwarePage() {
   const company = await getCompanySettings();
 

@@ -32,10 +32,14 @@ export function getQuotationWhatsAppText(params: {
   totalAmount: number;
   itemSummary: string;
   portalUrl: string;
+  companyName?: string;
+  companyPhone?: string;
 }): string {
   const greeting = params.contactPerson ? `Dear ${params.contactPerson} ji` : `Dear ${params.customerName}`;
+  const org = params.companyName || "GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED";
+  const footerContact = params.companyPhone ? `📞 ${params.companyPhone} | ` : "";
   return (
-    `*GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED*\n` +
+    `*${org}*\n` +
     `---------------------------------------------\n` +
     `${greeting},\n\n` +
     `Greetings from GARVIX! Please find your official *Proposal & Quotation #${params.quoteNumber}* for *${params.itemSummary}*.\n\n` +
@@ -44,8 +48,8 @@ export function getQuotationWhatsAppText(params: {
     `${params.portalUrl}\n\n` +
     `Kindly review and click *"Accept & Approve"* on the link to generate your official Proforma Invoice.\n\n` +
     `Warm regards,\n` +
-    `*GARVIX Software Solutions Pvt. Ltd.*\n` +
-    `📞 +91 99507 18876 | 🌐 https://garvix.in`
+    `*${org}*\n` +
+    `${footerContact}🌐 https://garvix.in`
   );
 }
 
@@ -58,13 +62,17 @@ export function getInvoiceWhatsAppText(params: {
   totalAmount: number;
   balanceDue: number;
   portalUrl: string;
+  companyName?: string;
+  companyPhone?: string;
 }): string {
   const isPI = params.invoiceType === "PROFORMA_INVOICE";
   const docType = isPI ? "Proforma Invoice (PI)" : "Tax Invoice";
   const greeting = params.contactPerson ? `Dear ${params.contactPerson} ji` : `Dear ${params.customerName}`;
+  const org = params.companyName || "GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED";
+  const footerContact = params.companyPhone ? `📞 ${params.companyPhone} | ` : "";
 
   return (
-    `*GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED*\n` +
+    `*${org}*\n` +
     `---------------------------------------------\n` +
     `${greeting},\n\n` +
     `Please find your official *${docType} #${params.invoiceNumber}* from GARVIX.\n\n` +
@@ -74,8 +82,8 @@ export function getInvoiceWhatsAppText(params: {
     `${params.portalUrl}\n\n` +
     `You can pay directly via UPI QR code or NEFT/IMPS bank transfer details given on the document.\n\n` +
     `Thank you for your business!\n` +
-    `*GARVIX Software Solutions Pvt. Ltd.*\n` +
-    `📞 +91 99507 18876 | 🌐 https://garvix.in`
+    `*${org}*\n` +
+    `${footerContact}🌐 https://garvix.in`
   );
 }
 
@@ -87,12 +95,16 @@ export function getPaymentReminderWhatsAppText(params: {
   balanceDue: number;
   daysPending?: number;
   portalUrl: string;
+  companyName?: string;
+  companyPhone?: string;
 }): string {
   const greeting = params.contactPerson ? `Dear ${params.contactPerson} ji` : `Dear ${params.customerName}`;
   const daysText = params.daysPending && params.daysPending > 0 ? ` (pending since ${params.daysPending} days)` : "";
+  const org = params.companyName || "GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED";
+  const footerContact = params.companyPhone ? `📞 ${params.companyPhone} | ` : "";
 
   return (
-    `*PAYMENT REMINDER | GARVIX SOFTWARE SOLUTIONS*\n` +
+    `*PAYMENT REMINDER | ${org}*\n` +
     `---------------------------------------------\n` +
     `${greeting},\n\n` +
     `Hope you are doing well! This is a gentle reminder regarding the outstanding balance for *Invoice #${params.invoiceNumber}*${daysText}.\n\n` +
@@ -101,8 +113,8 @@ export function getPaymentReminderWhatsAppText(params: {
     `${params.portalUrl}\n\n` +
     `Kindly process the payment at your earliest convenience. If already paid, please ignore this message.\n\n` +
     `Warm regards,\n` +
-    `*Accounts Desk - GARVIX Software Solutions Pvt. Ltd.*\n` +
-    `📞 +91 99507 18876 | 🌐 https://garvix.in`
+    `*Accounts Desk - ${org}*\n` +
+    `${footerContact}🌐 https://garvix.in`
   );
 }
 
@@ -114,17 +126,21 @@ export function getAmcRenewalWhatsAppText(params: {
   serviceTitle: string;
   expiryDateStr: string;
   daysRemaining: number;
+  companyName?: string;
+  companyPhone?: string;
 }): string {
   const greeting = params.contactPerson ? `Dear ${params.contactPerson} ji` : `Dear ${params.customerName}`;
+  const org = params.companyName || "GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED";
+  const footerContact = params.companyPhone ? `📞 ${params.companyPhone} | ` : "";
 
   return (
-    `*AMC RENEWAL NOTICE | GARVIX SOFTWARE SOLUTIONS*\n` +
+    `*AMC RENEWAL NOTICE | ${org}*\n` +
     `---------------------------------------------\n` +
     `${greeting},\n\n` +
     `This is to notify you that your Annual Maintenance & Support Contract (*${params.serviceTitle} - #${params.contractNumber}*) is due for renewal on *${params.expiryDateStr}* (in ${params.daysRemaining} days).\n\n` +
     `To ensure uninterrupted software updates, RFID support, and maintenance visits, our team will share the renewal proposal with you.\n\n` +
     `Warm regards,\n` +
-    `*Support & Services Desk - GARVIX Software Solutions Pvt. Ltd.*\n` +
-    `📞 +91 99507 18876 | 🌐 https://garvix.in`
+    `*Support & Services Desk - ${org}*\n` +
+    `${footerContact}🌐 https://garvix.in`
   );
 }

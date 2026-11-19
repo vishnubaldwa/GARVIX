@@ -21,6 +21,8 @@ export const metadata: Metadata = {
     "Schedule an architecture consultation with GARVIX Software Solutions Private Limited. Connect with our engineering desk for custom software and RFID automation across India.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function ContactPage() {
   const company = await getCompanySettings();
   const cleanPhone = company.phone ? company.phone.replace(/[^0-9+]/g, "") : "";
@@ -159,7 +161,7 @@ export default async function ContactPage() {
                   <span>Direct Engineering Desk</span>
                 </div>
                 <h4 className="text-sm font-bold text-white">
-                  Instant Sync to info@garvix.in &amp; ERP App
+                  Instant Sync to {company.email} &amp; ERP App
                 </h4>
                 <p className="text-slate-300 leading-relaxed">
                   Every enquiry submitted through this portal is instantly routed to our engineering team via direct email and our live GARVIX ERP platform.

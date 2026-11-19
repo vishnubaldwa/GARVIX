@@ -1,13 +1,17 @@
 import { prisma } from "@/lib/prisma";
+import { getCompanySettings } from "@/lib/settings";
 import { Phone, Mail } from "lucide-react";
 import { LeadStatusSelector } from "@/components/admin/LeadStatusSelector";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminLeadsPage() {
-  const leads = await prisma.lead.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const [leads, company] = await Promise.all([
+    prisma.lead.findMany({
+      orderBy: { createdAt: "desc" },
+    }),
+    getCompanySettings(),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -15,7 +19,7 @@ export default async function AdminLeadsPage() {
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Leads & CRM Pipeline</h1>
           <p className="text-xs text-slate-500 mt-1">
-            Website enquiries captured and synced with info@garvix.in &amp; GARVIX ERP Mobile App.
+            Website enquiries captured and synced with {company.email} &amp; GARVIX ERP Mobile App.
           </p>
         </div>
       </div>

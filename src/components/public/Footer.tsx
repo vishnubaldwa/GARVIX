@@ -126,10 +126,10 @@ export async function Footer() {
               <div className="flex items-center gap-2">
                 <Mail className="h-3.5 w-3.5 shrink-0 text-[#1d1d1f]" />
                 <a
-                  href="mailto:info@garvix.in"
+                  href={`mailto:${company.email}`}
                   className="hover:text-[#0071e3] transition font-medium text-[#1d1d1f]"
                 >
-                  info@garvix.in
+                  {company.email}
                 </a>
               </div>
               {company.phone && (
@@ -160,13 +160,13 @@ export async function Footer() {
 
         {/* Bottom Copyright */}
         <div className="mt-12 border-t border-black/[0.06] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#86868b]">
-          <p>© {new Date().getFullYear()} GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED.</p>
+          <p>© {new Date().getFullYear()} {company.name}.</p>
           <div className="flex items-center gap-5">
             <Link href="#contact" className="hover:text-[#1d1d1f] transition">
               Enquiry Desk
             </Link>
-            <a href="mailto:info@garvix.in" className="hover:text-[#1d1d1f] transition">
-              info@garvix.in
+            <a href={`mailto:${company.email}`} className="hover:text-[#1d1d1f] transition">
+              {company.email}
             </a>
           </div>
         </div>

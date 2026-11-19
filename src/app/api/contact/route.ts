@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendLeadEmail } from "@/lib/mailer";
+import { getCompanySettings } from "@/lib/settings";
 
 export async function POST(request: Request) {
   try {
@@ -49,7 +50,8 @@ export async function POST(request: Request) {
       },
     });
 
-    // Send Email to info@garvix.in
+    // Send Email to the Official Email configured in Company Settings
+    const companySettings = await getCompanySettings();
     const emailResult = await sendLeadEmail({
       name: lead.name,
       company: lead.company,
@@ -58,14 +60,15 @@ export async function POST(request: Request) {
       industry,
       solution: lead.solution,
       message: details.trim(),
+      toEmail: companySettings.email,
     });
 
     return NextResponse.json({
       success: true,
-      message:
-        "Thank you! Your enquiry has been sent to info@garvix.in. Our team will connect with you shortly.",
+      message: `Thank you! Your enquiry has been sent to ${companySettings.email}. Our team will connect with you shortly.`,
       leadId: lead.id,
       emailSent: emailResult.sent,
+      recipientEmail: companySettings.email,
     });
   } catch (err: any) {
     console.error("Contact API error:", err);

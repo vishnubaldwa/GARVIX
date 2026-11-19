@@ -24,6 +24,8 @@ export const metadata: Metadata = {
     "Learn about GARVIX Software Solutions Private Limited — a premier technology company engineering bespoke enterprise software and end-to-end RFID automation across India.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function AboutPage() {
   const company = await getCompanySettings();
 

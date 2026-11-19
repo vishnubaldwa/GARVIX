@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
 import { getCompanySettings, updateCompanySettings } from "@/lib/settings";
@@ -39,6 +40,9 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const updated = await updateCompanySettings(body);
+
+    // Immediately invalidate cached pages across the entire site & portals
+    revalidatePath("/", "layout");
 
     await prisma.auditLog.create({
       data: {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildUpiUri } from "@/lib/upi";
+import { getCompanySettings } from "@/lib/settings";
 
 export async function POST(request: Request) {
   try {
@@ -44,10 +45,11 @@ export async function POST(request: Request) {
       const nextSeq = String(piCount + 1).padStart(3, "0");
       const invoiceNumber = `GARVIX/PI/26-27/${nextSeq}`;
 
-      // Build UPI payment link
+      // Build UPI payment link from live Company Settings
+      const companySettings = await getCompanySettings();
       const upiUri = buildUpiUri({
-        upiId: process.env.NEXT_PUBLIC_UPI_ID || "garvix@upi",
-        payeeName: process.env.NEXT_PUBLIC_UPI_NAME || "GARVIX SOFTWARE SOLUTIONS",
+        upiId: companySettings.upiId || process.env.NEXT_PUBLIC_UPI_ID || "garvix@upi",
+        payeeName: companySettings.upiName || companySettings.name || "GARVIX SOFTWARE SOLUTIONS",
         amount: quotation.totalAmount,
         transactionRef: invoiceNumber.replace(/[^a-zA-Z0-9]/g, ""),
         note: `Advance for PI ${invoiceNumber}`,

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { buildUpiUri } from "@/lib/upi";
 import { getSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
+import { getCompanySettings } from "@/lib/settings";
 
 export async function POST(request: Request) {
   try {
@@ -34,10 +35,11 @@ export async function POST(request: Request) {
     const nextSeq = String(count + 1).padStart(3, "0");
     const invoiceNumber = `GARVIX/26-27/${nextSeq}`;
 
-    // UPI QR URI
+    // UPI QR URI from live Company Settings
+    const companySettings = await getCompanySettings();
     const upiUri = buildUpiUri({
-      upiId: process.env.NEXT_PUBLIC_UPI_ID || "garvix@upi",
-      payeeName: process.env.NEXT_PUBLIC_UPI_NAME || "GARVIX TECHNOLOGIES",
+      upiId: companySettings.upiId || process.env.NEXT_PUBLIC_UPI_ID || "garvix@upi",
+      payeeName: companySettings.upiName || companySettings.name || "GARVIX TECHNOLOGIES",
       amount: quote.totalAmount,
       transactionRef: invoiceNumber.replace(/[^a-zA-Z0-9]/g, ""),
       note: `Invoice ${invoiceNumber}`,

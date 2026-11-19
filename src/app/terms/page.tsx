@@ -10,6 +10,8 @@ export const metadata: Metadata = {
     "Terms & Conditions governing custom software engineering, RFID hardware warranties, and support agreements with GARVIX Software Solutions Private Limited.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function TermsPage() {
   const company = await getCompanySettings();
 

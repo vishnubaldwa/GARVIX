@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { getCompanySettings } from "@/lib/settings";
 
 export interface LeadEmailPayload {
   name: string;
@@ -8,21 +9,27 @@ export interface LeadEmailPayload {
   industry?: string | null;
   solution: string;
   message: string;
+  toEmail?: string | null;
 }
 
 export async function sendLeadEmail(
   lead: LeadEmailPayload
-): Promise<{ sent: boolean; reason?: string }> {
-  const smtpUser = process.env.SMTP_USER || "info@garvix.in";
+): Promise<{ sent: boolean; toEmail: string; reason?: string }> {
+  const companySettings = await getCompanySettings();
+  const smtpUser = process.env.SMTP_USER || companySettings.email || "info@garvix.in";
   const smtpPass = process.env.SMTP_PASS;
-  const toEmail = process.env.CONTACT_TO_EMAIL || "info@garvix.in";
+  const toEmail =
+    lead.toEmail?.trim() ||
+    companySettings.email?.trim() ||
+    process.env.CONTACT_TO_EMAIL ||
+    "info@garvix.in";
 
   if (!smtpPass) {
     console.warn(
       "[GARVIX Mailer] SMTP_PASS not set in environment. Skipping SMTP dispatch to",
       toEmail
     );
-    return { sent: false, reason: "SMTP_PASS_MISSING" };
+    return { sent: false, toEmail, reason: "SMTP_PASS_MISSING" };
   }
 
   const smtpHost = process.env.SMTP_HOST || "smtp.hostinger.com";
@@ -114,10 +121,10 @@ export async function sendLeadEmail(
       html: htmlBody,
     });
 
-    return { sent: true };
+    return { sent: true, toEmail };
   } catch (err: any) {
     console.error("[GARVIX Mailer] Failed to send lead email:", err?.message || err);
-    return { sent: false, reason: err?.message || "SEND_FAILED" };
+    return { sent: false, toEmail, reason: err?.message || "SEND_FAILED" };
   }
 }
 

@@ -25,6 +25,8 @@ export const metadata: Metadata = {
     "Tailored RFID automation and custom software solutions engineered for Retail & Jewellery, Education, Warehouses, Manufacturing, Corporate Offices, and Healthcare across India.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function IndustriesPage() {
   const company = await getCompanySettings();
 

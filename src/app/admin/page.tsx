@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
 import { getSession } from "@/lib/auth";
+import { getCompanySettings } from "@/lib/settings";
 import { isFullAdminRole, hasPermission } from "@/lib/permissions";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -48,7 +49,7 @@ export default async function AdminDashboardPage() {
     redirect("/admin/documents");
   }
 
-  const [invoices, purchases, expenses, leads, lowStockProducts, amcContracts] = await Promise.all([
+  const [invoices, purchases, expenses, leads, lowStockProducts, amcContracts, company] = await Promise.all([
     prisma.invoice.findMany({
       include: { customer: true },
       orderBy: { createdAt: "desc" },
@@ -69,6 +70,7 @@ export default async function AdminDashboardPage() {
       include: { customer: true },
       where: { status: "ACTIVE" },
     }),
+    getCompanySettings(),
   ]);
 
   const totalInvoiced = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
@@ -318,7 +320,7 @@ export default async function AdminDashboardPage() {
           <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
             <div>
               <h3 className="text-base font-semibold text-[#1d1d1f]">Website Enquiries</h3>
-              <p className="text-xs text-[#86868b]">Synced with info@garvix.in &amp; ERP App</p>
+              <p className="text-xs text-[#86868b]">Synced with {company.email} &amp; ERP App</p>
             </div>
             <Link
               href="/admin/leads"

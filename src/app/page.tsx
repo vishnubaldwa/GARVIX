@@ -15,6 +15,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const company = await getCompanySettings();
 
@@ -561,13 +563,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 6. Contact Form -> Sends directly to info@garvix.in */}
+      {/* 6. Contact Form -> Sends directly to Official Company Email */}
       <section className="py-20 sm:py-24 border-t border-black/[0.06] bg-white">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <ContactForm
             companyInfo={{
               phone: company.phone,
-              email: "info@garvix.in",
+              email: company.email,
               state: company.state,
             }}
           />

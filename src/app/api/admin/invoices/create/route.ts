@@ -4,6 +4,7 @@ import { computeGst } from "@/lib/gst";
 import { buildUpiUri } from "@/lib/upi";
 import { getSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
+import { getCompanySettings } from "@/lib/settings";
 
 export async function POST(request: Request) {
   try {
@@ -67,10 +68,11 @@ export async function POST(request: Request) {
     const taxDetails = computeGst(subtotal, customer.stateCode, 18);
     const grandTotal = subtotal + taxDetails.totalTax;
 
-    // Dynamic UPI QR URI
+    // Dynamic UPI QR URI from live Company Settings
+    const companySettings = await getCompanySettings();
     const upiUri = buildUpiUri({
-      upiId: process.env.NEXT_PUBLIC_UPI_ID || "garvix@upi",
-      payeeName: process.env.NEXT_PUBLIC_UPI_NAME || "GARVIX TECHNOLOGIES",
+      upiId: companySettings.upiId || process.env.NEXT_PUBLIC_UPI_ID || "garvix@upi",
+      payeeName: companySettings.upiName || companySettings.name || "GARVIX TECHNOLOGIES",
       amount: grandTotal,
       transactionRef: invoiceNumber.replace(/[^a-zA-Z0-9]/g, ""),
       note: `Invoice ${invoiceNumber}`,

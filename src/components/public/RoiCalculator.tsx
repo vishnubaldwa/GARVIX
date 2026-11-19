@@ -181,15 +181,13 @@ export function RoiCalculator() {
           </div>
 
           <div className="pt-2">
-            <a
-              href={`https://wa.me/919950718876?text=Hi%20Garvix,%20I%20used%20your%20ROI%20calculator%20for%20${itemCount}%20items%20and%20want%20to%20discuss%20implementation.`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/contact#contact"
               className="flex w-full items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-black py-3 text-xs font-semibold text-white shadow-sm transition"
             >
               <span>Get Customized Business Proposal</span>
               <ArrowRight className="h-3.5 w-3.5" />
-            </a>
+            </Link>
           </div>
         </div>
       </div>

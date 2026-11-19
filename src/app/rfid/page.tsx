@@ -28,6 +28,8 @@ export const metadata: Metadata = {
     "End-to-end RFID ecosystems across India: WPC-compliant UHF fixed readers, handheld scanners, gate portals, specialized tags, and high-throughput middleware for jewellery, warehousing, and schools.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function RfidPage() {
   const company = await getCompanySettings();
 

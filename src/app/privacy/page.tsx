@@ -10,6 +10,8 @@ export const metadata: Metadata = {
     "Privacy Policy for GARVIX Software Solutions Private Limited — outlining how we handle client data, intellectual property, and enterprise telemetry.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function PrivacyPage() {
   const company = await getCompanySettings();
 

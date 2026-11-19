@@ -20,6 +20,7 @@ export function ContactForm({
   companyInfo?: { phone?: string; email?: string; state?: string };
   defaultRequirement?: string;
 }) {
+  const contactEmail = companyInfo?.email?.trim() || "info@garvix.in";
   const [formData, setFormData] = useState({
     name: "",
     company: "",
@@ -70,7 +71,9 @@ export function ContactForm({
       if (res.ok) {
         setResponseMsg({
           type: "success",
-          text: "Thank you! Your enquiry has been sent to info@garvix.in. Our team will contact you shortly.",
+          text:
+            data.message ||
+            `Thank you! Your enquiry has been sent to ${contactEmail}. Our team will contact you shortly.`,
         });
         setFormData({
           name: "",
@@ -89,7 +92,7 @@ export function ContactForm({
     } catch {
       setResponseMsg({
         type: "error",
-        text: "Network error. Please try again or email us directly at info@garvix.in.",
+        text: `Network error. Please try again or email us directly at ${contactEmail}.`,
       });
     } finally {
       setLoading(false);
@@ -115,10 +118,10 @@ export function ContactForm({
         <p className="mt-2.5 text-sm text-[#86868b]">
           Request RFID samples, pricing, or discuss custom software tailored to your workflow. Enquiries go directly to{" "}
           <a
-            href="mailto:info@garvix.in"
+            href={`mailto:${contactEmail}`}
             className="text-[#1d1d1f] font-medium hover:text-[#0071e3] underline underline-offset-2"
           >
-            info@garvix.in
+            {contactEmail}
           </a>
           .
         </p>
@@ -272,10 +275,10 @@ export function ContactForm({
           <div className="flex items-center gap-2">
             <Mail className="h-3.5 w-3.5 text-[#0071e3]" />
             <a
-              href="mailto:info@garvix.in"
+              href={`mailto:${contactEmail}`}
               className="text-[#1d1d1f] hover:text-[#0071e3] font-medium transition"
             >
-              info@garvix.in
+              {contactEmail}
             </a>
           </div>
           {companyInfo?.phone && (

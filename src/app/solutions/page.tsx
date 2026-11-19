@@ -24,6 +24,8 @@ export const metadata: Metadata = {
     "Explore our complete range of technology solutions: Custom ERPs, Retail POS, School Automation, Warehouse Portals, FASTag boom barriers, and bespoke software engineering.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function SolutionsIndexPage() {
   const company = await getCompanySettings();
 
