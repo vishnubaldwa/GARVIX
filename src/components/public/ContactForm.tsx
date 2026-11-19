@@ -12,12 +12,12 @@ import {
   Layers,
   Briefcase,
   MessageSquare,
-  Sparkles,
+  MessageCircle,
 } from "lucide-react";
 
 export function ContactForm({
   companyInfo,
-  defaultRequirement = "Custom Software",
+  defaultRequirement = "Jewellery RFID",
 }: {
   companyInfo?: { phone?: string; email?: string; state?: string };
   defaultRequirement?: string;
@@ -50,7 +50,7 @@ export function ContactForm({
       if (res.ok) {
         setResponseMsg({
           type: "success",
-          text: "Thank you! Your requirements have been submitted successfully. A GARVIX technology consultant will connect with you within 2 business hours.",
+          text: "Thank you! Your inquiry has been received. Our solutions engineering team will reach out within 2 hours.",
         });
         setFormData({
           name: "",
@@ -58,19 +58,19 @@ export function ContactForm({
           email: "",
           phone: "",
           industry: "Retail & Jewellery",
-          requirementType: "Custom Software",
+          requirementType: "Jewellery RFID",
           requirementDetails: "",
         });
       } else {
         setResponseMsg({
           type: "error",
-          text: data.error || "Submission failed. Please verify your details and try again.",
+          text: data.error || "Submission failed. Please check your inputs and try again.",
         });
       }
     } catch {
       setResponseMsg({
         type: "error",
-        text: "Network error occurred. Please try again or call our engineering desk directly.",
+        text: "Network error occurred. Please try again or chat directly on WhatsApp.",
       });
     } finally {
       setLoading(false);
@@ -80,22 +80,17 @@ export function ContactForm({
   return (
     <div
       id="contact"
-      className="mx-auto max-w-4xl rounded-3xl border border-cyan-500/30 bg-[#0a0f1e]/95 p-6 sm:p-10 shadow-[0_0_60px_rgba(0,242,254,0.12)] backdrop-blur-xl relative overflow-hidden"
+      className="mx-auto max-w-4xl rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-10 shadow-[0_12px_45px_rgba(0,0,0,0.05)] relative overflow-hidden"
     >
-      {/* Decorative background glow */}
-      <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-cyan-500/10 blur-[90px] pointer-events-none"></div>
-      <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-blue-600/10 blur-[90px] pointer-events-none"></div>
-
-      <div className="text-center max-w-xl mx-auto mb-8 relative z-10">
-        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-950/40 px-3.5 py-1 text-xs font-semibold text-cyan-300 mb-3 shadow-[0_0_15px_rgba(0,242,254,0.2)]">
-          <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
-          <span>Real-Time Consultation & Architecture Design</span>
+      <div className="text-center max-w-xl mx-auto mb-8">
+        <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/70 px-3.5 py-1 text-xs font-semibold text-blue-700 mb-3">
+          <span>Schedule On-Site Consultation</span>
         </div>
-        <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-          Request a Solution <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Proposal & Demo</span>
+        <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          Request a Custom Proposal & Live Demo
         </h3>
-        <p className="mt-2 text-xs sm:text-sm text-slate-400 leading-relaxed">
-          Tell us how your business works. Our engineers will design a customized software or RFID automation system around your exact operations.
+        <p className="mt-2 text-xs sm:text-sm text-slate-500 leading-relaxed">
+          Tell us about your operations. We will demonstrate how GARVIX RFID and tailored software eliminate manual errors and streamline your workflows.
         </p>
       </div>
 
@@ -103,50 +98,50 @@ export function ContactForm({
         <div
           className={`mb-6 flex items-start gap-3 rounded-2xl p-4 text-xs font-medium ${
             responseMsg.type === "success"
-              ? "border border-emerald-500/40 bg-emerald-950/30 text-emerald-300"
-              : "border border-rose-500/40 bg-rose-950/30 text-rose-300"
+              ? "border border-emerald-200 bg-emerald-50 text-emerald-800"
+              : "border border-rose-200 bg-rose-50 text-rose-800"
           }`}
         >
           {responseMsg.type === "success" ? (
-            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400 mt-0.5" />
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 mt-0.5" />
           ) : (
-            <AlertCircle className="h-5 w-5 shrink-0 text-rose-400 mt-0.5" />
+            <AlertCircle className="h-5 w-5 shrink-0 text-rose-600 mt-0.5" />
           )}
           <span className="leading-relaxed">{responseMsg.text}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Full Name <span className="text-cyan-400">*</span>
+            <label className="block text-xs font-medium text-slate-700 mb-1.5">
+              Full Name <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <User className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+              <User className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <input
                 type="text"
                 required
-                placeholder="e.g. Vikram Singhania"
+                placeholder="e.g. Rahul Sharma"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full rounded-xl cyber-input py-2.5 pl-9 pr-3 text-xs focus:ring-1 focus:ring-cyan-400"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Company / Institution Name
+            <label className="block text-xs font-medium text-slate-700 mb-1.5">
+              Company / Business Name
             </label>
             <div className="relative">
-              <Building className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+              <Building className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="e.g. Acme Enterprise Pvt Ltd"
+                placeholder="e.g. Sharma Jewellers & Exports"
                 value={formData.company}
                 onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                className="w-full rounded-xl cyber-input py-2.5 pl-9 pr-3 text-xs focus:ring-1 focus:ring-cyan-400"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
               />
             </div>
           </div>
@@ -154,35 +149,35 @@ export function ContactForm({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Work Email Address <span className="text-cyan-400">*</span>
+            <label className="block text-xs font-medium text-slate-700 mb-1.5">
+              Work Email Address <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+              <Mail className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <input
                 type="email"
                 required
-                placeholder="vikram@acme.com"
+                placeholder="rahul@sharmajewellers.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full rounded-xl cyber-input py-2.5 pl-9 pr-3 text-xs focus:ring-1 focus:ring-cyan-400"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Phone / WhatsApp Number <span className="text-cyan-400">*</span>
+            <label className="block text-xs font-medium text-slate-700 mb-1.5">
+              Phone / WhatsApp Number <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+              <Phone className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <input
                 type="tel"
                 required
-                placeholder="+91 98765 43210"
+                placeholder="+91 99507 18876"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full rounded-xl cyber-input py-2.5 pl-9 pr-3 text-xs focus:ring-1 focus:ring-cyan-400 font-mono"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition font-mono"
               />
             </div>
           </div>
@@ -190,93 +185,102 @@ export function ContactForm({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Industry <span className="text-cyan-400">*</span>
+            <label className="block text-xs font-medium text-slate-700 mb-1.5">
+              Industry Domain <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <Briefcase className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+              <Briefcase className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <select
                 value={formData.industry}
                 onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                className="w-full rounded-xl cyber-input py-2.5 pl-9 pr-3 text-xs focus:ring-1 focus:ring-cyan-400"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
               >
-                <option value="Retail & Jewellery">Retail & Jewellery</option>
-                <option value="Education & Schools">Education & Schools</option>
+                <option value="Retail & Jewellery">Jewellery & Gemstones</option>
                 <option value="Warehousing & Logistics">Warehousing & Logistics</option>
-                <option value="Manufacturing & WIP">Manufacturing & WIP</option>
-                <option value="Corporate Offices & IT">Corporate Offices & IT</option>
-                <option value="Healthcare & Hospitals">Healthcare & Hospitals</option>
-                <option value="Hospitality & Hotels">Hospitality & Hotels</option>
-                <option value="Distribution & Wholesale">Distribution & Wholesale</option>
-                <option value="Other">Other Industry</option>
+                <option value="Manufacturing & WIP">Manufacturing & Factory Assembly</option>
+                <option value="Education & Schools">Education & Campus RFID</option>
+                <option value="Corporate Offices & IT">Corporate Asset Tracking</option>
+                <option value="Healthcare & Hospitals">Healthcare & Linen Tracking</option>
+                <option value="Other">Other Enterprise Workflow</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Requirement Type <span className="text-cyan-400">*</span>
+            <label className="block text-xs font-medium text-slate-700 mb-1.5">
+              Primary Solution Needed <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <Layers className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+              <Layers className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
               <select
                 value={formData.requirementType}
                 onChange={(e) => setFormData({ ...formData, requirementType: e.target.value })}
-                className="w-full rounded-xl cyber-input py-2.5 pl-9 pr-3 text-xs focus:ring-1 focus:ring-cyan-400 font-semibold text-cyan-300"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs font-semibold text-blue-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
               >
-                <option value="Custom Software">Custom Software</option>
-                <option value="RFID Automation">RFID Automation</option>
-                <option value="POS / Retail">POS / Retail</option>
-                <option value="Inventory Automation">Inventory Automation</option>
-                <option value="School Automation">School Automation</option>
-                <option value="ERP">ERP System</option>
-                <option value="Other">Other Requirement</option>
+                <option value="Jewellery RFID">Garvix JewelTrack™ (Jewellery RFID)</option>
+                <option value="Warehouse RFID">Warehouse Dock Door Portal & Handhelds</option>
+                <option value="Custom Software">Bespoke Enterprise Software & ERP</option>
+                <option value="Hardware Tags">RFID Hardware & Specialized Tags</option>
+                <option value="AMC Support">AMC & Preventive Maintenance</option>
+                <option value="Other">Complete Turnkey Solution</option>
               </select>
             </div>
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-            Requirement Details / Project Scope <span className="text-cyan-400">*</span>
+          <label className="block text-xs font-medium text-slate-700 mb-1.5">
+            Operational Overview & Pain Points <span className="text-rose-500">*</span>
           </label>
           <div className="relative">
-            <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+            <MessageSquare className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
             <textarea
               required
-              rows={4}
-              placeholder="Describe your current operational process, number of users/locations, hardware needs, timeline, or pain points..."
+              rows={3}
+              placeholder="Tell us about your current audit process, number of inventory items or locations, and what challenges you want to eliminate..."
               value={formData.requirementDetails}
               onChange={(e) => setFormData({ ...formData, requirementDetails: e.target.value })}
-              className="w-full rounded-xl cyber-input py-2.5 pl-9 pr-3 text-xs focus:ring-1 focus:ring-cyan-400"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
             ></textarea>
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 py-3.5 text-xs font-extrabold uppercase tracking-wider text-black shadow-[0_0_30px_rgba(0,242,254,0.4)] transition hover:opacity-95 disabled:opacity-50 overflow-hidden"
-        >
-          {loading ? (
-            <span>Transmitting to Engineering Desk...</span>
-          ) : (
-            <>
-              <span>Submit Requirement to GARVIX Engineers</span>
-              <Send className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </>
-          )}
-        </button>
+        <div className="pt-2 flex flex-col sm:flex-row gap-3">
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex-1 flex items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-black py-3 px-6 text-xs font-semibold text-white shadow-sm transition disabled:opacity-50"
+          >
+            {loading ? (
+              <span>Submitting Details...</span>
+            ) : (
+              <>
+                <span>Submit Inquiry to Engineering Team</span>
+                <Send className="h-3.5 w-3.5" />
+              </>
+            )}
+          </button>
+
+          <a
+            href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20would%20like%20to%20schedule%20a%20live%20RFID%20and%20Software%20demonstration"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white hover:bg-slate-50 py-3 px-6 text-xs font-semibold text-slate-800 shadow-sm transition"
+          >
+            <MessageCircle className="h-4 w-4 text-emerald-600" />
+            <span>Chat Directly on WhatsApp</span>
+          </a>
+        </div>
 
         {companyInfo?.phone && (
-          <div className="mt-4 pt-4 border-t border-cyan-500/20 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
+          <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500">
             <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-cyan-400" />
+              <Phone className="h-3.5 w-3.5 text-slate-400" />
               <span>
-                Call Desk:{" "}
+                Direct Line:{" "}
                 <a
                   href={`tel:${companyInfo.phone.replace(/[^0-9+]/g, "")}`}
-                  className="text-white hover:text-cyan-400 font-mono font-bold transition"
+                  className="text-slate-900 hover:text-blue-600 font-mono font-medium transition"
                 >
                   {companyInfo.phone}
                 </a>
@@ -284,12 +288,12 @@ export function ContactForm({
             </div>
             {companyInfo.email && (
               <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-cyan-400" />
+                <Mail className="h-3.5 w-3.5 text-slate-400" />
                 <span>
                   Email:{" "}
                   <a
                     href={`mailto:${companyInfo.email}`}
-                    className="text-white hover:text-cyan-400 font-mono font-bold transition"
+                    className="text-slate-900 hover:text-blue-600 font-mono font-medium transition"
                   >
                     {companyInfo.email}
                   </a>

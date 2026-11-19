@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calculator, Clock, TrendingUp, DollarSign, CheckCircle, ArrowRight } from "lucide-react";
+import { Calculator, Clock, TrendingUp, CheckCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export function RoiCalculator() {
@@ -24,28 +24,28 @@ export function RoiCalculator() {
   const hoursSavedPerYear = Math.round((manualHoursPerAudit * staffCount - rfidHoursPerAudit) * auditsPerMonth * 12);
 
   return (
-    <div id="roi-calculator" className="relative mx-auto max-w-5xl rounded-2xl border border-cyan-500/30 bg-[#0a0f1d]/90 p-6 md:p-10 shadow-[0_0_50px_rgba(0,242,254,0.1)] backdrop-blur-xl">
-      <div className="absolute -top-3 left-8 rounded-full border border-cyan-400 bg-cyan-950 px-3 py-1 text-xs font-bold uppercase tracking-wider text-cyan-300">
-        Interactive Business Tool
-      </div>
-
-      <div className="text-center max-w-2xl mx-auto">
-        <h3 className="text-2xl md:text-3xl font-extrabold text-white">
-          RFID vs Manual Audit <span className="text-cyan-400">ROI Calculator</span>
+    <div id="roi-calculator" className="relative mx-auto max-w-5xl rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.04)]">
+      <div className="text-center max-w-2xl mx-auto mb-8">
+        <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/70 px-3.5 py-1 text-xs font-semibold text-blue-700 mb-3">
+          <Calculator className="h-3.5 w-3.5 text-blue-600" />
+          <span>Interactive Business Value Calculator</span>
+        </div>
+        <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          Calculate Your RFID Return on Investment
         </h3>
-        <p className="mt-2 text-sm text-slate-400">
-          Calculate exact labor hours saved, stock discrepancy reduction, and annual ROI by switching from barcode to GARVIX RFID.
+        <p className="mt-2 text-sm text-slate-500 leading-relaxed">
+          See exactly how many labor hours and lakhs in stock shrinkage your enterprise saves every year by upgrading from manual barcodes to GARVIX RFID automation.
         </p>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-12 items-center">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-center">
         {/* Sliders Input Column */}
         <div className="lg:col-span-7 space-y-6">
           {/* Slider 1 */}
-          <div>
-            <div className="flex justify-between text-xs font-semibold text-slate-300 mb-2">
-              <span>Total Inventory Items / Stock Pieces</span>
-              <span className="text-cyan-400 font-mono font-bold text-sm">
+          <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-4">
+            <div className="flex justify-between text-xs font-medium text-slate-700 mb-2">
+              <span>Total Inventory Items / Stock Units</span>
+              <span className="text-blue-600 font-mono font-bold text-sm">
                 {itemCount.toLocaleString("en-IN")} pcs
               </span>
             </div>
@@ -56,124 +56,141 @@ export function RoiCalculator() {
               step="1000"
               value={itemCount}
               onChange={(e) => setItemCount(Number(e.target.value))}
-              className="w-full accent-cyan-400 cursor-pointer h-2 rounded-lg bg-slate-800"
+              className="w-full accent-blue-600 cursor-pointer h-2 rounded-lg bg-slate-200"
             />
-            <div className="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
-              <span>1,000</span>
-              <span>50,000</span>
-              <span>1,00,000</span>
+            <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+              <span>1,000 pcs (Retail Store)</span>
+              <span>1,00,000+ pcs (Warehouse)</span>
             </div>
           </div>
 
           {/* Slider 2 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <div className="flex justify-between text-xs font-semibold text-slate-300 mb-2">
-                <span>Staff for Audit</span>
-                <span className="text-cyan-400 font-mono font-bold">{staffCount} persons</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                step="1"
-                value={staffCount}
-                onChange={(e) => setStaffCount(Number(e.target.value))}
-                className="w-full accent-cyan-400 cursor-pointer h-2 rounded-lg bg-slate-800"
-              />
+          <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-4">
+            <div className="flex justify-between text-xs font-medium text-slate-700 mb-2">
+              <span>Audit Staff Members Involved</span>
+              <span className="text-blue-600 font-mono font-bold text-sm">
+                {staffCount} {staffCount === 1 ? "person" : "people"}
+              </span>
             </div>
-            <div>
-              <div className="flex justify-between text-xs font-semibold text-slate-300 mb-2">
-                <span>Audits / Month</span>
-                <span className="text-cyan-400 font-mono font-bold">{auditsPerMonth} times</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="30"
-                step="1"
-                value={auditsPerMonth}
-                onChange={(e) => setAuditsPerMonth(Number(e.target.value))}
-                className="w-full accent-cyan-400 cursor-pointer h-2 rounded-lg bg-slate-800"
-              />
+            <input
+              type="range"
+              min="1"
+              max="15"
+              step="1"
+              value={staffCount}
+              onChange={(e) => setStaffCount(Number(e.target.value))}
+              className="w-full accent-blue-600 cursor-pointer h-2 rounded-lg bg-slate-200"
+            />
+            <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+              <span>1 person</span>
+              <span>15 staff members</span>
             </div>
           </div>
 
           {/* Slider 3 */}
-          <div>
-            <div className="flex justify-between text-xs font-semibold text-slate-300 mb-2">
-              <span>Average Hourly Labor Cost (₹ / Hour)</span>
-              <span className="text-cyan-400 font-mono font-bold">₹{hourlyWage}/hr</span>
+          <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-4">
+            <div className="flex justify-between text-xs font-medium text-slate-700 mb-2">
+              <span>Stock Audits Per Month</span>
+              <span className="text-blue-600 font-mono font-bold text-sm">
+                {auditsPerMonth} times/month
+              </span>
+            </div>
+            <input
+              type="range"
+              min="1"
+              max="30"
+              step="1"
+              value={auditsPerMonth}
+              onChange={(e) => setAuditsPerMonth(Number(e.target.value))}
+              className="w-full accent-blue-600 cursor-pointer h-2 rounded-lg bg-slate-200"
+            />
+            <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+              <span>Monthly (1 time)</span>
+              <span>Daily (30 times)</span>
+            </div>
+          </div>
+
+          {/* Slider 4 */}
+          <div className="rounded-2xl border border-slate-100 bg-[#fbfbfd] p-4">
+            <div className="flex justify-between text-xs font-medium text-slate-700 mb-2">
+              <span>Average Hourly Staff Cost (₹)</span>
+              <span className="text-blue-600 font-mono font-bold text-sm">
+                ₹{hourlyWage}/hr
+              </span>
             </div>
             <input
               type="range"
               min="150"
-              max="1200"
+              max="1500"
               step="50"
               value={hourlyWage}
               onChange={(e) => setHourlyWage(Number(e.target.value))}
-              className="w-full accent-cyan-400 cursor-pointer h-2 rounded-lg bg-slate-800"
+              className="w-full accent-blue-600 cursor-pointer h-2 rounded-lg bg-slate-200"
             />
-          </div>
-
-          {/* Comparison Bar */}
-          <div className="rounded-xl border border-slate-800 bg-[#070b13] p-4 text-xs space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">Manual Barcode Audit Time:</span>
-              <span className="font-mono font-bold text-rose-400">
-                ~{manualHoursPerAudit} Hours / audit
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">GARVIX RFID Scan Time:</span>
-              <span className="font-mono font-bold text-emerald-400">
-                ~{rfidMinutesPerAudit} Minutes / audit (98% faster)
-              </span>
-            </div>
           </div>
         </div>
 
-        {/* Results Output Column */}
-        <div className="lg:col-span-5 rounded-xl border border-cyan-500/40 bg-gradient-to-br from-cyan-950/40 via-[#0d1726] to-[#080d17] p-6 text-center shadow-lg relative overflow-hidden">
-          <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-cyan-500/10 blur-2xl"></div>
-
-          <span className="text-xs uppercase tracking-wider text-cyan-300 font-bold">
-            Estimated Annual Value
-          </span>
-
-          <div className="my-4">
-            <div className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-emerald-400 font-mono">
-              ₹{annualSavings.toLocaleString("en-IN")}
+        {/* Results Card */}
+        <div className="lg:col-span-5 rounded-2xl border border-slate-200/90 bg-[#f5f5f7] p-6 space-y-5">
+          <div className="text-center pb-4 border-b border-slate-200">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Estimated Annual Savings
+            </span>
+            <div className="mt-1 text-3xl sm:text-4xl font-extrabold text-slate-900">
+              ₹{(annualSavings / 100000).toFixed(2)}{" "}
+              <span className="text-base font-semibold text-emerald-600">Lakhs / yr</span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Direct Labor & Operational Savings / Year</p>
+            <p className="text-[11px] text-slate-500 mt-1">
+              Direct operational labor savings alone
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 text-left my-5 border-y border-cyan-500/20 py-4">
-            <div>
-              <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                <Clock className="h-3.5 w-3.5 text-cyan-400" /> Time Saved
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl bg-white p-3.5 border border-slate-200/60 shadow-sm text-center">
+              <Clock className="h-4 w-4 text-blue-600 mx-auto mb-1" />
+              <div className="text-xs font-medium text-slate-500">Audit Time Saved</div>
+              <div className="text-lg font-bold text-slate-900 mt-0.5">
+                {hoursSavedPerYear.toLocaleString("en-IN")} hrs
               </div>
-              <p className="text-sm font-bold text-white font-mono mt-1">
-                {hoursSavedPerYear.toLocaleString("en-IN")} hrs/yr
-              </p>
+              <div className="text-[10px] text-slate-400">per year</div>
             </div>
-            <div>
-              <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                <CheckCircle className="h-3.5 w-3.5 text-emerald-400" /> Audit Speed
+
+            <div className="rounded-xl bg-white p-3.5 border border-slate-200/60 shadow-sm text-center">
+              <TrendingUp className="h-4 w-4 text-emerald-600 mx-auto mb-1" />
+              <div className="text-xs font-medium text-slate-500">Speed Increase</div>
+              <div className="text-lg font-bold text-emerald-600 mt-0.5">
+                {(manualHoursPerAudit / (rfidMinutesPerAudit / 60)).toFixed(0)}x Faster
               </div>
-              <p className="text-sm font-bold text-white font-mono mt-1">
-                900+ tags/sec
-              </p>
+              <div className="text-[10px] text-slate-400">instant bulk read</div>
             </div>
           </div>
 
-          <Link
-            href="#contact"
-            className="flex items-center justify-center gap-2 w-full rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 py-3 text-xs font-bold uppercase tracking-wider text-black shadow-md hover:opacity-95 transition"
-          >
-            Claim This ROI For Your Business
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          <div className="space-y-2 text-xs text-slate-600 pt-2">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              <span>Barcode Audit: ~{manualHoursPerAudit} hours per session</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              <span>GARVIX RFID: ~{rfidMinutesPerAudit} minutes per session</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              <span>99.9% reduction in inventory shrinkage</span>
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <a
+              href={`https://wa.me/919950718876?text=Hi%20Garvix,%20I%20used%20your%20ROI%20calculator%20for%20${itemCount}%20items%20and%20want%20to%20discuss%20implementation.`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-slate-900 hover:bg-black py-3 text-xs font-semibold text-white shadow-sm transition"
+            >
+              <span>Get Customized Business Proposal</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+          </div>
         </div>
       </div>
     </div>

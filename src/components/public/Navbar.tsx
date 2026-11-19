@@ -9,13 +9,12 @@ import {
   Menu,
   X,
   ArrowRight,
-  Layers,
-  Sparkles,
-  ShoppingBag,
-  GraduationCap,
+  Gem,
   Boxes,
-  Building2,
-  Phone,
+  Layers,
+  Wrench,
+  ShieldCheck,
+  MessageCircle,
 } from "lucide-react";
 
 export function Navbar() {
@@ -25,7 +24,7 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 15);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -35,34 +34,33 @@ export function Navbar() {
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         scrolled
-          ? "border-b border-cyan-500/20 bg-[#07090e]/95 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.8)]"
-          : "border-b border-cyan-500/10 bg-[#07090e]/80 backdrop-blur-md"
+          ? "border-b border-slate-200/80 bg-white/90 backdrop-blur-md shadow-[0_2px_15px_rgba(0,0,0,0.04)]"
+          : "border-b border-slate-100 bg-white/70 backdrop-blur-sm"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Brand Logo */}
-        <Link href="/" className="group flex items-center gap-3">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-500/40 bg-gradient-to-br from-cyan-500/20 via-blue-600/15 to-purple-600/10 text-cyan-400 shadow-[0_0_25px_rgba(0,242,254,0.3)] transition-all duration-300 group-hover:scale-105 group-hover:border-cyan-400">
-            <Radio className="h-5 w-5 animate-pulse text-cyan-300" />
-            <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-cyan-400"></span>
+        <Link href="/" className="group flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm transition-transform group-hover:scale-105">
+            <Radio className="h-4.5 w-4.5 text-blue-400" />
           </div>
-          <div>
-            <span className="text-xl font-black tracking-widest text-white transition-colors group-hover:text-cyan-400">
+          <div className="leading-tight">
+            <span className="text-lg font-bold tracking-tight text-slate-900 transition-colors group-hover:text-blue-600">
               GARVIX
             </span>
-            <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-cyan-300 transition-colors">
-              Software Solutions Pvt. Ltd.
+            <span className="block text-[10px] font-medium tracking-tight text-slate-500">
+              Precision RFID & Custom Software
             </span>
           </div>
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-7">
+        <nav className="hidden lg:flex items-center gap-6 text-[13px] font-medium text-slate-600">
           <Link
             href="/"
-            className="text-xs font-semibold uppercase tracking-wider text-slate-300 transition hover:text-cyan-400"
+            className="hover:text-slate-950 transition-colors"
           >
-            Home
+            Overview
           </Link>
 
           {/* Solutions Dropdown */}
@@ -73,62 +71,83 @@ export function Navbar() {
           >
             <button
               type="button"
-              className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-slate-300 transition hover:text-cyan-400 py-2"
+              className="flex items-center gap-1 hover:text-slate-950 transition-colors py-2"
             >
               <span>Solutions</span>
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${solutionsDropdownOpen ? "rotate-180 text-cyan-400" : ""}`} />
+              <ChevronDown
+                className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                  solutionsDropdownOpen ? "rotate-180 text-blue-600" : ""
+                }`}
+              />
             </button>
 
             {solutionsDropdownOpen && (
               <div className="absolute left-0 top-full pt-2 w-80">
-                <div className="rounded-2xl border border-cyan-500/30 bg-[#090e1a]/95 p-3 shadow-2xl backdrop-blur-2xl space-y-1">
+                <div className="rounded-2xl border border-slate-200 bg-white/98 p-2 shadow-xl backdrop-blur-xl space-y-1">
                   <Link
-                    href="/software"
-                    className="flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-cyan-950/40 group"
+                    href="/#jewellery"
+                    className="flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-slate-50 group"
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-blue-500/30 bg-blue-950/40 text-blue-400 group-hover:text-cyan-300">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                      <Gem className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
+                        Jewellery RFID (JewelTrack™)
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                        Sub-second tray scan, anti-theft, 500+ items in 2 seconds.
+                      </p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/#warehouse"
+                    className="flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-slate-50 group"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                      <Boxes className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
+                        Warehouse & Logistics Portals
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                        Dock-door pallet readers, 12m range, zero carton opening.
+                      </p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/#software"
+                    className="flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-slate-50 group"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
                       <Cpu className="h-4 w-4" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-white group-hover:text-cyan-300">
-                        Custom Software Development
+                      <div className="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
+                        Bespoke Enterprise Software
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                        Bespoke ERPs, Web/Mobile Apps & APIs tailored to your workflow.
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                        Workflow-first ERP, Auto GST (06), Telegram real-time bot.
                       </p>
                     </div>
                   </Link>
 
                   <Link
-                    href="/rfid"
-                    className="flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-cyan-950/40 group"
+                    href="/#hardware"
+                    className="flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-slate-50 group"
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cyan-500/30 bg-cyan-950/40 text-cyan-400 group-hover:text-cyan-300">
-                      <Radio className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-cyan-300">
-                        RFID Automation Ecosystem
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                        Hardware + Software + Tag tracking for sub-second audits.
-                      </p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/solutions"
-                    className="flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-cyan-950/40 group"
-                  >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-950/40 text-purple-400 group-hover:text-purple-300">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
                       <Layers className="h-4 w-4" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-white group-hover:text-purple-300">
-                        All Enterprise Solutions
+                      <div className="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
+                        Hardware & Smart Tags
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                        Retail, Schools, Warehouses & Asset Tracking systems.
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                        Fixed Impinj/Zebra readers, handhelds, on-metal tags.
                       </p>
                     </div>
                   </Link>
@@ -138,129 +157,162 @@ export function Navbar() {
           </div>
 
           <Link
-            href="/software"
-            className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300 transition hover:text-cyan-400"
+            href="/#jewellery"
+            className="hover:text-slate-950 transition-colors"
           >
-            <Cpu className="h-3.5 w-3.5 text-blue-400" />
-            <span>Software</span>
+            Jewellery RFID
           </Link>
 
           <Link
-            href="/rfid"
-            className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300 transition hover:text-cyan-400"
+            href="/#warehouse"
+            className="hover:text-slate-950 transition-colors"
           >
-            <Radio className="h-3.5 w-3.5 text-cyan-400" />
-            <span>RFID Automation</span>
+            Warehouse Portals
           </Link>
 
           <Link
-            href="/industries"
-            className="text-xs font-semibold uppercase tracking-wider text-slate-300 transition hover:text-cyan-400"
+            href="/#software"
+            className="hover:text-slate-950 transition-colors"
           >
-            Industries
+            Custom Software
           </Link>
 
           <Link
-            href="/about"
-            className="text-xs font-semibold uppercase tracking-wider text-slate-300 transition hover:text-cyan-400"
+            href="/#amc"
+            className="hover:text-slate-950 transition-colors"
           >
-            About
+            AMC & Support
           </Link>
 
           <Link
-            href="/contact"
-            className="text-xs font-semibold uppercase tracking-wider text-slate-300 transition hover:text-cyan-400"
+            href="/#roi-calculator"
+            className="hover:text-slate-950 transition-colors"
           >
-            Contact
+            ROI Calculator
           </Link>
         </nav>
 
         {/* Action Buttons */}
         <div className="hidden lg:flex items-center gap-3">
-          <Link
-            href="/contact"
-            className="group relative flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-black shadow-[0_0_25px_rgba(0,242,254,0.35)] transition-all hover:opacity-95 hover:shadow-[0_0_35px_rgba(0,242,254,0.5)]"
+          <a
+            href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20would%20like%20to%20know%20more%20about%20your%20RFID%20and%20Software%20solutions"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-300"
           >
-            <span>Get a Solution</span>
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            <MessageCircle className="h-3.5 w-3.5 text-emerald-600" />
+            <span>WhatsApp</span>
+          </a>
+
+          <Link
+            href="#contact"
+            className="flex items-center gap-1.5 rounded-full bg-slate-900 hover:bg-black px-5 py-2 text-xs font-semibold text-white shadow-sm transition hover:shadow"
+          >
+            <span>Request Demo</span>
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
         {/* Mobile Hamburger Toggle */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="rounded-xl border border-cyan-500/30 bg-cyan-950/30 p-2 text-slate-300 hover:bg-cyan-950/60 lg:hidden"
+          className="rounded-lg border border-slate-200 p-2 text-slate-700 hover:bg-slate-100 lg:hidden"
           aria-label="Toggle navigation menu"
         >
-          {mobileMenuOpen ? <X className="h-5 w-5 text-cyan-400" /> : <Menu className="h-5 w-5 text-cyan-400" />}
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="border-b border-cyan-500/20 bg-[#07090e]/98 px-6 py-6 lg:hidden space-y-4 shadow-2xl backdrop-blur-2xl">
-          <div className="flex flex-col space-y-3 pb-4 border-b border-slate-800">
+        <div className="border-b border-slate-200 bg-white px-6 py-6 lg:hidden space-y-4 shadow-xl">
+          <div className="flex flex-col space-y-3 pb-4 border-b border-slate-100 text-sm font-medium text-slate-800">
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-sm font-semibold text-slate-200 hover:text-cyan-400"
+              className="hover:text-blue-600"
             >
-              Home
+              Overview
             </Link>
             <Link
-              href="/software"
+              href="/#jewellery"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 text-sm font-semibold text-slate-200 hover:text-cyan-400"
+              className="flex items-center gap-2 hover:text-blue-600"
             >
-              <Cpu className="h-4 w-4 text-blue-400" />
-              <span>Custom Software Development</span>
+              <Gem className="h-4 w-4 text-amber-500" />
+              <span>Jewellery RFID (JewelTrack™)</span>
             </Link>
             <Link
-              href="/rfid"
+              href="/#warehouse"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 text-sm font-semibold text-slate-200 hover:text-cyan-400"
+              className="flex items-center gap-2 hover:text-blue-600"
             >
-              <Radio className="h-4 w-4 text-cyan-400" />
-              <span>Complete RFID Automation</span>
+              <Boxes className="h-4 w-4 text-blue-500" />
+              <span>Warehouse & Logistics Portals</span>
             </Link>
             <Link
-              href="/solutions"
+              href="/#software"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 text-sm font-semibold text-slate-200 hover:text-cyan-400"
+              className="flex items-center gap-2 hover:text-blue-600"
             >
-              <Layers className="h-4 w-4 text-purple-400" />
-              <span>All Solutions (Retail, Schools, SCM)</span>
+              <Cpu className="h-4 w-4 text-purple-500" />
+              <span>Bespoke Enterprise Software</span>
             </Link>
             <Link
-              href="/industries"
+              href="/#hardware"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-sm font-semibold text-slate-200 hover:text-cyan-400"
+              className="flex items-center gap-2 hover:text-blue-600"
             >
-              Industries We Serve
+              <Layers className="h-4 w-4 text-emerald-500" />
+              <span>Hardware & Smart Tags</span>
             </Link>
             <Link
-              href="/about"
+              href="/#amc"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-sm font-semibold text-slate-200 hover:text-cyan-400"
+              className="flex items-center gap-2 hover:text-blue-600"
             >
-              About GARVIX
+              <Wrench className="h-4 w-4 text-slate-500" />
+              <span>AMC & Enterprise Support</span>
             </Link>
             <Link
-              href="/contact"
+              href="/#roi-calculator"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-sm font-semibold text-slate-200 hover:text-cyan-400"
+              className="hover:text-blue-600"
             >
-              Contact & Consultation
+              Interactive ROI Calculator
+            </Link>
+            <Link
+              href="#contact"
+              onClick={() => setMobileMenuOpen(false)}
+              className="hover:text-blue-600"
+            >
+              Contact & Location
+            </Link>
+            <Link
+              href="/admin/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-slate-400 hover:text-slate-700 text-xs pt-2"
+            >
+              Staff ERP Login (/admin)
             </Link>
           </div>
 
-          <div className="pt-2 flex flex-col gap-3">
-            <Link
-              href="/contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 py-3 text-xs font-bold uppercase tracking-wider text-black shadow-lg"
+          <div className="pt-2 flex flex-col gap-2.5">
+            <a
+              href="https://wa.me/919950718876?text=Hi%20Garvix,%20I%20would%20like%20to%20know%20more%20about%20your%20RFID%20and%20Software%20solutions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white py-2.5 text-xs font-semibold text-slate-800 shadow-sm"
             >
-              <span>Get a Solution</span>
+              <MessageCircle className="h-4 w-4 text-emerald-600" />
+              <span>Chat on WhatsApp</span>
+            </a>
+            <Link
+              href="#contact"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-center gap-2 rounded-full bg-slate-900 py-2.5 text-xs font-semibold text-white shadow"
+            >
+              <span>Request On-Site Demo</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

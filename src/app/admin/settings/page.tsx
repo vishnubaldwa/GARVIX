@@ -1,11 +1,16 @@
 import { getSession } from "@/lib/auth";
 import { getCompanySettings } from "@/lib/settings";
 import { AdminSettingsView } from "@/components/admin/AdminSettingsView";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
   const session = await getSession();
+  if (!session) {
+    redirect("/admin/login");
+  }
+
   const companyInfo = await getCompanySettings();
 
   return (
@@ -18,8 +23,8 @@ export default async function AdminSettingsPage() {
       </div>
 
       <AdminSettingsView
-        sessionEmail={session?.email || "admin@garvix.in"}
-        sessionUsername={session?.username || "admin"}
+        sessionEmail={session.email}
+        sessionUsername={session.username}
         companyInfo={companyInfo}
       />
     </div>

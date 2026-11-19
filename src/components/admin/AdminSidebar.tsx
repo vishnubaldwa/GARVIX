@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { AuthSession } from "@/lib/auth";
+import { PermissionCode } from "@/lib/permissions";
 
 interface NavItem {
   href: string;
@@ -33,6 +34,7 @@ interface NavItem {
   icon: any;
   highlight?: boolean;
   adminOnly?: boolean;
+  requiredPermission?: PermissionCode;
   badge?: string;
 }
 
@@ -50,47 +52,53 @@ const navSections: NavSection[] = [
   {
     title: "1. Sales & Clients",
     items: [
-      { href: "/admin/clients", label: "Parties & Clients", icon: Building2 },
-      { href: "/admin/quotations", label: "Quotations & Proposals", icon: FileSpreadsheet },
-      { href: "/admin/leads", label: "Website Leads & CRM", icon: Users },
+      { href: "/admin/clients", label: "Parties & Clients", icon: Building2, requiredPermission: "CAN_CREATE_CLIENT" },
+      { href: "/admin/quotations", label: "Quotations & Proposals", icon: FileSpreadsheet, requiredPermission: "CAN_CREATE_QUOTATION" },
+      { href: "/admin/leads", label: "Website Leads & CRM", icon: Users, requiredPermission: "CAN_VIEW_LEADS" },
     ],
   },
   {
     title: "2. Billing & Dispatch",
     items: [
-      { href: "/admin/invoices", label: "Invoices & Proforma (PI)", icon: Receipt },
-      { href: "/admin/outstanding", label: "Outstanding & Payments", icon: Clock },
-      { href: "/admin/challans", label: "Delivery Challans & E-Way", icon: Truck },
+      { href: "/admin/invoices", label: "Invoices & Proforma (PI)", icon: Receipt, requiredPermission: "CAN_MANAGE_INVOICES" },
+      { href: "/admin/outstanding", label: "Outstanding & Payments", icon: Clock, requiredPermission: "CAN_MANAGE_INVOICES" },
+      { href: "/admin/challans", label: "Delivery Challans & E-Way", icon: Truck, requiredPermission: "CAN_MANAGE_INVOICES" },
     ],
   },
   {
     title: "3. Catalog & Contracts",
     items: [
-      { href: "/admin/inventory", label: "Hardware & Products", icon: Package },
-      { href: "/admin/inventory/serials", label: "Serial & IMEI Tracker", icon: Barcode },
-      { href: "/admin/amc", label: "AMC Support Contracts", icon: ShieldCheck },
+      { href: "/admin/inventory", label: "Hardware & Products", icon: Package, requiredPermission: "CAN_CREATE_PRODUCT" },
+      { href: "/admin/inventory/serials", label: "Serial & IMEI Tracker", icon: Barcode, requiredPermission: "CAN_CREATE_PRODUCT" },
+      { href: "/admin/amc", label: "AMC Support Contracts", icon: ShieldCheck, requiredPermission: "CAN_VIEW_SERVICE" },
     ],
   },
   {
     title: "4. Accounts & Finance",
     items: [
-      { href: "/admin/expenses", label: "Business Expenses", icon: Wallet },
-      { href: "/admin/gst-returns", label: "1-Click CA Return", icon: Download, highlight: true },
-      { href: "/admin/purchases", label: "Vendor Purchases & ITC", icon: ShoppingCart },
+      { href: "/admin/expenses", label: "Business Expenses", icon: Wallet, requiredPermission: "CAN_VIEW_FINANCES" },
+      { href: "/admin/gst-returns", label: "1-Click CA Return", icon: Download, highlight: true, requiredPermission: "CAN_VIEW_FINANCES" },
+      { href: "/admin/purchases", label: "Vendor Purchases & ITC", icon: ShoppingCart, requiredPermission: "CAN_VIEW_FINANCES" },
     ],
   },
   {
     title: "5. System & Staff",
     items: [
-      { href: "/admin/team", label: "Team & Staff", icon: UserCog, adminOnly: true },
-      { href: "/admin/roles", label: "Roles & Permissions", icon: Shield, adminOnly: true },
+      { href: "/admin/team", label: "Team & Staff", icon: UserCog, requiredPermission: "CAN_MANAGE_TEAM" },
+      { href: "/admin/roles", label: "Roles & Permissions", icon: Shield, requiredPermission: "CAN_MANAGE_ROLES" },
       { href: "/admin/settings", label: "Settings & Profile", icon: Settings },
       { href: "/admin/audit", label: "Audit Security Logs", icon: ShieldCheck, adminOnly: true },
     ],
   },
 ];
 
-export function AdminSidebar({ session }: { session: AuthSession | null }) {
+export function AdminSidebar({
+  session,
+  permissions = [],
+}: {
+  session: AuthSession | null;
+  permissions?: PermissionCode[];
+}) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -154,9 +162,14 @@ export function AdminSidebar({ session }: { session: AuthSession | null }) {
           {/* Grouped Navigation Links */}
           <nav className="mt-4 space-y-4">
             {navSections.map((section, sIdx) => {
-              const visibleItems = section.items.filter(
-                (item) => !item.adminOnly || session?.role === "SUPER_ADMIN"
-              );
+              const visibleItems = section.items.filter((item) => {
+                if (session?.role === "SUPER_ADMIN") return true;
+                if (item.adminOnly) return false;
+                if (item.requiredPermission) {
+                  return permissions.includes(item.requiredPermission);
+                }
+                return true;
+              });
 
               if (visibleItems.length === 0) return null;
 
@@ -206,16 +219,26 @@ export function AdminSidebar({ session }: { session: AuthSession | null }) {
         {/* User profile & Logout */}
         <div className="border-t border-slate-800 pt-4 mt-6 shrink-0">
           <div className="flex items-center justify-between mb-3 px-1">
-            <div>
-              <p className="text-xs font-bold text-white truncate max-w-[130px]">
-                {session?.name || "Vishnu Baldwa"}
+            <div className="min-w-0 pr-2">
+              <p className="text-xs font-bold text-white truncate">
+                {session?.name || "Staff Member"}
               </p>
-              <p className="text-[10px] text-blue-400 font-mono">
-                {session?.email || "admin@garvix.in"}
+              <p className="text-[10px] text-blue-400 font-mono truncate">
+                {session?.email || session?.username || "logged-in"}
               </p>
             </div>
-            <span className="rounded bg-slate-800 border border-slate-700 px-1.5 py-0.5 text-[9px] font-mono font-bold text-slate-300">
-              {session?.role || "ADMIN"}
+            <span
+              className={`rounded px-1.5 py-0.5 text-[9px] font-mono font-bold shrink-0 uppercase ${
+                session?.role === "SUPER_ADMIN"
+                  ? "bg-purple-950 text-purple-300 border border-purple-800"
+                  : session?.role === "SALES"
+                  ? "bg-blue-950 text-blue-300 border border-blue-800"
+                  : session?.role === "ACCOUNTS"
+                  ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                  : "bg-slate-800 text-slate-300 border border-slate-700"
+              }`}
+            >
+              {session?.role || "USER"}
             </span>
           </div>
 

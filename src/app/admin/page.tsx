@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   TrendingUp,
@@ -20,6 +22,11 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
+  const session = await getSession();
+  if (!session) {
+    redirect("/admin/login");
+  }
+
   const [invoices, purchases, expenses, leads, lowStockProducts, amcContracts] = await Promise.all([
     prisma.invoice.findMany({
       include: { customer: true },

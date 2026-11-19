@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 import bcrypt from "bcryptjs";
 
 export const dynamic = "force-dynamic";
@@ -8,8 +9,15 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     const session = await getSession();
-    if (!session || session.role !== "SUPER_ADMIN") {
-      return NextResponse.json({ error: "Access denied. Super Admin role required." }, { status: 403 });
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const allowed =
+      session.role === "SUPER_ADMIN" ||
+      (await hasPermission(session.role, "CAN_MANAGE_TEAM"));
+    if (!allowed) {
+      return NextResponse.json({ error: "Access denied. Team management permission required." }, { status: 403 });
     }
 
     const { id, newPassword } = await request.json();
