@@ -83,9 +83,37 @@ class ErpRepository {
         .toList();
   }
 
+  Future<void> createSerial({
+    required String productId,
+    required String serialNumber,
+    String? imei,
+    String status = 'IN_STOCK',
+    String? warrantyExpiry,
+    bool incrementStock = true,
+    String? notes,
+  }) async {
+    await _apiClient.post(
+      '/api/admin/inventory/serials',
+      body: {
+        'productId': productId,
+        'serialNumber': serialNumber,
+        'imei': imei,
+        'status': status,
+        'warrantyExpiry': warrantyExpiry,
+        'incrementStock': incrementStock,
+        'notes': notes,
+      },
+    );
+  }
+
   // --- AMC & Service Desk ---
-  Future<({List<AmcContractItem> contracts, List<ServiceTicketItem> tickets})>
-      fetchAmcAndTickets() async {
+  Future<
+      ({
+        List<AmcContractItem> contracts,
+        List<ServiceTicketItem> tickets,
+        List<({String id, String name})> customers,
+        List<String> staffNames,
+      })> fetchAmcAndTickets() async {
     final data = await _apiClient.get('/api/admin/amc');
     final contracts = ((data['contracts'] as List?) ?? const [])
         .map((e) => AmcContractItem.fromJson(e as Map<String, dynamic>))
@@ -93,7 +121,148 @@ class ErpRepository {
     final tickets = ((data['tickets'] as List?) ?? const [])
         .map((e) => ServiceTicketItem.fromJson(e as Map<String, dynamic>))
         .toList();
-    return (contracts: contracts, tickets: tickets);
+    final customers = ((data['customers'] as List?) ?? const [])
+        .map(
+          (e) => (
+            id: ((e as Map)['id'] ?? '').toString(),
+            name: (e['companyName'] ?? '').toString(),
+          ),
+        )
+        .where((c) => c.id.isNotEmpty)
+        .toList();
+    final staffNames = ((data['staffNames'] as List?) ?? const [])
+        .map((e) => e.toString())
+        .where((s) => s.isNotEmpty)
+        .toList();
+    return (
+      contracts: contracts,
+      tickets: tickets,
+      customers: customers,
+      staffNames: staffNames,
+    );
+  }
+
+  Future<void> createAmcContract({
+    required String customerId,
+    required String title,
+    required String startDate,
+    required String endDate,
+    required String visitFrequency,
+    required double contractValue,
+    String? notes,
+  }) async {
+    await _apiClient.post(
+      '/api/admin/amc',
+      body: {
+        'type': 'contract',
+        'customerId': customerId,
+        'title': title,
+        'startDate': startDate,
+        'endDate': endDate,
+        'visitFrequency': visitFrequency,
+        'contractValue': contractValue,
+        'notes': notes,
+      },
+    );
+  }
+
+  Future<void> updateAmcContract({
+    required String id,
+    required String title,
+    required String startDate,
+    required String endDate,
+    required String visitFrequency,
+    required double contractValue,
+    required String status,
+    String? notes,
+  }) async {
+    await _apiClient.patch(
+      '/api/admin/amc',
+      body: {
+        'type': 'contract',
+        'id': id,
+        'title': title,
+        'startDate': startDate,
+        'endDate': endDate,
+        'visitFrequency': visitFrequency,
+        'contractValue': contractValue,
+        'status': status,
+        'notes': notes,
+      },
+    );
+  }
+
+  Future<void> createServiceTicket({
+    required String customerId,
+    String? amcId,
+    required String issueTitle,
+    required String description,
+    required String priority,
+    String? assignedTo,
+  }) async {
+    await _apiClient.post(
+      '/api/admin/amc',
+      body: {
+        'type': 'ticket',
+        'customerId': customerId,
+        'amcId': amcId,
+        'issueTitle': issueTitle,
+        'description': description,
+        'priority': priority,
+        'assignedTo': assignedTo,
+      },
+    );
+  }
+
+  Future<void> updateServiceTicket({
+    required String id,
+    required String status,
+    required String priority,
+    String? assignedTo,
+    String? resolutionNotes,
+  }) async {
+    await _apiClient.patch(
+      '/api/admin/amc',
+      body: {
+        'type': 'ticket',
+        'id': id,
+        'status': status,
+        'priority': priority,
+        'assignedTo': assignedTo,
+        'resolutionNotes': resolutionNotes,
+      },
+    );
+  }
+
+  Future<void> createPurchase({
+    required String billNumber,
+    required String vendorName,
+    String? vendorGstin,
+    String? vendorState,
+    required String billDate,
+    required double subtotal,
+    required double taxRate,
+    required String gstType,
+    required bool itcEligible,
+    required String paymentStatus,
+    String? notes,
+  }) async {
+    await _apiClient.post(
+      '/api/admin/purchases',
+      body: {
+        'billNumber': billNumber,
+        'vendorName': vendorName,
+        'vendorGstin': vendorGstin,
+        'vendorState': vendorState,
+        'billDate': billDate,
+        'subtotal': subtotal,
+        'taxRate': taxRate,
+        'gstType': gstType,
+        'itcEligible': itcEligible,
+        'paymentStatus': paymentStatus,
+        'notes': notes,
+      },
+    );
   }
 
   // --- Expenses ---

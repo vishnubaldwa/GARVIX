@@ -195,10 +195,13 @@ class AmcContractItem {
     required this.contractValue,
     required this.visitFrequency,
     required this.status,
+    this.customerId = '',
+    this.notes,
   });
 
   final String id;
   final String contractNumber;
+  final String customerId;
   final String customerName;
   final String customerPhone;
   final String title;
@@ -207,6 +210,7 @@ class AmcContractItem {
   final double contractValue;
   final String visitFrequency;
   final String status;
+  final String? notes;
 
   int get daysRemaining => endDate.difference(DateTime.now()).inDays;
 
@@ -214,6 +218,7 @@ class AmcContractItem {
     return AmcContractItem(
       id: (json['id'] ?? '').toString(),
       contractNumber: (json['contractNumber'] ?? '').toString(),
+      customerId: (json['customerId'] ?? '').toString(),
       customerName: (json['customerName'] ?? '').toString(),
       customerPhone: (json['customerPhone'] ?? '').toString(),
       title: (json['title'] ?? '').toString(),
@@ -226,6 +231,7 @@ class AmcContractItem {
           : 0,
       visitFrequency: (json['visitFrequency'] ?? 'QUARTERLY').toString(),
       status: (json['status'] ?? 'ACTIVE').toString(),
+      notes: json['notes']?.toString(),
     );
   }
 }

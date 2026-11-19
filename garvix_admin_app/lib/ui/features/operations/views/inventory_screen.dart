@@ -308,6 +308,221 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
+  Future<void> _showAddSerialSheet() async {
+    if (_products.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Add a Hardware Product first before registering serials.'),
+        ),
+      );
+      return;
+    }
+
+    String productId = _products.first.id;
+    final serialCtrl = TextEditingController();
+    final imeiCtrl = TextEditingController();
+    final notesCtrl = TextEditingController();
+    final now = DateTime.now();
+    DateTime warrantyDate = DateTime(now.year + 1, now.month, now.day);
+    String status = 'IN_STOCK';
+    bool incrementStock = true;
+    bool submitting = false;
+
+    String isoDate(DateTime d) =>
+        '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            16,
+            20,
+            MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppleColors.border,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const Text(
+                  'Register Serial / IMEI',
+                  style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 14),
+                DropdownButtonFormField<String>(
+                  initialValue: productId,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Product *'),
+                  items: _products
+                      .map(
+                        (p) => DropdownMenuItem(
+                          value: p.id,
+                          child: Text(
+                            '${p.name} (${p.sku})',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) setModalState(() => productId = v);
+                  },
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: serialCtrl,
+                  maxLines: 2,
+                  textCapitalization: TextCapitalization.characters,
+                  decoration: const InputDecoration(
+                    labelText: 'Serial Number(s) *',
+                    hintText: 'Single or comma-separated list',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: imeiCtrl,
+                        decoration:
+                            const InputDecoration(labelText: 'IMEI / Chip ID'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: ctx,
+                            initialDate: warrantyDate,
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime(2035),
+                          );
+                          if (picked != null) {
+                            setModalState(() => warrantyDate = picked);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: const InputDecoration(
+                            labelText: 'Warranty Till',
+                          ),
+                          child: Text(formatShortDate(warrantyDate)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  initialValue: status,
+                  decoration: const InputDecoration(labelText: 'Status'),
+                  items: const [
+                    DropdownMenuItem(value: 'IN_STOCK', child: Text('IN STOCK')),
+                    DropdownMenuItem(
+                      value: 'UNDER_SERVICE',
+                      child: Text('UNDER SERVICE'),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) setModalState(() => status = v);
+                  },
+                ),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text(
+                    'Add to Product Stock count',
+                    style: TextStyle(fontSize: 13.5),
+                  ),
+                  value: incrementStock,
+                  onChanged: (v) => setModalState(() => incrementStock = v),
+                ),
+                TextField(
+                  controller: notesCtrl,
+                  decoration: const InputDecoration(labelText: 'Notes'),
+                ),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: submitting
+                      ? null
+                      : () async {
+                          if (serialCtrl.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Enter at least one serial number.'),
+                              ),
+                            );
+                            return;
+                          }
+                          setModalState(() => submitting = true);
+                          try {
+                            await widget.erpRepository.createSerial(
+                              productId: productId,
+                              serialNumber: serialCtrl.text.trim(),
+                              imei: imeiCtrl.text.trim().isEmpty
+                                  ? null
+                                  : imeiCtrl.text.trim(),
+                              status: status,
+                              warrantyExpiry: isoDate(warrantyDate),
+                              incrementStock: incrementStock,
+                              notes: notesCtrl.text.trim().isEmpty
+                                  ? null
+                                  : notesCtrl.text.trim(),
+                            );
+                            if (ctx.mounted) Navigator.pop(ctx);
+                            await _load();
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Serial number registered!'),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            setModalState(() => submitting = false);
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(e.toString())),
+                              );
+                            }
+                          }
+                        },
+                  child: submitting
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Save Serial'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final query = _search.trim().toLowerCase();
@@ -344,7 +559,15 @@ class _InventoryScreenState extends State<InventoryScreen> {
               icon: const Icon(Icons.add_box_outlined),
               label: const Text('Add Product'),
             )
-          : null,
+          : _tab == 1 && (widget.user.canCreateProduct || widget.user.canViewService)
+              ? FloatingActionButton.extended(
+                  onPressed: _showAddSerialSheet,
+                  backgroundColor: AppleColors.blue,
+                  foregroundColor: Colors.white,
+                  icon: const Icon(Icons.qr_code_scanner_rounded),
+                  label: const Text('Add Serial'),
+                )
+              : null,
       body: Column(
         children: [
           Padding(

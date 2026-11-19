@@ -689,6 +689,275 @@ class _FinanceScreenState extends State<FinanceScreen> {
     );
   }
 
+  Future<void> _showAddPurchaseSheet() async {
+    final billNoCtrl = TextEditingController();
+    final vendorCtrl = TextEditingController();
+    final gstinCtrl = TextEditingController();
+    final stateCtrl = TextEditingController(text: 'Haryana');
+    final subtotalCtrl = TextEditingController();
+    final notesCtrl = TextEditingController();
+    DateTime billDate = DateTime.now();
+    String taxRate = '18';
+    String paymentStatus = 'PAID';
+    bool itcEligible = true;
+    bool submitting = false;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            16,
+            20,
+            MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppleColors.border,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const Text(
+                  'Add Vendor Purchase Bill',
+                  style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: billNoCtrl,
+                        decoration:
+                            const InputDecoration(labelText: 'Bill / Inv # *'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: ctx,
+                            initialDate: billDate,
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now()
+                                .add(const Duration(days: 365)),
+                          );
+                          if (picked != null) {
+                            setModalState(() => billDate = picked);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration:
+                              const InputDecoration(labelText: 'Bill Date'),
+                          child: Text(formatShortDate(billDate)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: vendorCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Vendor / Supplier Name *',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: gstinCtrl,
+                        textCapitalization: TextCapitalization.characters,
+                        decoration:
+                            const InputDecoration(labelText: 'Vendor GSTIN'),
+                        onChanged: (v) {
+                          final u = v.trim().toUpperCase();
+                          if (u.startsWith('06')) stateCtrl.text = 'Haryana';
+                          if (u.startsWith('07')) stateCtrl.text = 'Delhi';
+                          if (u.startsWith('27')) {
+                            stateCtrl.text = 'Maharashtra';
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: stateCtrl,
+                        decoration: const InputDecoration(labelText: 'State'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: subtotalCtrl,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration:
+                            const InputDecoration(labelText: 'Taxable (₹) *'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        initialValue: taxRate,
+                        decoration: const InputDecoration(labelText: 'GST %'),
+                        items: const [
+                          DropdownMenuItem(value: '18', child: Text('18% GST')),
+                          DropdownMenuItem(value: '12', child: Text('12% GST')),
+                          DropdownMenuItem(value: '5', child: Text('5% GST')),
+                          DropdownMenuItem(value: '28', child: Text('28% GST')),
+                          DropdownMenuItem(value: '0', child: Text('0% Exempt')),
+                        ],
+                        onChanged: (v) {
+                          if (v != null) setModalState(() => taxRate = v);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        initialValue: paymentStatus,
+                        decoration:
+                            const InputDecoration(labelText: 'Payment Status'),
+                        items: const [
+                          DropdownMenuItem(value: 'PAID', child: Text('PAID')),
+                          DropdownMenuItem(
+                            value: 'PENDING',
+                            child: Text('PENDING'),
+                          ),
+                        ],
+                        onChanged: (v) {
+                          if (v != null) setModalState(() => paymentStatus = v);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: SwitchListTile.adaptive(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text(
+                          'ITC Eligible',
+                          style: TextStyle(fontSize: 12.5),
+                        ),
+                        value: itcEligible,
+                        onChanged: (v) => setModalState(() => itcEligible = v),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: notesCtrl,
+                  decoration: const InputDecoration(labelText: 'Notes / Items'),
+                ),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: submitting
+                      ? null
+                      : () async {
+                          final sub =
+                              double.tryParse(subtotalCtrl.text.trim()) ?? 0;
+                          if (billNoCtrl.text.trim().isEmpty ||
+                              vendorCtrl.text.trim().isEmpty ||
+                              sub <= 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Enter Bill #, Vendor Name, and Taxable amount.',
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+                          final gstin = gstinCtrl.text.trim().toUpperCase();
+                          final isIntra = gstin.startsWith('06') ||
+                              stateCtrl.text
+                                  .trim()
+                                  .toLowerCase()
+                                  .contains('haryana');
+                          setModalState(() => submitting = true);
+                          try {
+                            await widget.erpRepository.createPurchase(
+                              billNumber: billNoCtrl.text.trim(),
+                              vendorName: vendorCtrl.text.trim(),
+                              vendorGstin: gstin.isEmpty ? null : gstin,
+                              vendorState: stateCtrl.text.trim().isEmpty
+                                  ? null
+                                  : stateCtrl.text.trim(),
+                              billDate: _formatIsoDate(billDate),
+                              subtotal: sub,
+                              taxRate: double.tryParse(taxRate) ?? 18,
+                              gstType: isIntra ? 'INTRA_STATE' : 'INTER_STATE',
+                              itcEligible: itcEligible,
+                              paymentStatus: paymentStatus,
+                              notes: notesCtrl.text.trim().isEmpty
+                                  ? null
+                                  : notesCtrl.text.trim(),
+                            );
+                            if (ctx.mounted) Navigator.pop(ctx);
+                            await _load();
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Purchase bill recorded!'),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            setModalState(() => submitting = false);
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(e.toString())),
+                              );
+                            }
+                          }
+                        },
+                  child: submitting
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Save Purchase Bill'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _exportGst(String type) async {
     setState(() => _exporting = true);
     try {
@@ -728,7 +997,15 @@ class _FinanceScreenState extends State<FinanceScreen> {
               icon: const Icon(Icons.add_rounded),
               label: const Text('Add Expense'),
             )
-          : null,
+          : _tab == 1
+              ? FloatingActionButton.extended(
+                  onPressed: _showAddPurchaseSheet,
+                  backgroundColor: AppleColors.blue,
+                  foregroundColor: Colors.white,
+                  icon: const Icon(Icons.add_shopping_cart_outlined),
+                  label: const Text('Add Purchase'),
+                )
+              : null,
       body: Column(
         children: [
           Padding(
