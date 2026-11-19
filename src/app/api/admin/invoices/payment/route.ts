@@ -1,17 +1,25 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 import { sendTelegramPaymentAlert } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const allowed = await hasPermission(session.role, "CAN_MANAGE_INVOICES");
+    if (!allowed) {
+      return NextResponse.json({ error: "Access denied. Invoice payment permission required." }, { status: 403 });
+    }
+
     const { invoiceId, amount, paymentMode, referenceNumber, notes } = await request.json();
 
     if (!invoiceId || !amount || amount <= 0) {
       return NextResponse.json({ error: "Invalid payment parameters." }, { status: 400 });
     }
-
-    const session = await getSession();
 
     const invoice = await prisma.invoice.findUnique({
       where: { id: invoiceId },

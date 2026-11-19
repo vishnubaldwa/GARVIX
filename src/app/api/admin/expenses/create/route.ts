@@ -1,15 +1,23 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 
 export async function POST(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const allowed = await hasPermission(session.role, "CAN_VIEW_FINANCES");
+    if (!allowed) {
+      return NextResponse.json({ error: "Access denied. Finance permission required." }, { status: 403 });
+    }
+
     const { category, amount, description, paymentMode } = await request.json();
     if (!amount || !description) {
       return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
     }
-
-    const session = await getSession();
 
     const expense = await prisma.expense.create({
       data: {

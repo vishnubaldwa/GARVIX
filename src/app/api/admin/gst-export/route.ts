@@ -2,14 +2,22 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateGstr1Workbook, generateGstr3bSummaryWorkbook } from "@/lib/excel-export";
 import { getSession } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 
 export async function GET(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const allowed = await hasPermission(session.role, "CAN_VIEW_FINANCES");
+    if (!allowed) {
+      return NextResponse.json({ error: "Access denied. Finance export permission required." }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") || "gstr1";
     const month = searchParams.get("month") || "all";
-
-    const session = await getSession();
 
     // Fetch invoices and purchases
     const invoices = await prisma.invoice.findMany({

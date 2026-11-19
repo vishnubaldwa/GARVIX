@@ -3,10 +3,20 @@ import { prisma } from "@/lib/prisma";
 import { computeGst } from "@/lib/gst";
 import { buildUpiUri } from "@/lib/upi";
 import { getSession } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 import { sendTelegramInvoiceAlert } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const allowed = await hasPermission(session.role, "CAN_MANAGE_INVOICES");
+    if (!allowed) {
+      return NextResponse.json({ error: "Access denied. Invoice management permission required." }, { status: 403 });
+    }
+
     const {
       customerId,
       invoiceType,
@@ -22,8 +32,6 @@ export async function POST(request: Request) {
     if (!customerId || !items || items.length === 0) {
       return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
     }
-
-    const session = await getSession();
 
     const customer = await prisma.customer.findUnique({
       where: { id: customerId },

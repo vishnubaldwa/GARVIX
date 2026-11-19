@@ -11,7 +11,10 @@ export async function GET() {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const allowed = await hasPermission(session.role, "CAN_CREATE_CLIENT");
+    const allowed =
+      (await hasPermission(session.role, "CAN_CREATE_CLIENT")) ||
+      (await hasPermission(session.role, "CAN_CREATE_QUOTATION")) ||
+      (await hasPermission(session.role, "CAN_MANAGE_INVOICES"));
     if (!allowed) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }

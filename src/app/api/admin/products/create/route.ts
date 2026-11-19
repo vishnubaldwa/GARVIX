@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 
 export async function POST(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const allowed = await hasPermission(session.role, "CAN_CREATE_PRODUCT");
+    if (!allowed) {
+      return NextResponse.json({ error: "Access denied. Product creation permission required." }, { status: 403 });
+    }
+
     const {
       name,
       sku,
@@ -23,8 +33,6 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    const session = await getSession();
 
     // Check SKU unique
     const existing = await prisma.product.findUnique({

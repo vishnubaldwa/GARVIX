@@ -2,15 +2,22 @@ import 'package:material_ui/material_ui.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../domain/models/auth_user.dart';
 import '../../../core/theme/apple_theme.dart';
 import '../../../core/widgets/apple_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../view_models/billing_view_model.dart';
+import 'billing_forms.dart';
 
 class BillingScreen extends StatefulWidget {
-  const BillingScreen({super.key, required this.viewModel});
+  const BillingScreen({
+    super.key,
+    required this.viewModel,
+    required this.user,
+  });
 
   final BillingViewModel viewModel;
+  final AuthUser user;
 
   @override
   State<BillingScreen> createState() => _BillingScreenState();
@@ -22,7 +29,55 @@ class _BillingScreenState extends State<BillingScreen> {
   @override
   void initState() {
     super.initState();
+    if (!widget.user.canManageInvoices && !widget.user.canViewFinances) {
+      _tab = widget.user.canCreateQuotation ? 1 : 2;
+    }
     widget.viewModel.loadAll();
+  }
+
+  Widget? _buildFab() {
+    if (_tab == 0 && widget.user.canManageInvoices) {
+      return FloatingActionButton.extended(
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => CreateBillingDocumentScreen(
+              viewModel: widget.viewModel,
+              isInvoice: true,
+            ),
+          ),
+        ),
+        backgroundColor: AppleColors.blue,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('New Invoice'),
+      );
+    }
+    if (_tab == 1 && widget.user.canCreateQuotation) {
+      return FloatingActionButton.extended(
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => CreateBillingDocumentScreen(
+              viewModel: widget.viewModel,
+              isInvoice: false,
+            ),
+          ),
+        ),
+        backgroundColor: AppleColors.blue,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('New Quote'),
+      );
+    }
+    if (_tab == 2 && widget.user.canCreateClient) {
+      return FloatingActionButton.extended(
+        onPressed: () => showCreateClientSheet(context, widget.viewModel),
+        backgroundColor: AppleColors.blue,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.person_add_alt_1_rounded),
+        label: const Text('Add Client'),
+      );
+    }
+    return null;
   }
 
   @override
@@ -37,6 +92,7 @@ class _BillingScreenState extends State<BillingScreen> {
           ),
         ],
       ),
+      floatingActionButton: _buildFab(),
       body: ListenableBuilder(
         listenable: widget.viewModel,
         builder: (context, _) {
@@ -51,15 +107,24 @@ class _BillingScreenState extends State<BillingScreen> {
                     segments: [
                       ButtonSegment(
                         value: 0,
-                        label: Text('Invoices (${widget.viewModel.invoices.length})', style: const TextStyle(fontSize: 12)),
+                        label: Text(
+                          'Invoices (${widget.viewModel.invoices.length})',
+                          style: const TextStyle(fontSize: 12),
+                        ),
                       ),
                       ButtonSegment(
                         value: 1,
-                        label: Text('Quotes (${widget.viewModel.quotations.length})', style: const TextStyle(fontSize: 12)),
+                        label: Text(
+                          'Quotes (${widget.viewModel.quotations.length})',
+                          style: const TextStyle(fontSize: 12),
+                        ),
                       ),
                       ButtonSegment(
                         value: 2,
-                        label: Text('Clients (${widget.viewModel.clients.length})', style: const TextStyle(fontSize: 12)),
+                        label: Text(
+                          'Clients (${widget.viewModel.clients.length})',
+                          style: const TextStyle(fontSize: 12),
+                        ),
                       ),
                     ],
                     selected: {_tab},
@@ -89,17 +154,36 @@ class _BillingScreenState extends State<BillingScreen> {
   }
 
   Widget _buildInvoices() {
+    if (!widget.user.canManageInvoices && !widget.user.canViewFinances) {
+      return const AppleEmptyState(
+        icon: Icons.lock_outline_rounded,
+        title: 'Invoice access restricted',
+        subtitle: 'Your role does not include invoice permissions.',
+      );
+    }
+
     final items = widget.viewModel.invoices;
     if (items.isEmpty) {
-      return const AppleEmptyState(
+      return AppleEmptyState(
         icon: Icons.receipt_long_outlined,
         title: 'No invoices yet',
-        subtitle: 'Issued Tax Invoices and Proforma Invoices appear here.',
+        subtitle: 'Issue GST Tax Invoices or Proforma Invoices right from mobile.',
+        actionLabel: widget.user.canManageInvoices ? 'Create Invoice' : null,
+        onAction: widget.user.canManageInvoices
+            ? () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => CreateBillingDocumentScreen(
+                      viewModel: widget.viewModel,
+                      isInvoice: true,
+                    ),
+                  ),
+                )
+            : null,
       );
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 92),
       itemCount: items.length,
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
@@ -115,12 +199,16 @@ class _BillingScreenState extends State<BillingScreen> {
                   Expanded(
                     child: Text(
                       inv.customerName,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                   AppleBadge(
                     label: inv.paymentStatus,
-                    background: isPaid ? AppleColors.greenSoft : AppleColors.amberSoft,
+                    background:
+                        isPaid ? AppleColors.greenSoft : AppleColors.amberSoft,
                     foreground: isPaid ? AppleColors.green : AppleColors.amber,
                   ),
                 ],
@@ -128,7 +216,8 @@ class _BillingScreenState extends State<BillingScreen> {
               const SizedBox(height: 4),
               Text(
                 '${inv.invoiceNumber} • ${formatShortDate(inv.createdAt)}',
-                style: const TextStyle(fontSize: 12, color: AppleColors.inkMuted),
+                style:
+                    const TextStyle(fontSize: 12, color: AppleColors.inkMuted),
               ),
               const SizedBox(height: 10),
               Row(
@@ -136,19 +225,34 @@ class _BillingScreenState extends State<BillingScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Total', style: TextStyle(fontSize: 11, color: AppleColors.inkMuted)),
+                      const Text(
+                        'Total',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppleColors.inkMuted,
+                        ),
+                      ),
                       Text(
                         formatInr(inv.totalAmount),
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24),
+                  const SizedBox(width: 22),
                   if (inv.balanceDue > 0)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Balance Due', style: TextStyle(fontSize: 11, color: AppleColors.inkMuted)),
+                        const Text(
+                          'Due',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppleColors.inkMuted,
+                          ),
+                        ),
                         Text(
                           formatInr(inv.balanceDue),
                           style: const TextStyle(
@@ -159,7 +263,30 @@ class _BillingScreenState extends State<BillingScreen> {
                         ),
                       ],
                     ),
-                  const Spacer(),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (!isPaid && widget.user.canManageInvoices)
+                    FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppleColors.green,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 9,
+                        ),
+                      ),
+                      onPressed: () => showRecordPaymentSheet(
+                        context,
+                        widget.viewModel,
+                        inv,
+                      ),
+                      icon: const Icon(Icons.payments_outlined, size: 16),
+                      label: const Text('Record Payment'),
+                    ),
                   FilledButton.tonalIcon(
                     onPressed: () {
                       SharePlus.instance.share(
@@ -182,61 +309,128 @@ class _BillingScreenState extends State<BillingScreen> {
   }
 
   Widget _buildQuotes() {
+    if (!widget.user.canCreateQuotation) {
+      return const AppleEmptyState(
+        icon: Icons.lock_outline_rounded,
+        title: 'Quotation access restricted',
+        subtitle: 'Your role does not include quotation permissions.',
+      );
+    }
+
     final items = widget.viewModel.quotations;
     if (items.isEmpty) {
-      return const AppleEmptyState(
+      return AppleEmptyState(
         icon: Icons.description_outlined,
         title: 'No quotations yet',
-        subtitle: 'Sales proposals and client quotes appear here.',
+        subtitle: 'Create professional proposals with automatic Haryana/IGST calculation.',
+        actionLabel: 'Create Quotation',
+        onAction: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => CreateBillingDocumentScreen(
+              viewModel: widget.viewModel,
+              isInvoice: false,
+            ),
+          ),
+        ),
       );
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 92),
       itemCount: items.length,
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final q = items[index];
+        final isConverted = q.status.toUpperCase() == 'CONVERTED';
         return AppleCard(
           padding: const EdgeInsets.all(15),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            q.customerName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        AppleBadge(label: q.status),
-                      ],
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      q.customerName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${q.quoteNumber} • ${formatInr(q.totalAmount)} • ${formatShortDate(q.createdAt)}',
-                      style: const TextStyle(fontSize: 12, color: AppleColors.inkSecondary),
-                    ),
-                  ],
+                  ),
+                  const SizedBox(width: 8),
+                  AppleBadge(
+                    label: q.status,
+                    background: isConverted
+                        ? AppleColors.greenSoft
+                        : AppleColors.blueSoft,
+                    foreground:
+                        isConverted ? AppleColors.green : AppleColors.blue,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${q.quoteNumber} • ${formatInr(q.totalAmount)} • ${formatShortDate(q.createdAt)}',
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  color: AppleColors.inkSecondary,
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.ios_share_rounded, color: AppleColors.blue),
-                onPressed: () {
-                  SharePlus.instance.share(
-                    ShareParams(
-                      text:
-                          'GARVIX Quotation ${q.quoteNumber} (${formatInr(q.totalAmount)}): ${q.portalUrl}',
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (!isConverted && widget.user.canManageInvoices)
+                    FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 9,
+                        ),
+                      ),
+                      onPressed: widget.viewModel.isMutating
+                          ? null
+                          : () async {
+                              try {
+                                await widget.viewModel.convertQuotation(q.id);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Converted to Tax Invoice with UPI QR!',
+                                      ),
+                                    ),
+                                  );
+                                  setState(() => _tab = 0);
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(e.toString())),
+                                  );
+                                }
+                              }
+                            },
+                      icon: const Icon(Icons.swap_horiz_rounded, size: 17),
+                      label: const Text('Convert to Invoice'),
                     ),
-                  );
-                },
+                  FilledButton.tonalIcon(
+                    onPressed: () {
+                      SharePlus.instance.share(
+                        ShareParams(
+                          text:
+                              'GARVIX Quotation ${q.quoteNumber} (${formatInr(q.totalAmount)}): ${q.portalUrl}',
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.ios_share_rounded, size: 16),
+                    label: const Text('Share Quote'),
+                  ),
+                ],
               ),
             ],
           ),
@@ -248,15 +442,19 @@ class _BillingScreenState extends State<BillingScreen> {
   Widget _buildClients() {
     final items = widget.viewModel.clients;
     if (items.isEmpty) {
-      return const AppleEmptyState(
+      return AppleEmptyState(
         icon: Icons.business_outlined,
         title: 'No clients yet',
-        subtitle: 'Parties & B2B clients will appear here.',
+        subtitle: 'Add B2B & corporate parties with GSTIN details.',
+        actionLabel: widget.user.canCreateClient ? 'Add Client' : null,
+        onAction: widget.user.canCreateClient
+            ? () => showCreateClientSheet(context, widget.viewModel)
+            : null,
       );
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 6, 16, 28),
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 92),
       itemCount: items.length,
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
@@ -271,17 +469,26 @@ class _BillingScreenState extends State<BillingScreen> {
                   children: [
                     Text(
                       c.companyName,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      '${c.state}${c.gstin != null && c.gstin!.isNotEmpty ? " • GST: ${c.gstin}" : ""}',
-                      style: const TextStyle(fontSize: 12, color: AppleColors.inkSecondary),
+                      '${c.state} (${c.stateCode})${c.gstin != null && c.gstin!.isNotEmpty ? " • ${c.gstin}" : ""}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppleColors.inkSecondary,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Billed: ${formatInr(c.totalBilled)} • Due: ${formatInr(c.totalDue)}',
-                      style: const TextStyle(fontSize: 12, color: AppleColors.inkMuted),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppleColors.inkMuted,
+                      ),
                     ),
                   ],
                 ),

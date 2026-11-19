@@ -2,16 +2,24 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildUpiUri } from "@/lib/upi";
 import { getSession } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 import { sendTelegramInvoiceAlert } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const allowed = await hasPermission(session.role, "CAN_MANAGE_INVOICES");
+    if (!allowed) {
+      return NextResponse.json({ error: "Access denied. Invoice management permission required." }, { status: 403 });
+    }
+
     const { quotationId } = await request.json();
     if (!quotationId) {
       return NextResponse.json({ error: "Quotation ID required." }, { status: 400 });
     }
-
-    const session = await getSession();
 
     const quote = await prisma.quotation.findUnique({
       where: { id: quotationId },

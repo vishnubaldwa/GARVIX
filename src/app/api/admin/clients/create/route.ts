@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 
 export async function POST(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const allowed = await hasPermission(session.role, "CAN_CREATE_CLIENT");
+    if (!allowed) {
+      return NextResponse.json({ error: "Access denied. Client creation permission required." }, { status: 403 });
+    }
+
     const {
       companyName,
       contactPerson,
@@ -22,8 +32,6 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    const session = await getSession();
 
     // Auto-detect state code from GSTIN if provided (first 2 digits)
     let finalStateCode = stateCode || "06";

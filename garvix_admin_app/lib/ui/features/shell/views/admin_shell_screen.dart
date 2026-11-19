@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../../data/repositories/crm_repository.dart';
 import '../../../../data/repositories/dashboard_repository.dart';
+import '../../../../data/repositories/erp_repository.dart';
 import '../../../../data/repositories/team_repository.dart';
 import '../../../../data/repositories/vault_repository.dart';
 import '../../../../domain/models/auth_user.dart';
@@ -10,9 +11,9 @@ import '../../billing/views/billing_screen.dart';
 import '../../dashboard/view_models/dashboard_view_model.dart';
 import '../../dashboard/views/dashboard_screen.dart';
 import '../../leads/view_models/leads_view_model.dart';
-import '../../leads/views/leads_screen.dart';
+import '../../modules/views/modules_hub_screen.dart';
+import '../../settings/views/account_screen.dart';
 import '../../team/view_models/team_view_model.dart';
-import '../../team/views/more_and_team_screen.dart';
 import '../../vault/view_models/vault_view_model.dart';
 import '../../vault/views/vault_screen.dart';
 
@@ -40,6 +41,7 @@ class AdminShellScreen extends StatefulWidget {
     required this.dashboardRepository,
     required this.vaultRepository,
     required this.crmRepository,
+    required this.erpRepository,
     required this.teamRepository,
     required this.onSignOut,
   });
@@ -49,6 +51,7 @@ class AdminShellScreen extends StatefulWidget {
   final DashboardRepository dashboardRepository;
   final VaultRepository vaultRepository;
   final CrmRepository crmRepository;
+  final ErpRepository erpRepository;
   final TeamRepository teamRepository;
   final VoidCallback onSignOut;
 
@@ -71,7 +74,10 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
     _dashboardVm = DashboardViewModel(repository: widget.dashboardRepository);
     _vaultVm = VaultViewModel(repository: widget.vaultRepository);
     _leadsVm = LeadsViewModel(repository: widget.crmRepository);
-    _billingVm = BillingViewModel(repository: widget.crmRepository);
+    _billingVm = BillingViewModel(
+      crmRepository: widget.crmRepository,
+      erpRepository: widget.erpRepository,
+    );
     _teamVm = TeamViewModel(repository: widget.teamRepository);
   }
 
@@ -88,21 +94,44 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
   List<_NavTab> _buildTabs() {
     final tabs = <_NavTab>[];
 
-    if (!widget.user.isDocumentViewerOnly) {
-      tabs.add(
-        _NavTab(
-          key: 'overview',
-          label: 'Overview',
-          icon: Icons.grid_view_outlined,
-          selectedIcon: Icons.grid_view_rounded,
-          page: DashboardScreen(
-            viewModel: _dashboardVm,
-            user: widget.user,
-            onNavigateTab: _selectTabByKey,
+    // External Banker / CA Document Viewer sees ONLY the Company Vault
+    if (widget.user.isDocumentViewerOnly) {
+      if (widget.user.canViewVault) {
+        tabs.add(
+          _NavTab(
+            key: 'vault',
+            label: 'Vault',
+            icon: Icons.folder_shared_outlined,
+            selectedIcon: Icons.folder_shared_rounded,
+            page: VaultScreen(
+              viewModel: _vaultVm,
+              user: widget.user,
+              onSignOut: widget.onSignOut,
+            ),
           ),
-        ),
-      );
+        );
+      }
+      return tabs;
     }
+
+    tabs.add(
+      _NavTab(
+        key: 'overview',
+        label: 'Overview',
+        icon: Icons.grid_view_outlined,
+        selectedIcon: Icons.grid_view_rounded,
+        page: DashboardScreen(
+          viewModel: _dashboardVm,
+          user: widget.user,
+          crmRepository: widget.crmRepository,
+          erpRepository: widget.erpRepository,
+          leadsViewModel: _leadsVm,
+          billingViewModel: _billingVm,
+          teamViewModel: _teamVm,
+          onNavigateTab: _selectTabByKey,
+        ),
+      ),
+    );
 
     if (widget.user.canViewVault) {
       tabs.add(
@@ -114,52 +143,58 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
           page: VaultScreen(
             viewModel: _vaultVm,
             user: widget.user,
-            onSignOut: widget.user.isDocumentViewerOnly ? widget.onSignOut : null,
           ),
         ),
       );
     }
 
-    if (widget.user.canViewLeads && !widget.user.isDocumentViewerOnly) {
-      tabs.add(
-        _NavTab(
-          key: 'leads',
-          label: 'Leads',
-          icon: Icons.people_outline_rounded,
-          selectedIcon: Icons.people_rounded,
-          page: LeadsScreen(viewModel: _leadsVm),
-        ),
-      );
-    }
-
-    if (widget.user.canViewBilling && !widget.user.isDocumentViewerOnly) {
+    if (widget.user.canViewBilling) {
       tabs.add(
         _NavTab(
           key: 'billing',
           label: 'Billing',
           icon: Icons.receipt_long_outlined,
           selectedIcon: Icons.receipt_long_rounded,
-          page: BillingScreen(viewModel: _billingVm),
-        ),
-      );
-    }
-
-    if (!widget.user.isDocumentViewerOnly) {
-      tabs.add(
-        _NavTab(
-          key: 'more',
-          label: 'Team',
-          icon: Icons.person_outline_rounded,
-          selectedIcon: Icons.person_rounded,
-          page: MoreAndTeamScreen(
+          page: BillingScreen(
+            viewModel: _billingVm,
             user: widget.user,
-            serverUrl: widget.serverUrl,
-            viewModel: _teamVm,
-            onSignOut: widget.onSignOut,
           ),
         ),
       );
     }
+
+    tabs.add(
+      _NavTab(
+        key: 'modules',
+        label: 'Modules',
+        icon: Icons.apps_outlined,
+        selectedIcon: Icons.apps_rounded,
+        page: ModulesHubScreen(
+          user: widget.user,
+          crmRepository: widget.crmRepository,
+          erpRepository: widget.erpRepository,
+          leadsViewModel: _leadsVm,
+          billingViewModel: _billingVm,
+          teamViewModel: _teamVm,
+          onNavigateTab: _selectTabByKey,
+        ),
+      ),
+    );
+
+    tabs.add(
+      _NavTab(
+        key: 'account',
+        label: 'Account',
+        icon: Icons.person_outline_rounded,
+        selectedIcon: Icons.person_rounded,
+        page: AccountScreen(
+          user: widget.user,
+          serverUrl: widget.serverUrl,
+          erpRepository: widget.erpRepository,
+          onSignOut: widget.onSignOut,
+        ),
+      ),
+    );
 
     return tabs;
   }
@@ -188,7 +223,6 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
 
     final safeIndex = _currentIndex.clamp(0, tabs.length - 1);
 
-    // Banker / External Document Viewer sees ONLY the clean Vault screen (no bottom bar)
     if (tabs.length == 1) {
       return tabs.first.page;
     }

@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/crm_repository.dart';
 import 'data/repositories/dashboard_repository.dart';
+import 'data/repositories/erp_repository.dart';
 import 'data/repositories/team_repository.dart';
 import 'data/repositories/vault_repository.dart';
 import 'data/services/api_client.dart';
@@ -31,6 +32,7 @@ class _GarvixAdminAppState extends State<GarvixAdminApp> {
   late final DashboardRepository _dashboardRepository;
   late final VaultRepository _vaultRepository;
   late final CrmRepository _crmRepository;
+  late final ErpRepository _erpRepository;
   late final TeamRepository _teamRepository;
   late final AuthViewModel _authViewModel;
 
@@ -46,6 +48,7 @@ class _GarvixAdminAppState extends State<GarvixAdminApp> {
     _dashboardRepository = DashboardRepository(apiClient: _apiClient);
     _vaultRepository = VaultRepository(apiClient: _apiClient);
     _crmRepository = CrmRepository(apiClient: _apiClient);
+    _erpRepository = ErpRepository(apiClient: _apiClient);
     _teamRepository = TeamRepository(apiClient: _apiClient);
     _authViewModel = AuthViewModel(authRepository: _authRepository)..initialize();
   }
@@ -99,6 +102,7 @@ class _GarvixAdminAppState extends State<GarvixAdminApp> {
             dashboardRepository: _dashboardRepository,
             vaultRepository: _vaultRepository,
             crmRepository: _crmRepository,
+            erpRepository: _erpRepository,
             teamRepository: _teamRepository,
             onSignOut: _authViewModel.signOut,
           );

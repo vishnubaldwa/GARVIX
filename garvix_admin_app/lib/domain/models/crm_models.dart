@@ -31,7 +31,8 @@ class LeadItem {
       solution: (json['solution'] ?? '').toString(),
       message: (json['message'] ?? '').toString(),
       status: (json['status'] ?? 'NEW').toString(),
-      createdAt: DateTime.tryParse((json['createdAt'] ?? '').toString()) ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse((json['createdAt'] ?? '').toString()) ?? DateTime.now(),
     );
   }
 }
@@ -45,6 +46,8 @@ class ClientItem {
     required this.phone,
     required this.gstin,
     required this.state,
+    required this.stateCode,
+    required this.billingAddress,
     required this.invoiceCount,
     required this.quotationCount,
     required this.totalBilled,
@@ -58,10 +61,14 @@ class ClientItem {
   final String phone;
   final String? gstin;
   final String state;
+  final String stateCode;
+  final String? billingAddress;
   final int invoiceCount;
   final int quotationCount;
   final double totalBilled;
   final double totalDue;
+
+  bool get isHaryana => stateCode == '06';
 
   factory ClientItem.fromJson(Map<String, dynamic> json) {
     return ClientItem(
@@ -72,10 +79,20 @@ class ClientItem {
       phone: (json['phone'] ?? '').toString(),
       gstin: json['gstin']?.toString(),
       state: (json['state'] ?? 'Haryana').toString(),
-      invoiceCount: (json['invoiceCount'] is num) ? (json['invoiceCount'] as num).toInt() : 0,
-      quotationCount: (json['quotationCount'] is num) ? (json['quotationCount'] as num).toInt() : 0,
-      totalBilled: (json['totalBilled'] is num) ? (json['totalBilled'] as num).toDouble() : 0,
-      totalDue: (json['totalDue'] is num) ? (json['totalDue'] as num).toDouble() : 0,
+      stateCode: (json['stateCode'] ?? '06').toString(),
+      billingAddress: json['billingAddress']?.toString(),
+      invoiceCount: (json['invoiceCount'] is num)
+          ? (json['invoiceCount'] as num).toInt()
+          : 0,
+      quotationCount: (json['quotationCount'] is num)
+          ? (json['quotationCount'] as num).toInt()
+          : 0,
+      totalBilled: (json['totalBilled'] is num)
+          ? (json['totalBilled'] as num).toDouble()
+          : 0,
+      totalDue: (json['totalDue'] is num)
+          ? (json['totalDue'] as num).toDouble()
+          : 0,
     );
   }
 }
@@ -88,6 +105,10 @@ class InvoiceItem {
     required this.type,
     required this.customerName,
     required this.customerPhone,
+    required this.subtotal,
+    required this.cgstAmount,
+    required this.sgstAmount,
+    required this.igstAmount,
     required this.totalAmount,
     required this.amountPaid,
     required this.balanceDue,
@@ -102,6 +123,10 @@ class InvoiceItem {
   final String type;
   final String customerName;
   final String customerPhone;
+  final double subtotal;
+  final double cgstAmount;
+  final double sgstAmount;
+  final double igstAmount;
   final double totalAmount;
   final double amountPaid;
   final double balanceDue;
@@ -117,12 +142,31 @@ class InvoiceItem {
       type: (json['type'] ?? 'TAX_INVOICE').toString(),
       customerName: (json['customerName'] ?? '').toString(),
       customerPhone: (json['customerPhone'] ?? '').toString(),
-      totalAmount: (json['totalAmount'] is num) ? (json['totalAmount'] as num).toDouble() : 0,
-      amountPaid: (json['amountPaid'] is num) ? (json['amountPaid'] as num).toDouble() : 0,
-      balanceDue: (json['balanceDue'] is num) ? (json['balanceDue'] as num).toDouble() : 0,
+      subtotal: (json['subtotal'] is num)
+          ? (json['subtotal'] as num).toDouble()
+          : 0,
+      cgstAmount: (json['cgstAmount'] is num)
+          ? (json['cgstAmount'] as num).toDouble()
+          : 0,
+      sgstAmount: (json['sgstAmount'] is num)
+          ? (json['sgstAmount'] as num).toDouble()
+          : 0,
+      igstAmount: (json['igstAmount'] is num)
+          ? (json['igstAmount'] as num).toDouble()
+          : 0,
+      totalAmount: (json['totalAmount'] is num)
+          ? (json['totalAmount'] as num).toDouble()
+          : 0,
+      amountPaid: (json['amountPaid'] is num)
+          ? (json['amountPaid'] as num).toDouble()
+          : 0,
+      balanceDue: (json['balanceDue'] is num)
+          ? (json['balanceDue'] as num).toDouble()
+          : 0,
       paymentStatus: (json['paymentStatus'] ?? 'UNPAID').toString(),
       portalUrl: (json['portalUrl'] ?? '').toString(),
-      createdAt: DateTime.tryParse((json['createdAt'] ?? '').toString()) ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse((json['createdAt'] ?? '').toString()) ?? DateTime.now(),
     );
   }
 }
@@ -157,10 +201,13 @@ class QuotationItem {
       token: (json['token'] ?? '').toString(),
       customerName: (json['customerName'] ?? '').toString(),
       customerPhone: (json['customerPhone'] ?? '').toString(),
-      totalAmount: (json['totalAmount'] is num) ? (json['totalAmount'] as num).toDouble() : 0,
+      totalAmount: (json['totalAmount'] is num)
+          ? (json['totalAmount'] as num).toDouble()
+          : 0,
       status: (json['status'] ?? 'DRAFT').toString(),
       portalUrl: (json['portalUrl'] ?? '').toString(),
-      createdAt: DateTime.tryParse((json['createdAt'] ?? '').toString()) ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse((json['createdAt'] ?? '').toString()) ?? DateTime.now(),
     );
   }
 }

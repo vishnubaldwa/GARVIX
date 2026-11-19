@@ -1,9 +1,22 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 
 export async function POST(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const allowed =
+      (await hasPermission(session.role, "CAN_MANAGE_INVOICES")) ||
+      (await hasPermission(session.role, "CAN_CREATE_PRODUCT")) ||
+      (await hasPermission(session.role, "CAN_VIEW_SERVICE"));
+    if (!allowed) {
+      return NextResponse.json({ error: "Access denied. Challan permission required." }, { status: 403 });
+    }
+
     const {
       customerId,
       challanType,
@@ -17,8 +30,6 @@ export async function POST(request: Request) {
     if (!customerId || !items || items.length === 0) {
       return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
     }
-
-    const session = await getSession();
 
     const count = await prisma.deliveryChallan.count();
     const nextSeq = String(count + 1).padStart(3, "0");

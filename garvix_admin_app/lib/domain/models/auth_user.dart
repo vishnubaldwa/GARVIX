@@ -30,12 +30,29 @@ class AuthUser {
   bool get canManageVault => isFullAdmin || hasPermission('CAN_MANAGE_DOCUMENTS');
   bool get canViewVault => isFullAdmin || hasPermission('CAN_VIEW_DOCUMENTS');
   bool get canViewLeads => isFullAdmin || hasPermission('CAN_VIEW_LEADS');
-  bool get canViewBilling =>
-      isFullAdmin ||
-      hasPermission('CAN_MANAGE_INVOICES') ||
-      hasPermission('CAN_CREATE_QUOTATION') ||
-      hasPermission('CAN_CREATE_CLIENT');
+  bool get canCreateClient => isFullAdmin || hasPermission('CAN_CREATE_CLIENT');
+  bool get canCreateQuotation =>
+      isFullAdmin || hasPermission('CAN_CREATE_QUOTATION');
+  bool get canManageInvoices =>
+      isFullAdmin || hasPermission('CAN_MANAGE_INVOICES');
+  bool get canViewFinances => isFullAdmin || hasPermission('CAN_VIEW_FINANCES');
+  bool get canCreateProduct =>
+      isFullAdmin || hasPermission('CAN_CREATE_PRODUCT');
+  bool get canViewService => isFullAdmin || hasPermission('CAN_VIEW_SERVICE');
   bool get canManageTeam => isFullAdmin || hasPermission('CAN_MANAGE_TEAM');
+  bool get canManageRoles => isFullAdmin || hasPermission('CAN_MANAGE_ROLES');
+  bool get canManageSettings =>
+      isFullAdmin || hasPermission('CAN_MANAGE_SETTINGS');
+  bool get canViewAudit => isFullAdmin;
+
+  bool get canViewBilling =>
+      canManageInvoices || canCreateQuotation || canCreateClient || canViewFinances;
+
+  bool get canViewChallans =>
+      canManageInvoices || canCreateProduct || canViewService;
+
+  bool get canViewInventory =>
+      canCreateProduct || canCreateQuotation || canManageInvoices || canViewService;
 
   String get initials {
     final parts = name.trim().split(RegExp(r'\s+'));

@@ -69,7 +69,7 @@ export default function DownloadAppPage() {
               </div>
             </div>
             <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-700">
-              v1.0
+              v2.0
             </span>
           </div>
 
