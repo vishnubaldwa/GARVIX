@@ -71,8 +71,8 @@ export function ExpenseCreateForm({
   const [description, setDescription] = useState("");
   const [paymentMode, setPaymentMode] = useState("UPI");
 
-  // Extra detail fields
-  const [showMore, setShowMore] = useState(true);
+  // Extra detail fields (collapsed by default for compact 2-row layout)
+  const [showMore, setShowMore] = useState(false);
   const [vendorName, setVendorName] = useState("");
   const [paidBy, setPaidBy] = useState("Company Account");
   const [customPaidBy, setCustomPaidBy] = useState("");
@@ -202,6 +202,14 @@ export function ExpenseCreateForm({
   };
 
   const uniqueStaff = Array.from(new Set(staffNames.filter(Boolean)));
+  const hasExtraFilled = Boolean(
+    paidBy !== "Company Account" ||
+      reimbursementStatus !== "COMPANY_PAID" ||
+      billNumber.trim() ||
+      referenceNo.trim() ||
+      notes.trim() ||
+      receiptFile
+  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
@@ -211,87 +219,44 @@ export function ExpenseCreateForm({
         </div>
       )}
 
-      <div>
-        <div className="flex items-center justify-between mb-1">
-          <label className="block text-slate-700 font-semibold">Expense Category *</label>
-          {!isCreatingNew && (
-            <button
-              type="button"
-              onClick={() => setIsCreatingNew(true)}
-              className="text-[11px] font-bold text-blue-600 hover:text-blue-800 transition flex items-center gap-1"
-            >
-              <Plus className="h-3 w-3" /> New Category
-            </button>
-          )}
+      {/* Row 1: Category, Date, Amount, Payment Method */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <label className="block text-slate-700 font-semibold">Expense Category *</label>
+            {!isCreatingNew && (
+              <button
+                type="button"
+                onClick={() => setIsCreatingNew(true)}
+                className="text-[11px] font-bold text-blue-600 hover:text-blue-800 transition flex items-center gap-0.5"
+              >
+                <Plus className="h-3 w-3" /> New
+              </button>
+            )}
+          </div>
+          <select
+            value={isCreatingNew ? "__CREATE_NEW__" : category}
+            onChange={(e) => {
+              if (e.target.value === "__CREATE_NEW__") {
+                setIsCreatingNew(true);
+              } else {
+                setCategory(e.target.value);
+                setIsCreatingNew(false);
+              }
+            }}
+            className="w-full admin-input py-2 px-3"
+          >
+            {categories.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+            <option value="__CREATE_NEW__" className="text-blue-600 font-bold">
+              ➕ + Create New Category...
+            </option>
+          </select>
         </div>
 
-        <select
-          value={isCreatingNew ? "__CREATE_NEW__" : category}
-          onChange={(e) => {
-            if (e.target.value === "__CREATE_NEW__") {
-              setIsCreatingNew(true);
-            } else {
-              setCategory(e.target.value);
-              setIsCreatingNew(false);
-            }
-          }}
-          className="w-full admin-input py-2 px-3"
-        >
-          {categories.map((c) => (
-            <option key={c.value} value={c.value}>
-              {c.label}
-            </option>
-          ))}
-          <option value="__CREATE_NEW__" className="text-blue-600 font-bold">
-            ➕ + Create New Category...
-          </option>
-        </select>
-
-        {isCreatingNew && (
-          <div className="mt-2.5 p-3 rounded-xl border border-blue-200 bg-blue-50/70 space-y-2 animate-in fade-in duration-200">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-900 flex items-center gap-1.5">
-                <Tag className="h-3 w-3 text-blue-600" /> Create Custom Category
-              </span>
-              <button
-                type="button"
-                onClick={() => setIsCreatingNew(false)}
-                className="text-slate-400 hover:text-slate-600"
-                title="Cancel"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                autoFocus
-                placeholder="e.g. Company formation, Staff Welfare..."
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddNewCategory();
-                  } else if (e.key === "Escape") {
-                    setIsCreatingNew(false);
-                  }
-                }}
-                className="flex-1 admin-input py-1.5 px-3 text-xs bg-white text-slate-900 font-medium placeholder:text-slate-400"
-              />
-              <button
-                type="button"
-                onClick={handleAddNewCategory}
-                className="rounded-lg bg-blue-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-blue-700 transition shrink-0"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-2 gap-2.5">
         <div>
           <label className="block text-slate-700 font-semibold mb-1">Expense Date *</label>
           <input
@@ -299,9 +264,10 @@ export function ExpenseCreateForm({
             required
             value={expenseDate}
             onChange={(e) => setExpenseDate(e.target.value)}
-            className="w-full admin-input py-2 px-2.5 font-mono text-slate-900"
+            className="w-full admin-input py-2 px-3 font-mono text-slate-900"
           />
         </div>
+
         <div>
           <label className="block text-slate-700 font-semibold mb-1">Amount (₹) *</label>
           <input
@@ -315,60 +281,129 @@ export function ExpenseCreateForm({
             className="w-full admin-input py-2 px-3 font-mono font-bold text-slate-900"
           />
         </div>
+
+        <div>
+          <label className="block text-slate-700 font-semibold mb-1">Payment Method</label>
+          <select
+            value={paymentMode}
+            onChange={(e) => setPaymentMode(e.target.value)}
+            className="w-full admin-input py-2 px-3"
+          >
+            {EXPENSE_PAYMENT_MODES.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <div>
-        <label className="block text-slate-700 font-semibold mb-1">Description *</label>
-        <input
-          type="text"
-          required
-          placeholder="e.g. Razorpay Rize company registration fee"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full admin-input py-2 px-3"
-        />
+      {/* Inline Custom Category Creator */}
+      {isCreatingNew && (
+        <div className="p-3 rounded-xl border border-blue-200 bg-blue-50/70 flex flex-col sm:flex-row sm:items-center gap-2.5 animate-in fade-in duration-200">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-900 flex items-center gap-1.5 shrink-0">
+            <Tag className="h-3.5 w-3.5 text-blue-600" /> New Category:
+          </span>
+          <input
+            type="text"
+            autoFocus
+            placeholder="e.g. Company formation, Staff Welfare, Tooling..."
+            value={newCategoryName}
+            onChange={(e) => setNewCategoryName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddNewCategory();
+              } else if (e.key === "Escape") {
+                setIsCreatingNew(false);
+              }
+            }}
+            className="flex-1 admin-input py-1.5 px-3 text-xs bg-white text-slate-900 font-medium placeholder:text-slate-400"
+          />
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleAddNewCategory}
+              className="rounded-lg bg-blue-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-blue-700 transition"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsCreatingNew(false)}
+              className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-slate-500 hover:text-slate-700 transition"
+              title="Cancel"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Row 2: Description, Vendor, Submit */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-end">
+        <div className="lg:col-span-6">
+          <label className="block text-slate-700 font-semibold mb-1">Description *</label>
+          <input
+            type="text"
+            required
+            placeholder="e.g. Razorpay Rize company registration fee, Gurugram site travel..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full admin-input py-2 px-3"
+          />
+        </div>
+
+        <div className="lg:col-span-3">
+          <label className="block text-slate-700 font-semibold mb-1">Vendor / Paid To</label>
+          <input
+            type="text"
+            placeholder="e.g. Razorpay Rize, MCA, Amazon"
+            value={vendorName}
+            onChange={(e) => setVendorName(e.target.value)}
+            className="w-full admin-input py-2 px-3"
+          />
+        </div>
+
+        <div className="lg:col-span-3">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 py-2.5 px-4 font-bold uppercase text-white hover:bg-blue-700 transition disabled:opacity-50 shadow-sm"
+          >
+            <Plus className="h-4 w-4" /> {loading ? "Recording..." : "Log Expense"}
+          </button>
+        </div>
       </div>
 
-      <div>
-        <label className="block text-slate-700 font-semibold mb-1">Payment Method</label>
-        <select
-          value={paymentMode}
-          onChange={(e) => setPaymentMode(e.target.value)}
-          className="w-full admin-input py-2 px-3"
-        >
-          {EXPENSE_PAYMENT_MODES.map((m) => (
-            <option key={m.value} value={m.value}>
-              {m.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Collapsible Additional Details */}
-      <div className="pt-1 border-t border-slate-100">
+      {/* Collapsible Additional Details Toggle (Default Closed — Option A) */}
+      <div className="pt-2 border-t border-slate-100">
         <button
           type="button"
           onClick={() => setShowMore((v) => !v)}
-          className="w-full flex items-center justify-between py-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-slate-800 transition"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 text-[11px] font-bold text-slate-600 transition"
         >
-          <span>Additional Details (Optional)</span>
-          {showMore ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+          {showMore ? (
+            <ChevronUp className="h-3.5 w-3.5 text-blue-600" />
+          ) : (
+            <ChevronDown className="h-3.5 w-3.5 text-blue-600" />
+          )}
+          <span>
+            {showMore
+              ? "Hide Additional Details"
+              : "More Details (Paid By, Reimbursement, Bill #, UTR, Receipt & Notes)"}
+          </span>
+          {!showMore && hasExtraFilled && (
+            <span className="ml-1 rounded-full bg-blue-600 px-1.5 py-0.5 text-[9px] text-white">
+              Added
+            </span>
+          )}
         </button>
 
         {showMore && (
-          <div className="mt-2.5 space-y-3">
-            <div>
-              <label className="block text-slate-700 font-semibold mb-1">Vendor / Paid To</label>
-              <input
-                type="text"
-                placeholder="e.g. Razorpay Rize, MCA, Amazon, Local Shop"
-                value={vendorName}
-                onChange={(e) => setVendorName(e.target.value)}
-                className="w-full admin-input py-2 px-3"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="mt-3 pt-3 border-t border-slate-100 space-y-3 animate-in fade-in duration-150">
+            {/* Row 3: Paid By, Reimbursement, Bill No, UTR */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div>
                 <label className="block text-slate-700 font-semibold mb-1">Paid By</label>
                 <select
@@ -382,7 +417,7 @@ export function ExpenseCreateForm({
                       setReimbursementStatus("PENDING");
                     }
                   }}
-                  className="w-full admin-input py-2 px-2.5"
+                  className="w-full admin-input py-2 px-3"
                 >
                   <option value="Company Account">Company Account</option>
                   {uniqueStaff.map((name) => (
@@ -395,11 +430,11 @@ export function ExpenseCreateForm({
               </div>
 
               <div>
-                <label className="block text-slate-700 font-semibold mb-1">Reimbursement</label>
+                <label className="block text-slate-700 font-semibold mb-1">Reimbursement Status</label>
                 <select
                   value={reimbursementStatus}
                   onChange={(e) => setReimbursementStatus(e.target.value)}
-                  className="w-full admin-input py-2 px-2.5"
+                  className="w-full admin-input py-2 px-3"
                 >
                   {REIMBURSEMENT_STATUSES.map((r) => (
                     <option key={r.value} value={r.value}>
@@ -408,10 +443,32 @@ export function ExpenseCreateForm({
                   ))}
                 </select>
               </div>
+
+              <div>
+                <label className="block text-slate-700 font-semibold mb-1">Bill / Invoice No.</label>
+                <input
+                  type="text"
+                  placeholder="e.g. INV-2026-08"
+                  value={billNumber}
+                  onChange={(e) => setBillNumber(e.target.value)}
+                  className="w-full admin-input py-2 px-3 font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-semibold mb-1">UTR / Txn Ref No.</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 4291827364"
+                  value={referenceNo}
+                  onChange={(e) => setReferenceNo(e.target.value)}
+                  className="w-full admin-input py-2 px-3 font-mono"
+                />
+              </div>
             </div>
 
             {paidBy === "__OTHER__" && (
-              <div>
+              <div className="max-w-xs">
                 <label className="block text-slate-700 font-semibold mb-1">Paid By Name</label>
                 <input
                   type="text"
@@ -423,84 +480,56 @@ export function ExpenseCreateForm({
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-2.5">
+            {/* Row 4: Bill Receipt Upload & Notes */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               <div>
-                <label className="block text-slate-700 font-semibold mb-1">Bill / Invoice No.</label>
-                <input
-                  type="text"
-                  placeholder="e.g. INV-2026-08"
-                  value={billNumber}
-                  onChange={(e) => setBillNumber(e.target.value)}
-                  className="w-full admin-input py-2 px-2.5 font-mono"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 font-semibold mb-1">UTR / Txn Ref No.</label>
-                <input
-                  type="text"
-                  placeholder="e.g. 4291827364"
-                  value={referenceNo}
-                  onChange={(e) => setReferenceNo(e.target.value)}
-                  className="w-full admin-input py-2 px-2.5 font-mono"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-slate-700 font-semibold mb-1">
-                Bill / Receipt (PDF or Photo)
-              </label>
-              <div className="flex items-center gap-2">
-                <label className="flex-1 flex items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 px-3 py-2 cursor-pointer transition text-slate-600 truncate">
-                  <Paperclip className="h-3.5 w-3.5 text-blue-600 shrink-0" />
-                  <span className="truncate">
-                    {receiptFile ? receiptFile.name : "Attach bill photo or PDF (max 10 MB)"}
-                  </span>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="application/pdf,image/png,image/jpeg,image/webp"
-                    onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
-                    className="hidden"
-                  />
+                <label className="block text-slate-700 font-semibold mb-1">
+                  Bill / Receipt Attachment (PDF or Photo)
                 </label>
-                {receiptFile && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setReceiptFile(null);
-                      if (fileInputRef.current) fileInputRef.current.value = "";
-                    }}
-                    className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:text-rose-600 hover:border-rose-200 transition"
-                    title="Clear file"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                )}
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 flex items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 px-3 py-2 cursor-pointer transition text-slate-600 truncate">
+                    <Paperclip className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+                    <span className="truncate">
+                      {receiptFile ? receiptFile.name : "Attach bill photo or PDF (max 10 MB)"}
+                    </span>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="application/pdf,image/png,image/jpeg,image/webp"
+                      onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
+                      className="hidden"
+                    />
+                  </label>
+                  {receiptFile && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReceiptFile(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                      className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:text-rose-600 hover:border-rose-200 transition"
+                      title="Clear file"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-slate-700 font-semibold mb-1">Notes / Remarks</label>
-              <textarea
-                rows={2}
-                placeholder="Any extra context, client/project reference, or remarks..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full admin-input py-2 px-3 resize-none"
-              />
+              <div>
+                <label className="block text-slate-700 font-semibold mb-1">Notes / Remarks</label>
+                <input
+                  type="text"
+                  placeholder="Extra context, client/project name, or remarks..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="w-full admin-input py-2 px-3"
+                />
+              </div>
             </div>
           </div>
         )}
       </div>
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 py-2.5 font-bold uppercase text-white hover:bg-blue-700 transition disabled:opacity-50 shadow-sm"
-      >
-        <Plus className="h-4 w-4" /> {loading ? "Recording..." : "Log Expense Entry"}
-      </button>
     </form>
   );
 }
