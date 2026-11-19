@@ -97,16 +97,33 @@ class ErpRepository {
   }
 
   // --- Expenses ---
-  Future<({double totalExpenses, List<ExpenseItem> expenses})>
-      fetchExpenses() async {
+  Future<
+      ({
+        double totalExpenses,
+        double pendingReimbursements,
+        List<String> staffNames,
+        List<ExpenseItem> expenses,
+      })> fetchExpenses() async {
     final data = await _apiClient.get('/api/admin/expenses');
     final total = (data['totalExpenses'] is num)
         ? (data['totalExpenses'] as num).toDouble()
         : 0.0;
+    final pending = (data['pendingReimbursements'] is num)
+        ? (data['pendingReimbursements'] as num).toDouble()
+        : 0.0;
+    final staff = ((data['staffNames'] as List?) ?? const [])
+        .map((e) => e.toString())
+        .where((e) => e.isNotEmpty)
+        .toList();
     final list = ((data['expenses'] as List?) ?? const [])
         .map((e) => ExpenseItem.fromJson(e as Map<String, dynamic>))
         .toList();
-    return (totalExpenses: total, expenses: list);
+    return (
+      totalExpenses: total,
+      pendingReimbursements: pending,
+      staffNames: staff,
+      expenses: list,
+    );
   }
 
   Future<void> createExpense({
@@ -114,15 +131,106 @@ class ErpRepository {
     required double amount,
     required String description,
     required String paymentMode,
+    String? expenseDate,
+    String? vendorName,
+    String? paidBy,
+    String? billNumber,
+    String? referenceNo,
+    String reimbursementStatus = 'COMPANY_PAID',
+    String? notes,
+    File? receiptFile,
   }) async {
-    await _apiClient.post(
-      '/api/admin/expenses/create',
-      body: {
-        'category': category,
-        'amount': amount,
-        'description': description,
-        'paymentMode': paymentMode,
-      },
+    final fields = <String, String>{
+      'category': category,
+      'amount': amount.toString(),
+      'description': description,
+      'paymentMode': paymentMode,
+      'reimbursementStatus': reimbursementStatus,
+      'expenseDate': ?expenseDate,
+      'vendorName': ?vendorName,
+      'paidBy': ?paidBy,
+      'billNumber': ?billNumber,
+      'referenceNo': ?referenceNo,
+      'notes': ?notes,
+    };
+
+    if (receiptFile != null) {
+      await _apiClient.uploadMultipartFiles(
+        '/api/admin/expenses/create',
+        fields: fields,
+        files: [receiptFile],
+        fileFieldName: 'receipt',
+        method: 'POST',
+      );
+    } else {
+      await _apiClient.post(
+        '/api/admin/expenses/create',
+        body: {
+          ...fields,
+          'amount': amount,
+        },
+      );
+    }
+  }
+
+  Future<void> updateExpense({
+    required String id,
+    required String category,
+    required double amount,
+    required String description,
+    required String paymentMode,
+    required String expenseDate,
+    String? vendorName,
+    String? paidBy,
+    String? billNumber,
+    String? referenceNo,
+    String reimbursementStatus = 'COMPANY_PAID',
+    String? notes,
+    File? receiptFile,
+    bool removeReceipt = false,
+  }) async {
+    final fields = <String, String>{
+      'category': category,
+      'amount': amount.toString(),
+      'description': description,
+      'paymentMode': paymentMode,
+      'expenseDate': expenseDate,
+      'vendorName': vendorName ?? '',
+      'paidBy': paidBy ?? '',
+      'billNumber': billNumber ?? '',
+      'referenceNo': referenceNo ?? '',
+      'reimbursementStatus': reimbursementStatus,
+      'notes': notes ?? '',
+      if (removeReceipt) 'removeReceipt': 'true',
+    };
+
+    if (receiptFile != null) {
+      await _apiClient.uploadMultipartFiles(
+        '/api/admin/expenses/$id',
+        fields: fields,
+        files: [receiptFile],
+        fileFieldName: 'receipt',
+        method: 'PATCH',
+      );
+    } else {
+      await _apiClient.patch(
+        '/api/admin/expenses/$id',
+        body: {
+          ...fields,
+          'amount': amount,
+          'removeReceipt': removeReceipt,
+        },
+      );
+    }
+  }
+
+  Future<File> downloadExpenseReceipt(ExpenseItem expense) {
+    final fallbackName = 'Expense_Receipt_${expense.id}.pdf';
+    return _apiClient.downloadBinaryFile(
+      '/api/admin/expenses/${expense.id}/receipt?download=1',
+      suggestedFileName: expense.receiptName?.isNotEmpty == true
+          ? expense.receiptName!
+          : fallbackName,
     );
   }
 

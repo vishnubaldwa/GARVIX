@@ -276,15 +276,24 @@ model PurchaseItem {
 }
 
 model Expense {
-  id              String   @id @default(cuid())
-  expenseDate     DateTime @default(now())
-  category        String   // TRAVEL, HARDWARE_RND, CLOUD_SERVER, OFFICE_SUPPLIES, MARKETING, MISC
-  amount          Float
-  description     String
-  paymentMode     String   @default("UPI")
-  receiptUrl      String?
-  isTaxDeductible Boolean  @default(true)
-  createdAt       DateTime @default(now())
+  id                  String   @id @default(cuid())
+  expenseDate         DateTime @default(now())
+  category            String   // TRAVEL, HARDWARE_RND, CLOUD_SERVER, OFFICE_SUPPLIES, MARKETING, MISC
+  amount              Float
+  description         String
+  paymentMode         String   @default("UPI")
+  vendorName          String?
+  paidBy              String?
+  billNumber          String?
+  referenceNo         String?
+  reimbursementStatus String   @default("COMPANY_PAID") // COMPANY_PAID, PENDING, REIMBURSED
+  notes               String?
+  receiptUrl          String?
+  receiptName         String?
+  receiptMimeType     String?
+  isTaxDeductible     Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @default(now()) @updatedAt
 }
 
 model AMCContract {

@@ -283,6 +283,15 @@ class ExpenseItem {
     required this.amount,
     required this.description,
     required this.paymentMode,
+    this.vendorName,
+    this.paidBy,
+    this.billNumber,
+    this.referenceNo,
+    this.reimbursementStatus = 'COMPANY_PAID',
+    this.notes,
+    this.hasReceipt = false,
+    this.receiptName,
+    this.receiptMimeType,
   });
 
   final String id;
@@ -291,6 +300,15 @@ class ExpenseItem {
   final double amount;
   final String description;
   final String paymentMode;
+  final String? vendorName;
+  final String? paidBy;
+  final String? billNumber;
+  final String? referenceNo;
+  final String reimbursementStatus;
+  final String? notes;
+  final bool hasReceipt;
+  final String? receiptName;
+  final String? receiptMimeType;
 
   factory ExpenseItem.fromJson(Map<String, dynamic> json) {
     return ExpenseItem(
@@ -304,6 +322,16 @@ class ExpenseItem {
           (json['amount'] is num) ? (json['amount'] as num).toDouble() : 0,
       description: (json['description'] ?? '').toString(),
       paymentMode: (json['paymentMode'] ?? 'UPI').toString(),
+      vendorName: json['vendorName']?.toString(),
+      paidBy: json['paidBy']?.toString(),
+      billNumber: json['billNumber']?.toString(),
+      referenceNo: json['referenceNo']?.toString(),
+      reimbursementStatus:
+          (json['reimbursementStatus'] ?? 'COMPANY_PAID').toString(),
+      notes: json['notes']?.toString(),
+      hasReceipt: json['hasReceipt'] == true,
+      receiptName: json['receiptName']?.toString(),
+      receiptMimeType: json['receiptMimeType']?.toString(),
     );
   }
 }

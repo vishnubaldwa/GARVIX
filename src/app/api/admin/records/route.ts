@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { isFullAdminRole } from "@/lib/permissions";
+import { deleteExpenseReceiptFile } from "@/lib/expense-receipts";
 
 export const dynamic = "force-dynamic";
 
@@ -252,6 +253,9 @@ export async function DELETE(request: Request) {
         const exp = await prisma.expense.findUnique({ where: { id } });
         if (!exp) {
           return NextResponse.json({ error: "Expense not found." }, { status: 404 });
+        }
+        if (exp.receiptUrl) {
+          await deleteExpenseReceiptFile(exp.receiptUrl);
         }
         await prisma.expense.delete({ where: { id } });
         auditEntityType = "EXPENSE";
