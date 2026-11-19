@@ -92,12 +92,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         label: '+ Quote',
         icon: Icons.description_outlined,
         color: AppleColors.blue,
-        onTap: () => _push(
-          CreateBillingDocumentScreen(
-            viewModel: widget.billingViewModel,
-            isInvoice: false,
-          ),
-        ),
+        onTap: () async {
+          final created = await Navigator.of(context).push<bool>(
+            MaterialPageRoute<bool>(
+              builder: (_) => CreateBillingDocumentScreen(
+                viewModel: widget.billingViewModel,
+                isInvoice: false,
+              ),
+            ),
+          );
+          if (created == true) {
+            widget.onNavigateTab('quotes');
+          }
+        },
       );
     }
     if (u.canManageInvoices) {
@@ -105,12 +112,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         label: '+ Invoice',
         icon: Icons.receipt_long_rounded,
         color: AppleColors.green,
-        onTap: () => _push(
-          CreateBillingDocumentScreen(
-            viewModel: widget.billingViewModel,
-            isInvoice: true,
-          ),
-        ),
+        onTap: () async {
+          final created = await Navigator.of(context).push<bool>(
+            MaterialPageRoute<bool>(
+              builder: (_) => CreateBillingDocumentScreen(
+                viewModel: widget.billingViewModel,
+                isInvoice: true,
+              ),
+            ),
+          );
+          if (created == true) {
+            widget.onNavigateTab('invoices');
+          }
+        },
       );
     }
     if (u.canCreateClient) {

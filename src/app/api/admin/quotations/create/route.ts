@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { computeGst, HARYANA_STATE_CODE } from "@/lib/gst";
+import { computeGst } from "@/lib/gst";
 import { getSession } from "@/lib/auth";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission, isFullAdminRole } from "@/lib/permissions";
 
 export async function POST(request: Request) {
   try {
@@ -10,7 +11,9 @@ export async function POST(request: Request) {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const allowed = await hasPermission(session.role, "CAN_CREATE_QUOTATION");
+    const allowed =
+      isFullAdminRole(session.role) ||
+      (await hasPermission(session.role, "CAN_CREATE_QUOTATION"));
     if (!allowed) {
       return NextResponse.json({ error: "Access denied. Quotation permission required." }, { status: 403 });
     }
@@ -29,10 +32,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Customer not found." }, { status: 404 });
     }
 
-    // Sequence calculation
-    const count = await prisma.quotation.count();
-    const nextSeq = String(count + 1).padStart(3, "0");
-    const quoteNumber = `GARVIX/QT/26-27/${nextSeq}`;
+    // Safe sequence calculation (never collides even after deletions)
+    const prefix = "GARVIX/QT/26-27/";
+    const existingQuotes = await prisma.quotation.findMany({
+      where: { quoteNumber: { startsWith: prefix } },
+      select: { quoteNumber: true },
+    });
+    let maxSeq = 0;
+    for (const q of existingQuotes) {
+      const n = parseInt(q.quoteNumber.slice(prefix.length), 10);
+      if (!Number.isNaN(n) && n > maxSeq) maxSeq = n;
+    }
+    const nextSeq = String(maxSeq + 1).padStart(3, "0");
+    const quoteNumber = `${prefix}${nextSeq}`;
 
     // Subtotal and tax
     let subtotal = 0;
@@ -87,6 +99,8 @@ export async function POST(request: Request) {
         details: `Created Quotation ${quoteNumber} for ${customer.companyName} (INR ${grandTotal})`,
       },
     });
+
+    revalidatePath("/admin", "layout");
 
     return NextResponse.json({ success: true, quotation });
   } catch (err: any) {

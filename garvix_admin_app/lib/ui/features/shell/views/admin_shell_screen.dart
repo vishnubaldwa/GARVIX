@@ -65,6 +65,7 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
   late final LeadsViewModel _leadsVm;
   late final BillingViewModel _billingVm;
   late final TeamViewModel _teamVm;
+  late final ValueNotifier<int> _billingTabNotifier;
 
   int _currentIndex = 0;
 
@@ -79,6 +80,11 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
       erpRepository: widget.erpRepository,
     );
     _teamVm = TeamViewModel(repository: widget.teamRepository);
+    final initialBillingTab =
+        (!widget.user.canManageInvoices && !widget.user.canViewFinances)
+            ? (widget.user.canCreateQuotation ? 1 : 2)
+            : 0;
+    _billingTabNotifier = ValueNotifier<int>(initialBillingTab);
   }
 
   @override
@@ -88,6 +94,7 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
     _leadsVm.dispose();
     _billingVm.dispose();
     _teamVm.dispose();
+    _billingTabNotifier.dispose();
     super.dispose();
   }
 
@@ -158,6 +165,7 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
           page: BillingScreen(
             viewModel: _billingVm,
             user: widget.user,
+            tabNotifier: _billingTabNotifier,
           ),
         ),
       );
@@ -200,8 +208,23 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
   }
 
   void _selectTabByKey(String key) {
+    String targetKey = key;
+    if (key == 'invoices' || key == 'billing') {
+      targetKey = 'billing';
+      _billingTabNotifier.value = 0;
+      _billingVm.loadAll();
+    } else if (key == 'quotes') {
+      targetKey = 'billing';
+      _billingTabNotifier.value = 1;
+      _billingVm.loadAll();
+    } else if (key == 'clients') {
+      targetKey = 'billing';
+      _billingTabNotifier.value = 2;
+      _billingVm.loadAll();
+    }
+
     final tabs = _buildTabs();
-    final idx = tabs.indexWhere((t) => t.key == key);
+    final idx = tabs.indexWhere((t) => t.key == targetKey);
     if (idx != -1) {
       setState(() => _currentIndex = idx);
     }

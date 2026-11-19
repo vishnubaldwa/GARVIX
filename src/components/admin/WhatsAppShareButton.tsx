@@ -12,6 +12,7 @@ export function WhatsAppShareButton({
   portalUrl,
   customLabel,
   companyName,
+  iconOnly = false,
 }: {
   phone?: string | null;
   clientName: string;
@@ -21,6 +22,7 @@ export function WhatsAppShareButton({
   portalUrl: string;
   customLabel?: string;
   companyName?: string;
+  iconOnly?: boolean;
 }) {
   const handleShare = () => {
     const orgName = companyName?.trim() || "GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED";
@@ -55,11 +57,15 @@ export function WhatsAppShareButton({
     <button
       type="button"
       onClick={handleShare}
-      className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-300 px-2 py-1 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 transition shadow-sm"
+      className={
+        iconOnly
+          ? "inline-flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 p-1.5 text-emerald-700 hover:bg-emerald-100 transition"
+          : "inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-300 px-2 py-1 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 transition shadow-sm"
+      }
       title="Share directly to Client via WhatsApp"
     >
-      <MessageSquareShare className="h-3 w-3 text-emerald-600" />
-      <span>{customLabel || "WhatsApp"}</span>
+      <MessageSquareShare className={iconOnly ? "h-3.5 w-3.5 text-emerald-600" : "h-3 w-3 text-emerald-600"} />
+      {!iconOnly && <span>{customLabel || "WhatsApp"}</span>}
     </button>
   );
 }

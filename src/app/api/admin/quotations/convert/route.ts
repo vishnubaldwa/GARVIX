@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { buildUpiUri } from "@/lib/upi";
 import { getSession } from "@/lib/auth";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission, isFullAdminRole } from "@/lib/permissions";
 import { getCompanySettings } from "@/lib/settings";
 
 export async function POST(request: Request) {
@@ -11,7 +12,9 @@ export async function POST(request: Request) {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const allowed = await hasPermission(session.role, "CAN_MANAGE_INVOICES");
+    const allowed =
+      isFullAdminRole(session.role) ||
+      (await hasPermission(session.role, "CAN_MANAGE_INVOICES"));
     if (!allowed) {
       return NextResponse.json({ error: "Access denied. Invoice management permission required." }, { status: 403 });
     }
@@ -30,10 +33,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Quotation not found." }, { status: 404 });
     }
 
-    // Generate sequence number
-    const count = await prisma.invoice.count();
-    const nextSeq = String(count + 1).padStart(3, "0");
-    const invoiceNumber = `GARVIX/26-27/${nextSeq}`;
+    // Safe sequence number generation (never collides after deletions)
+    const prefix = "GARVIX/26-27/";
+    const existingInvoices = await prisma.invoice.findMany({
+      where: { invoiceNumber: { startsWith: prefix } },
+      select: { invoiceNumber: true },
+    });
+    let maxSeq = 0;
+    for (const inv of existingInvoices) {
+      const n = parseInt(inv.invoiceNumber.slice(prefix.length), 10);
+      if (!Number.isNaN(n) && n > maxSeq) maxSeq = n;
+    }
+    const nextSeq = String(maxSeq + 1).padStart(3, "0");
+    const invoiceNumber = `${prefix}${nextSeq}`;
 
     // UPI QR URI from live Company Settings
     const companySettings = await getCompanySettings();
@@ -97,6 +109,8 @@ export async function POST(request: Request) {
         details: `Converted Quotation ${quote.quoteNumber} to Tax Invoice ${invoice.invoiceNumber} for ${quote.customer.companyName}`,
       },
     });
+
+    revalidatePath("/admin", "layout");
 
     return NextResponse.json({ success: true, invoice });
   } catch (err: any) {

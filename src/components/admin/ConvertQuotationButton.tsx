@@ -4,7 +4,13 @@ import { useState } from "react";
 import { Receipt, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export function ConvertQuotationButton({ quotationId }: { quotationId: string }) {
+export function ConvertQuotationButton({
+  quotationId,
+  iconOnly = false,
+}: {
+  quotationId: string;
+  iconOnly?: boolean;
+}) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -37,17 +43,22 @@ export function ConvertQuotationButton({ quotationId }: { quotationId: string })
 
   return (
     <button
+      type="button"
       onClick={handleConvert}
       disabled={loading}
-      className="flex items-center gap-1 rounded-md bg-blue-50 border border-blue-200 px-2.5 py-1 text-[11px] font-bold text-blue-700 hover:bg-blue-100 transition disabled:opacity-50"
-      title="Convert to Tax Invoice"
+      className={
+        iconOnly
+          ? "inline-flex items-center justify-center rounded-lg border border-blue-200 bg-blue-50 p-1.5 text-blue-700 hover:bg-blue-100 transition disabled:opacity-50"
+          : "flex items-center gap-1 rounded-md bg-blue-50 border border-blue-200 px-2.5 py-1 text-[11px] font-bold text-blue-700 hover:bg-blue-100 transition disabled:opacity-50"
+      }
+      title="Convert Quotation to Tax Invoice"
     >
       {loading ? (
-        <Loader2 className="h-3 w-3 animate-spin" />
+        <Loader2 className={iconOnly ? "h-3.5 w-3.5 animate-spin" : "h-3 w-3 animate-spin"} />
       ) : (
         <>
-          <Receipt className="h-3 w-3 text-blue-600" />
-          <span>To Invoice</span>
+          <Receipt className={iconOnly ? "h-3.5 w-3.5 text-blue-600" : "h-3 w-3 text-blue-600"} />
+          {!iconOnly && <span>To Invoice</span>}
         </>
       )}
     </button>

@@ -50,21 +50,21 @@ export default async function AdminInvoicesPage() {
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase">
               <tr>
-                <th className="py-3 px-4">Invoice #</th>
-                <th className="py-3 px-4">Customer & State</th>
-                <th className="py-3 px-4 text-center">Tax Type</th>
-                <th className="py-3 px-4 text-right">Taxable</th>
-                <th className="py-3 px-4 text-right">Invoice Total</th>
-                <th className="py-3 px-4 text-right text-emerald-700">Paid</th>
-                <th className="py-3 px-4 text-right text-amber-700">Balance</th>
-                <th className="py-3 px-4 text-center">Status</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-3 px-4 whitespace-nowrap">Invoice #</th>
+                <th className="py-3 px-4">Customer &amp; State</th>
+                <th className="py-3 px-4 text-center whitespace-nowrap">Tax Type</th>
+                <th className="py-3 px-4 text-right whitespace-nowrap">Taxable</th>
+                <th className="py-3 px-4 text-right whitespace-nowrap">Total</th>
+                <th className="py-3 px-4 text-right text-emerald-700 whitespace-nowrap">Paid</th>
+                <th className="py-3 px-4 text-right text-amber-700 whitespace-nowrap">Balance</th>
+                <th className="py-3 px-4 text-center whitespace-nowrap">Status</th>
+                <th className="py-3 px-4 text-right whitespace-nowrap">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-mono">
               {invoices.map((inv) => (
                 <tr key={inv.id} className="hover:bg-slate-50 transition">
-                  <td className="py-3.5 px-4 font-bold text-blue-600">
+                  <td className="py-3.5 px-4 font-bold text-blue-600 whitespace-nowrap">
                     {inv.invoiceNumber}
                   </td>
 
@@ -75,7 +75,7 @@ export default async function AdminInvoicesPage() {
                     </div>
                   </td>
 
-                  <td className="py-3.5 px-4 text-center font-sans">
+                  <td className="py-3.5 px-4 text-center font-sans whitespace-nowrap">
                     <span
                       className={`inline-block rounded-md px-2 py-0.5 text-[10px] font-bold ${
                         inv.taxType === "INTRA_STATE"
@@ -87,23 +87,23 @@ export default async function AdminInvoicesPage() {
                     </span>
                   </td>
 
-                  <td className="py-3.5 px-4 text-right text-slate-600">
+                  <td className="py-3.5 px-4 text-right text-slate-600 whitespace-nowrap">
                     {formatINR(inv.subtotal)}
                   </td>
 
-                  <td className="py-3.5 px-4 text-right font-bold text-slate-900 text-sm">
+                  <td className="py-3.5 px-4 text-right font-bold text-slate-900 text-sm whitespace-nowrap">
                     {formatINR(inv.totalAmount)}
                   </td>
 
-                  <td className="py-3.5 px-4 text-right text-emerald-700 font-semibold">
+                  <td className="py-3.5 px-4 text-right text-emerald-700 font-semibold whitespace-nowrap">
                     {formatINR(inv.amountPaid)}
                   </td>
 
-                  <td className="py-3.5 px-4 text-right text-amber-700 font-bold">
+                  <td className="py-3.5 px-4 text-right text-amber-700 font-bold whitespace-nowrap">
                     {formatINR(inv.balanceDue)}
                   </td>
 
-                  <td className="py-3.5 px-4 text-center font-sans">
+                  <td className="py-3.5 px-4 text-center font-sans whitespace-nowrap">
                     <span
                       className={`inline-block rounded-md px-2.5 py-1 text-[10px] font-bold uppercase ${
                         inv.paymentStatus === "PAID"
@@ -117,8 +117,8 @@ export default async function AdminInvoicesPage() {
                     </span>
                   </td>
 
-                  <td className="py-3.5 px-4 text-right font-sans">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="py-3.5 px-4 text-right font-sans whitespace-nowrap">
+                    <div className="inline-flex items-center justify-end gap-1.5">
                       <WhatsAppShareButton
                         phone={inv.customer.phone}
                         clientName={inv.customer.companyName}
@@ -127,19 +127,20 @@ export default async function AdminInvoicesPage() {
                         amount={inv.totalAmount}
                         portalUrl={`https://garvix.in/portal/invoice/${inv.token}`}
                         companyName={company.name}
+                        iconOnly
                       />
 
-                      <RecordPaymentModal invoice={inv} />
+                      <RecordPaymentModal invoice={inv} iconOnly />
 
-                      <CopyPortalLinkButton token={inv.token} type="invoice" />
+                      <CopyPortalLinkButton token={inv.token} type="invoice" iconOnly />
 
                       <Link
                         href={`/portal/invoice/${inv.token}`}
                         target="_blank"
-                        className="rounded p-1 text-slate-500 hover:text-blue-600 transition"
+                        className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition"
                         title="View Tax Invoice & Dynamic UPI QR"
                       >
-                        <ExternalLink className="h-4 w-4" />
+                        <ExternalLink className="h-3.5 w-3.5" />
                       </Link>
 
                       {isSuperAdmin && (

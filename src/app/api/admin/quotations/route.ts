@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission, isFullAdminRole } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,11 @@ export async function GET() {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const allowed = await hasPermission(session.role, "CAN_CREATE_QUOTATION");
+    const allowed =
+      isFullAdminRole(session.role) ||
+      (await hasPermission(session.role, "CAN_CREATE_QUOTATION")) ||
+      (await hasPermission(session.role, "CAN_MANAGE_INVOICES")) ||
+      (await hasPermission(session.role, "CAN_VIEW_FINANCES"));
     if (!allowed) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }

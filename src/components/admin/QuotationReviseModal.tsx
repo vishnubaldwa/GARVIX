@@ -6,6 +6,7 @@ import { RefreshCw, X, History, AlertCircle, Check } from "lucide-react";
 import { formatINR } from "@/lib/gst";
 
 interface QuotationReviseModalProps {
+  iconOnly?: boolean;
   quote: {
     id: string;
     quoteNumber: string;
@@ -27,7 +28,7 @@ interface QuotationReviseModalProps {
   };
 }
 
-export function QuotationReviseModal({ quote }: QuotationReviseModalProps) {
+export function QuotationReviseModal({ quote, iconOnly = false }: QuotationReviseModalProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -104,13 +105,27 @@ export function QuotationReviseModal({ quote }: QuotationReviseModalProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-[11px] font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm"
-        title="Revise rate and track negotiation history"
+        className={
+          iconOnly
+            ? "relative inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition"
+            : "inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-[11px] font-bold text-slate-700 hover:bg-slate-50 transition shadow-sm"
+        }
+        title={
+          currentRev > 1
+            ? `Revise Rate (Currently Rev ${currentRev})`
+            : "Revise rate & track negotiation history"
+        }
       >
-        <RefreshCw className="h-3 w-3 text-blue-600" />
-        <span>Revise Rate</span>
+        <RefreshCw className={iconOnly ? "h-3.5 w-3.5 text-blue-600" : "h-3 w-3 text-blue-600"} />
+        {!iconOnly && <span>Revise Rate</span>}
         {currentRev > 1 && (
-          <span className="rounded bg-blue-100 px-1 py-0.2 text-[9px] text-blue-800 font-mono">
+          <span
+            className={
+              iconOnly
+                ? "ml-0.5 rounded bg-blue-100 px-1 text-[9px] font-bold text-blue-800 font-mono"
+                : "rounded bg-blue-100 px-1 py-0.2 text-[9px] text-blue-800 font-mono"
+            }
+          >
             R{currentRev}
           </span>
         )}

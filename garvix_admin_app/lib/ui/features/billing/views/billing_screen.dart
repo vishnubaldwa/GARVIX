@@ -14,10 +14,12 @@ class BillingScreen extends StatefulWidget {
     super.key,
     required this.viewModel,
     required this.user,
+    this.tabNotifier,
   });
 
   final BillingViewModel viewModel;
   final AuthUser user;
+  final ValueNotifier<int>? tabNotifier;
 
   @override
   State<BillingScreen> createState() => _BillingScreenState();
@@ -29,23 +31,64 @@ class _BillingScreenState extends State<BillingScreen> {
   @override
   void initState() {
     super.initState();
-    if (!widget.user.canManageInvoices && !widget.user.canViewFinances) {
+    if (widget.tabNotifier != null) {
+      _tab = widget.tabNotifier!.value;
+      widget.tabNotifier!.addListener(_onExternalTabChange);
+    } else if (!widget.user.canManageInvoices && !widget.user.canViewFinances) {
       _tab = widget.user.canCreateQuotation ? 1 : 2;
     }
     widget.viewModel.loadAll();
   }
 
+  @override
+  void dispose() {
+    widget.tabNotifier?.removeListener(_onExternalTabChange);
+    super.dispose();
+  }
+
+  void _onExternalTabChange() {
+    final target = widget.tabNotifier?.value ?? 0;
+    if (mounted && _tab != target) {
+      setState(() => _tab = target);
+    }
+    widget.viewModel.loadAll();
+  }
+
+  Future<void> _openPortalUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open document link.')),
+      );
+    }
+  }
+
+  Future<void> _openCreateDocument({required bool isInvoice}) async {
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => CreateBillingDocumentScreen(
+          viewModel: widget.viewModel,
+          isInvoice: isInvoice,
+        ),
+      ),
+    );
+    if (created == true) {
+      await widget.viewModel.loadAll();
+      if (mounted) {
+        setState(() => _tab = isInvoice ? 0 : 1);
+      }
+    }
+  }
+
   Widget? _buildFab() {
     if (_tab == 0 && widget.user.canManageInvoices) {
       return FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => CreateBillingDocumentScreen(
-              viewModel: widget.viewModel,
-              isInvoice: true,
-            ),
-          ),
-        ),
+        onPressed: () => _openCreateDocument(isInvoice: true),
         backgroundColor: AppleColors.blue,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
@@ -54,14 +97,7 @@ class _BillingScreenState extends State<BillingScreen> {
     }
     if (_tab == 1 && widget.user.canCreateQuotation) {
       return FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => CreateBillingDocumentScreen(
-              viewModel: widget.viewModel,
-              isInvoice: false,
-            ),
-          ),
-        ),
+        onPressed: () => _openCreateDocument(isInvoice: false),
         backgroundColor: AppleColors.blue,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
@@ -128,7 +164,10 @@ class _BillingScreenState extends State<BillingScreen> {
                       ),
                     ],
                     selected: {_tab},
-                    onSelectionChanged: (s) => setState(() => _tab = s.first),
+                    onSelectionChanged: (s) {
+                      setState(() => _tab = s.first);
+                      widget.tabNotifier?.value = s.first;
+                    },
                   ),
                 ),
               ),
@@ -163,6 +202,15 @@ class _BillingScreenState extends State<BillingScreen> {
     }
 
     final items = widget.viewModel.invoices;
+    if (items.isEmpty && widget.viewModel.invoicesError != null) {
+      return AppleEmptyState(
+        icon: Icons.error_outline_rounded,
+        title: 'Could not load invoices',
+        subtitle: widget.viewModel.invoicesError!,
+        actionLabel: 'Retry',
+        onAction: widget.viewModel.loadAll,
+      );
+    }
     if (items.isEmpty) {
       return AppleEmptyState(
         icon: Icons.receipt_long_outlined,
@@ -170,14 +218,7 @@ class _BillingScreenState extends State<BillingScreen> {
         subtitle: 'Issue GST Tax Invoices or Proforma Invoices right from mobile.',
         actionLabel: widget.user.canManageInvoices ? 'Create Invoice' : null,
         onAction: widget.user.canManageInvoices
-            ? () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => CreateBillingDocumentScreen(
-                      viewModel: widget.viewModel,
-                      isInvoice: true,
-                    ),
-                  ),
-                )
+            ? () => _openCreateDocument(isInvoice: true)
             : null,
       );
     }
@@ -191,6 +232,7 @@ class _BillingScreenState extends State<BillingScreen> {
         final isPaid = inv.paymentStatus.toUpperCase() == 'PAID';
         return AppleCard(
           padding: const EdgeInsets.all(15),
+          onTap: () => _openPortalUrl(inv.portalUrl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -287,6 +329,11 @@ class _BillingScreenState extends State<BillingScreen> {
                       icon: const Icon(Icons.payments_outlined, size: 16),
                       label: const Text('Record Payment'),
                     ),
+                  OutlinedButton.icon(
+                    onPressed: () => _openPortalUrl(inv.portalUrl),
+                    icon: const Icon(Icons.open_in_new_rounded, size: 15),
+                    label: const Text('View'),
+                  ),
                   FilledButton.tonalIcon(
                     onPressed: () {
                       SharePlus.instance.share(
@@ -297,7 +344,7 @@ class _BillingScreenState extends State<BillingScreen> {
                       );
                     },
                     icon: const Icon(Icons.ios_share_rounded, size: 16),
-                    label: const Text('Share UPI'),
+                    label: const Text('Share'),
                   ),
                   if (widget.user.isFullAdmin)
                     OutlinedButton.icon(
@@ -330,7 +377,9 @@ class _BillingScreenState extends State<BillingScreen> {
   }
 
   Widget _buildQuotes() {
-    if (!widget.user.canCreateQuotation) {
+    if (!widget.user.canCreateQuotation &&
+        !widget.user.canManageInvoices &&
+        !widget.user.canViewFinances) {
       return const AppleEmptyState(
         icon: Icons.lock_outline_rounded,
         title: 'Quotation access restricted',
@@ -339,20 +388,25 @@ class _BillingScreenState extends State<BillingScreen> {
     }
 
     final items = widget.viewModel.quotations;
+    if (items.isEmpty && widget.viewModel.quotationsError != null) {
+      return AppleEmptyState(
+        icon: Icons.error_outline_rounded,
+        title: 'Could not load quotations',
+        subtitle: widget.viewModel.quotationsError!,
+        actionLabel: 'Retry',
+        onAction: widget.viewModel.loadAll,
+      );
+    }
     if (items.isEmpty) {
       return AppleEmptyState(
         icon: Icons.description_outlined,
         title: 'No quotations yet',
         subtitle: 'Create professional proposals with automatic Haryana/IGST calculation.',
-        actionLabel: 'Create Quotation',
-        onAction: () => Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => CreateBillingDocumentScreen(
-              viewModel: widget.viewModel,
-              isInvoice: false,
-            ),
-          ),
-        ),
+        actionLabel:
+            widget.user.canCreateQuotation ? 'Create Quotation' : null,
+        onAction: widget.user.canCreateQuotation
+            ? () => _openCreateDocument(isInvoice: false)
+            : null,
       );
     }
 
@@ -365,6 +419,7 @@ class _BillingScreenState extends State<BillingScreen> {
         final isConverted = q.status.toUpperCase() == 'CONVERTED';
         return AppleCard(
           padding: const EdgeInsets.all(15),
+          onTap: () => _openPortalUrl(q.portalUrl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -439,6 +494,11 @@ class _BillingScreenState extends State<BillingScreen> {
                       icon: const Icon(Icons.swap_horiz_rounded, size: 17),
                       label: const Text('Convert to Invoice'),
                     ),
+                  OutlinedButton.icon(
+                    onPressed: () => _openPortalUrl(q.portalUrl),
+                    icon: const Icon(Icons.open_in_new_rounded, size: 15),
+                    label: const Text('View'),
+                  ),
                   FilledButton.tonalIcon(
                     onPressed: () {
                       SharePlus.instance.share(
@@ -449,7 +509,7 @@ class _BillingScreenState extends State<BillingScreen> {
                       );
                     },
                     icon: const Icon(Icons.ios_share_rounded, size: 16),
-                    label: const Text('Share Quote'),
+                    label: const Text('Share'),
                   ),
                   if (widget.user.isFullAdmin)
                     OutlinedButton.icon(

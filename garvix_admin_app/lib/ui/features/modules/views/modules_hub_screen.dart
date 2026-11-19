@@ -93,21 +93,53 @@ class ModulesHubScreen extends StatelessWidget {
         ),
       );
     }
+    if (user.canCreateQuotation ||
+        user.canManageInvoices ||
+        user.canViewFinances) {
+      salesItems.add(
+        _ModuleItem(
+          title: 'Quotations & Proposals',
+          subtitle: 'View all created quotations, share & convert',
+          icon: Icons.request_quote_outlined,
+          color: const Color(0xFF4F46E5),
+          bgColor: const Color(0xFFEEF2FF),
+          onTap: () => onNavigateTab('quotes'),
+        ),
+      );
+    }
     if (user.canCreateQuotation) {
       salesItems.add(
         _ModuleItem(
           title: 'New Quotation',
-          subtitle: 'Multi-item proposal with Haryana / IGST',
+          subtitle: 'Create proposal with Haryana / IGST auto-calc',
           icon: Icons.description_outlined,
-          color: const Color(0xFF4F46E5),
-          bgColor: const Color(0xFFEEF2FF),
-          onTap: () => _push(
-            context,
-            CreateBillingDocumentScreen(
-              viewModel: billingViewModel,
-              isInvoice: false,
-            ),
-          ),
+          color: AppleColors.blue,
+          bgColor: AppleColors.blueSoft,
+          onTap: () async {
+            final created = await Navigator.of(context).push<bool>(
+              MaterialPageRoute<bool>(
+                builder: (_) => CreateBillingDocumentScreen(
+                  viewModel: billingViewModel,
+                  isInvoice: false,
+                ),
+              ),
+            );
+            if (created == true) {
+              onNavigateTab('quotes');
+            }
+          },
+        ),
+      );
+    }
+    if (user.canCreateClient || user.canViewBilling) {
+      salesItems.add(
+        _ModuleItem(
+          title: 'Parties & Clients',
+          subtitle: 'Browse client directory, GSTIN & balances',
+          icon: Icons.business_outlined,
+          color: const Color(0xFF0284C7),
+          bgColor: const Color(0xFFE0F2FE),
+          onTap: () => onNavigateTab('clients'),
         ),
       );
     }
@@ -129,21 +161,39 @@ class ModulesHubScreen extends StatelessWidget {
 
     // 2. Billing & Dispatch
     final billingItems = <_ModuleItem>[];
+    if (user.canManageInvoices || user.canViewFinances) {
+      billingItems.add(
+        _ModuleItem(
+          title: 'Tax Invoices & Proforma',
+          subtitle: 'View all invoices, UPI QR links & payments',
+          icon: Icons.receipt_long_rounded,
+          color: AppleColors.blue,
+          bgColor: AppleColors.blueSoft,
+          onTap: () => onNavigateTab('invoices'),
+        ),
+      );
+    }
     if (user.canManageInvoices) {
       billingItems.add(
         _ModuleItem(
           title: 'New GST Tax Invoice',
           subtitle: 'Issue invoice with Dynamic UPI QR & E-Way',
-          icon: Icons.receipt_long_rounded,
-          color: AppleColors.blue,
-          bgColor: AppleColors.blueSoft,
-          onTap: () => _push(
-            context,
-            CreateBillingDocumentScreen(
-              viewModel: billingViewModel,
-              isInvoice: true,
-            ),
-          ),
+          icon: Icons.post_add_rounded,
+          color: AppleColors.green,
+          bgColor: AppleColors.greenSoft,
+          onTap: () async {
+            final created = await Navigator.of(context).push<bool>(
+              MaterialPageRoute<bool>(
+                builder: (_) => CreateBillingDocumentScreen(
+                  viewModel: billingViewModel,
+                  isInvoice: true,
+                ),
+              ),
+            );
+            if (created == true) {
+              onNavigateTab('invoices');
+            }
+          },
         ),
       );
     }

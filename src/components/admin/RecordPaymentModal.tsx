@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { CreditCard, X } from "lucide-react";
 import { formatINR } from "@/lib/gst";
 
-export function RecordPaymentModal({ invoice }: { invoice: any }) {
+export function RecordPaymentModal({
+  invoice,
+  iconOnly = false,
+}: {
+  invoice: any;
+  iconOnly?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState(invoice.balanceDue || 0);
   const [paymentMode, setPaymentMode] = useState("UPI");
@@ -53,6 +59,7 @@ export function RecordPaymentModal({ invoice }: { invoice: any }) {
   };
 
   if (invoice.paymentStatus === "PAID") {
+    if (iconOnly) return null;
     return (
       <span className="text-[11px] text-emerald-700 font-semibold px-2 py-1 select-none">
         Settled
@@ -63,15 +70,20 @@ export function RecordPaymentModal({ invoice }: { invoice: any }) {
   return (
     <>
       <button
+        type="button"
         onClick={() => {
           setAmount(invoice.balanceDue);
           setOpen(true);
         }}
-        className="flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 transition shadow-sm"
+        className={
+          iconOnly
+            ? "inline-flex items-center justify-center rounded-lg border border-blue-200 bg-blue-50 p-1.5 text-blue-700 hover:bg-blue-100 transition"
+            : "flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 transition shadow-sm"
+        }
         title="Record Client Payment"
       >
-        <CreditCard className="h-3 w-3 text-emerald-600" />
-        <span>Pay</span>
+        <CreditCard className={iconOnly ? "h-3.5 w-3.5 text-blue-600" : "h-3 w-3 text-emerald-600"} />
+        {!iconOnly && <span>Pay</span>}
       </button>
 
       {open && (

@@ -41,16 +41,37 @@ class BillingViewModel extends ChangeNotifier {
   String? _error;
   String? get error => _error;
 
+  String? _invoicesError;
+  String? get invoicesError => _invoicesError;
+
+  String? _quotationsError;
+  String? get quotationsError => _quotationsError;
+
+  String? _clientsError;
+  String? get clientsError => _clientsError;
+
   Future<void> loadAll() async {
     _isLoading = true;
     _error = null;
+    _invoicesError = null;
+    _quotationsError = null;
+    _clientsError = null;
     notifyListeners();
     try {
       final results = await Future.wait([
-        _crmRepository.fetchInvoices().catchError((_) => <InvoiceItem>[]),
-        _crmRepository.fetchQuotations().catchError((_) => <QuotationItem>[]),
-        _crmRepository.fetchClients().catchError((_) => <ClientItem>[]),
-        _erpRepository.fetchProducts().catchError((_) => <ProductItem>[]),
+        _crmRepository.fetchInvoices().catchError((Object e) {
+          _invoicesError = e.toString();
+          return _invoices;
+        }),
+        _crmRepository.fetchQuotations().catchError((Object e) {
+          _quotationsError = e.toString();
+          return _quotations;
+        }),
+        _crmRepository.fetchClients().catchError((Object e) {
+          _clientsError = e.toString();
+          return _clients;
+        }),
+        _erpRepository.fetchProducts().catchError((_) => _products),
       ]);
       _invoices = results[0] as List<InvoiceItem>;
       _quotations = results[1] as List<QuotationItem>;
