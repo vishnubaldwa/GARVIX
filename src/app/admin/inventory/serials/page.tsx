@@ -1,22 +1,29 @@
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { SuperAdminDeleteButton } from "@/components/admin/SuperAdminDeleteButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSerialsPage() {
-  const serials = await prisma.serialNumber.findMany({
-    include: {
-      product: true,
-      deliveryChallan: {
-        include: { customer: true },
+  const [session, serials] = await Promise.all([
+    getSession(),
+    prisma.serialNumber.findMany({
+      include: {
+        product: true,
+        deliveryChallan: {
+          include: { customer: true },
+        },
+        invoice: {
+          include: { customer: true },
+        },
       },
-      invoice: {
-        include: { customer: true },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+  const isSuperAdmin = isFullAdminRole(session?.role);
 
   return (
     <div className="space-y-6">
@@ -47,6 +54,7 @@ export default async function AdminSerialsPage() {
                 <th className="py-3 px-4 text-center">Status</th>
                 <th className="py-3 px-4">Assigned Document & Client</th>
                 <th className="py-3 px-4 text-right">Warranty Status</th>
+                {isSuperAdmin && <th className="py-3 px-4 text-right">Delete</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-mono">
@@ -109,6 +117,15 @@ export default async function AdminSerialsPage() {
                       <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> 1-Yr Active Warranty
                     </span>
                   </td>
+                  {isSuperAdmin && (
+                    <td className="py-3.5 px-4 text-right font-sans">
+                      <SuperAdminDeleteButton
+                        entity="serial"
+                        id={item.id}
+                        label={`serial ${item.serialNumber}`}
+                      />
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

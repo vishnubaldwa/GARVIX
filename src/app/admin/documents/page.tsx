@@ -1,4 +1,5 @@
 import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
 import { getVaultAccessContext } from "@/lib/vault";
 import { redirect } from "next/navigation";
 import { DocumentVaultView } from "@/components/admin/DocumentVaultView";
@@ -16,5 +17,5 @@ export default async function AdminDocumentsVaultPage() {
     redirect("/admin");
   }
 
-  return <DocumentVaultView />;
+  return <DocumentVaultView isSuperAdmin={isFullAdminRole(session.role)} />;
 }

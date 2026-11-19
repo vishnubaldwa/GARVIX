@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../data/repositories/erp_repository.dart';
+import '../../../../domain/models/auth_user.dart';
 import '../../../../domain/models/erp_models.dart';
 import '../../../core/theme/apple_theme.dart';
 import '../../../core/widgets/apple_card.dart';
@@ -11,10 +12,12 @@ class FinanceScreen extends StatefulWidget {
   const FinanceScreen({
     super.key,
     required this.erpRepository,
+    required this.user,
     this.initialTab = 0,
   });
 
   final ErpRepository erpRepository;
+  final AuthUser user;
   final int initialTab; // 0: Expenses, 1: Purchases & ITC, 2: CA GST Returns
 
   @override
@@ -389,6 +392,27 @@ class _FinanceScreenState extends State<FinanceScreen> {
                       color: AppleColors.red,
                     ),
                   ),
+                  if (widget.user.isFullAdmin)
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Delete permanently',
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        size: 19,
+                        color: AppleColors.red,
+                      ),
+                      onPressed: () => confirmSuperAdminDelete(
+                        context,
+                        label: 'expense "${e.description}"',
+                        onDelete: () async {
+                          await widget.erpRepository.deleteRecord(
+                            entity: 'expense',
+                            id: e.id,
+                          );
+                          await _load();
+                        },
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -492,6 +516,27 @@ class _FinanceScreenState extends State<FinanceScreen> {
                             ? AppleColors.green
                             : AppleColors.inkMuted,
                       ),
+                      if (widget.user.isFullAdmin)
+                        IconButton(
+                          visualDensity: VisualDensity.compact,
+                          tooltip: 'Delete permanently',
+                          icon: const Icon(
+                            Icons.delete_outline_rounded,
+                            size: 19,
+                            color: AppleColors.red,
+                          ),
+                          onPressed: () => confirmSuperAdminDelete(
+                            context,
+                            label: 'purchase bill "#${p.billNumber}"',
+                            onDelete: () async {
+                              await widget.erpRepository.deleteRecord(
+                                entity: 'purchase',
+                                id: p.id,
+                              );
+                              await _load();
+                            },
+                          ),
+                        ),
                     ],
                   ),
                   const SizedBox(height: 4),

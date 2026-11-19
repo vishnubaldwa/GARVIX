@@ -140,6 +140,30 @@ class _ChallansScreenState extends State<ChallansScreen> {
                                             ? AppleColors.amber
                                             : AppleColors.green,
                                       ),
+                                      if (widget.user.isFullAdmin)
+                                        IconButton(
+                                          visualDensity: VisualDensity.compact,
+                                          tooltip: 'Delete permanently',
+                                          icon: const Icon(
+                                            Icons.delete_outline_rounded,
+                                            size: 19,
+                                            color: AppleColors.red,
+                                          ),
+                                          onPressed: () =>
+                                              confirmSuperAdminDelete(
+                                            context,
+                                            label:
+                                                'challan "${c.challanNumber}"',
+                                            onDelete: () async {
+                                              await widget.erpRepository
+                                                  .deleteRecord(
+                                                entity: 'challan',
+                                                id: c.id,
+                                              );
+                                              await _load();
+                                            },
+                                          ),
+                                        ),
                                     ],
                                   ),
                                   const SizedBox(height: 4),

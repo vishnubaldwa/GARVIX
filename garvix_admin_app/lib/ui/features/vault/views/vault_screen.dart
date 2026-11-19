@@ -787,6 +787,22 @@ class _VaultScreenState extends State<VaultScreen> {
                   icon: const Icon(Icons.edit_outlined, size: 15),
                   label: const Text('Rename', style: TextStyle(fontSize: 12)),
                 ),
+                if (widget.user.isFullAdmin)
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    tooltip: 'Delete folder permanently',
+                    icon: const Icon(
+                      Icons.delete_outline_rounded,
+                      size: 18,
+                      color: AppleColors.red,
+                    ),
+                    onPressed: () => confirmSuperAdminDelete(
+                      context,
+                      label: 'folder "${selectedFolder.name}"',
+                      onDelete: () =>
+                          widget.viewModel.deleteFolder(selectedFolder.id),
+                    ),
+                  ),
               ],
             ),
           ],
@@ -892,38 +908,19 @@ class _VaultScreenState extends State<VaultScreen> {
                       ),
                       tooltip: 'Download & Share',
                     ),
-                    if (canManage)
+                    if (widget.user.isFullAdmin)
                       IconButton(
-                        onPressed: () async {
-                          final ok = await showDialog<bool>(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: const Text('Delete Document?'),
-                              content: Text('Permanently delete "${entry.doc.title}"?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx, false),
-                                  child: const Text('Cancel'),
-                                ),
-                                FilledButton(
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: AppleColors.red,
-                                  ),
-                                  onPressed: () => Navigator.pop(ctx, true),
-                                  child: const Text('Delete'),
-                                ),
-                              ],
-                            ),
-                          );
-                          if (ok == true) {
-                            await widget.viewModel.deleteDocument(entry.doc.id);
-                            _showSnack('Deleted "${entry.doc.title}".');
-                          }
-                        },
+                        tooltip: 'Delete permanently',
+                        onPressed: () => confirmSuperAdminDelete(
+                          context,
+                          label: 'document "${entry.doc.title}"',
+                          onDelete: () =>
+                              widget.viewModel.deleteDocument(entry.doc.id),
+                        ),
                         icon: const Icon(
                           Icons.delete_outline_rounded,
                           size: 20,
-                          color: AppleColors.inkMuted,
+                          color: AppleColors.red,
                         ),
                       ),
                   ],

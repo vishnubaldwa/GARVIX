@@ -1,14 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
 import { Wallet, Plus, TrendingDown } from "lucide-react";
 import { ExpenseCreateForm } from "@/components/admin/ExpenseCreateForm";
+import { SuperAdminDeleteButton } from "@/components/admin/SuperAdminDeleteButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminExpensesPage() {
-  const expenses = await prisma.expense.findMany({
-    orderBy: { expenseDate: "desc" },
-  });
+  const [session, expenses] = await Promise.all([
+    getSession(),
+    prisma.expense.findMany({
+      orderBy: { expenseDate: "desc" },
+    }),
+  ]);
+  const isSuperAdmin = isFullAdminRole(session?.role);
 
   const totalExpense = expenses.reduce((s, e) => s + e.amount, 0);
   const distinctCategories = Array.from(new Set(expenses.map((e) => e.category)));
@@ -46,6 +53,7 @@ export default async function AdminExpensesPage() {
                   <th className="py-3 px-4">Description</th>
                   <th className="py-3 px-4">Mode</th>
                   <th className="py-3 px-4 text-right">Amount</th>
+                  {isSuperAdmin && <th className="py-3 px-4 text-right">Delete</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-mono">
@@ -68,6 +76,15 @@ export default async function AdminExpensesPage() {
                     <td className="py-3.5 px-4 text-right font-bold text-slate-900 text-sm">
                       {formatINR(e.amount)}
                     </td>
+                    {isSuperAdmin && (
+                      <td className="py-3.5 px-4 text-right font-sans">
+                        <SuperAdminDeleteButton
+                          entity="expense"
+                          id={e.id}
+                          label={`expense "${e.description}"`}
+                        />
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

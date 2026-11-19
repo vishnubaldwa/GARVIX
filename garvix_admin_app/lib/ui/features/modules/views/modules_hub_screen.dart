@@ -82,7 +82,14 @@ class ModulesHubScreen extends StatelessWidget {
           icon: Icons.people_alt_rounded,
           color: AppleColors.blue,
           bgColor: AppleColors.blueSoft,
-          onTap: () => _push(context, LeadsScreen(viewModel: leadsViewModel)),
+          onTap: () => _push(
+            context,
+            LeadsScreen(
+              viewModel: leadsViewModel,
+              user: user,
+              erpRepository: erpRepository,
+            ),
+          ),
         ),
       );
     }
@@ -228,7 +235,10 @@ class ModulesHubScreen extends StatelessWidget {
           icon: Icons.build_circle_outlined,
           color: AppleColors.green,
           bgColor: AppleColors.greenSoft,
-          onTap: () => _push(context, AmcScreen(erpRepository: erpRepository)),
+          onTap: () => _push(
+            context,
+            AmcScreen(erpRepository: erpRepository, user: user),
+          ),
         ),
       );
     }
@@ -264,7 +274,11 @@ class ModulesHubScreen extends StatelessWidget {
               bgColor: AppleColors.redSoft,
               onTap: () => _push(
                 context,
-                FinanceScreen(erpRepository: erpRepository, initialTab: 0),
+                FinanceScreen(
+                  erpRepository: erpRepository,
+                  user: user,
+                  initialTab: 0,
+                ),
               ),
             ),
             _ModuleItem(
@@ -275,7 +289,11 @@ class ModulesHubScreen extends StatelessWidget {
               bgColor: AppleColors.greenSoft,
               onTap: () => _push(
                 context,
-                FinanceScreen(erpRepository: erpRepository, initialTab: 1),
+                FinanceScreen(
+                  erpRepository: erpRepository,
+                  user: user,
+                  initialTab: 1,
+                ),
               ),
             ),
             _ModuleItem(
@@ -286,7 +304,11 @@ class ModulesHubScreen extends StatelessWidget {
               bgColor: AppleColors.blueSoft,
               onTap: () => _push(
                 context,
-                FinanceScreen(erpRepository: erpRepository, initialTab: 2),
+                FinanceScreen(
+                  erpRepository: erpRepository,
+                  user: user,
+                  initialTab: 2,
+                ),
               ),
             ),
           ],
@@ -321,7 +343,7 @@ class ModulesHubScreen extends StatelessWidget {
           bgColor: const Color(0xFFEEF2FF),
           onTap: () => _push(
             context,
-            RolesMatrixScreen(viewModel: teamViewModel),
+            RolesMatrixScreen(viewModel: teamViewModel, currentUser: user),
           ),
         ),
       );

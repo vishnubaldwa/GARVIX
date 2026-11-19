@@ -135,7 +135,11 @@ function getFolderIcon(iconName: string) {
   }
 }
 
-export function DocumentVaultView() {
+export function DocumentVaultView({
+  isSuperAdmin = false,
+}: {
+  isSuperAdmin?: boolean;
+}) {
   const [loading, setLoading] = useState(true);
   const [canManage, setCanManage] = useState(false);
   const [folders, setFolders] = useState<VaultFolder[]>([]);
@@ -744,13 +748,13 @@ export function DocumentVaultView() {
                           <Pencil className="h-3 w-3" />
                         </button>
                       )}
-                      {canManage && !folder.isDefault && (
+                      {isSuperAdmin && !folder.isDefault && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteFolder(folder);
                           }}
-                          title="Delete Folder"
+                          title="Delete Folder (Super Admin Only)"
                           className={`p-1 rounded-lg opacity-0 group-hover:opacity-100 transition ${
                             selected
                               ? "hover:bg-white/20 text-white"
@@ -948,10 +952,10 @@ export function DocumentVaultView() {
                           <Download className="h-3.5 w-3.5" />
                           <span>Download</span>
                         </a>
-                        {canManage && (
+                        {isSuperAdmin && (
                           <button
                             onClick={() => handleDeleteDoc(doc)}
-                            title="Delete Document"
+                            title="Delete Document (Super Admin Only)"
                             className="rounded-full p-2 text-[#86868b] hover:bg-rose-50 hover:text-rose-600 transition"
                           >
                             <Trash2 className="h-3.5 w-3.5" />

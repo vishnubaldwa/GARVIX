@@ -72,10 +72,12 @@ export function EmployeeListView({
   initialEmployees,
   initialRoles,
   currentUserEmail,
+  isSuperAdmin = false,
 }: {
   initialEmployees: Employee[];
   initialRoles?: RoleOption[];
   currentUserEmail?: string;
+  isSuperAdmin?: boolean;
 }) {
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [searchTerm, setSearchTerm] = useState("");
@@ -479,10 +481,10 @@ export function EmployeeListView({
                             </button>
                           )}
 
-                          {!isProtectedSuperAdmin && !isSelf && (
+                          {isSuperAdmin && !isProtectedSuperAdmin && !isSelf && (
                             <button
                               onClick={() => handleDeleteEmployee(emp)}
-                              title="Delete Account Permanently"
+                              title="Delete Account Permanently (Super Admin Only)"
                               className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition"
                             >
                               <Trash2 className="h-3.5 w-3.5" />

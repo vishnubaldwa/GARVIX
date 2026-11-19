@@ -1,18 +1,25 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
 import { AlertTriangle, Barcode } from "lucide-react";
 import Link from "next/link";
 import { ProductCreateModal } from "@/components/admin/ProductCreateModal";
+import { SuperAdminDeleteButton } from "@/components/admin/SuperAdminDeleteButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminInventoryPage() {
-  const products = await prisma.product.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      serialNumbers: true,
-    },
-  });
+  const [session, products] = await Promise.all([
+    getSession(),
+    prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        serialNumbers: true,
+      },
+    }),
+  ]);
+  const isSuperAdmin = isFullAdminRole(session?.role);
 
   return (
     <div className="space-y-6">
@@ -47,6 +54,7 @@ export default async function AdminInventoryPage() {
                 <th className="py-3 px-4 text-right">Selling Price</th>
                 <th className="py-3 px-4 text-center">Stock In Hand</th>
                 <th className="py-3 px-4 text-center">Serial Items</th>
+                {isSuperAdmin && <th className="py-3 px-4 text-right">Delete</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -98,6 +106,15 @@ export default async function AdminInventoryPage() {
                         {product.serialNumbers.length} Tagged
                       </span>
                     </td>
+                    {isSuperAdmin && (
+                      <td className="py-3.5 px-4 text-right">
+                        <SuperAdminDeleteButton
+                          entity="product"
+                          id={product.id}
+                          label={`product "${product.name}"`}
+                        />
+                      </td>
+                    )}
                   </tr>
                 );
               })}

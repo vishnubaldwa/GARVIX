@@ -1,17 +1,24 @@
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
+import { SuperAdminDeleteButton } from "@/components/admin/SuperAdminDeleteButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminChallansPage() {
-  const challans = await prisma.deliveryChallan.findMany({
-    include: {
-      customer: true,
-      items: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [session, challans] = await Promise.all([
+    getSession(),
+    prisma.deliveryChallan.findMany({
+      include: {
+        customer: true,
+        items: true,
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+  const isSuperAdmin = isFullAdminRole(session?.role);
 
   return (
     <div className="space-y-6">
@@ -43,6 +50,7 @@ export default async function AdminChallansPage() {
                 <th className="py-3 px-4 font-mono">Transporter & Vehicle</th>
                 <th className="py-3 px-4 text-center">Status</th>
                 <th className="py-3 px-4 text-right">Items Dispatched</th>
+                {isSuperAdmin && <th className="py-3 px-4 text-right">Delete</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-mono">
@@ -99,6 +107,15 @@ export default async function AdminChallansPage() {
                       {ch.items.map((i) => i.description).join(", ")}
                     </div>
                   </td>
+                  {isSuperAdmin && (
+                    <td className="py-3.5 px-4 text-right font-sans">
+                      <SuperAdminDeleteButton
+                        entity="challan"
+                        id={ch.id}
+                        label={`challan ${ch.challanNumber}`}
+                      />
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

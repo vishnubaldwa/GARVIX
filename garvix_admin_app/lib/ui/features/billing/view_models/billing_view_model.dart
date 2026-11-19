@@ -179,4 +179,19 @@ class BillingViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> deleteRecord({
+    required String entity,
+    required String id,
+  }) async {
+    _isMutating = true;
+    notifyListeners();
+    try {
+      await _erpRepository.deleteRecord(entity: entity, id: id);
+      await loadAll();
+    } finally {
+      _isMutating = false;
+      notifyListeners();
+    }
+  }
 }

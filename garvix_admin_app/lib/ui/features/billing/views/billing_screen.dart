@@ -299,6 +299,27 @@ class _BillingScreenState extends State<BillingScreen> {
                     icon: const Icon(Icons.ios_share_rounded, size: 16),
                     label: const Text('Share UPI'),
                   ),
+                  if (widget.user.isFullAdmin)
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppleColors.red,
+                        side: const BorderSide(color: Color(0x33BE123C)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 9,
+                        ),
+                      ),
+                      onPressed: () => confirmSuperAdminDelete(
+                        context,
+                        label: 'invoice ${inv.invoiceNumber}',
+                        onDelete: () => widget.viewModel.deleteRecord(
+                          entity: 'invoice',
+                          id: inv.id,
+                        ),
+                      ),
+                      icon: const Icon(Icons.delete_outline_rounded, size: 16),
+                      label: const Text('Delete'),
+                    ),
                 ],
               ),
             ],
@@ -430,6 +451,27 @@ class _BillingScreenState extends State<BillingScreen> {
                     icon: const Icon(Icons.ios_share_rounded, size: 16),
                     label: const Text('Share Quote'),
                   ),
+                  if (widget.user.isFullAdmin)
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppleColors.red,
+                        side: const BorderSide(color: Color(0x33BE123C)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 9,
+                        ),
+                      ),
+                      onPressed: () => confirmSuperAdminDelete(
+                        context,
+                        label: 'quotation ${q.quoteNumber}',
+                        onDelete: () => widget.viewModel.deleteRecord(
+                          entity: 'quotation',
+                          id: q.id,
+                        ),
+                      ),
+                      icon: const Icon(Icons.delete_outline_rounded, size: 16),
+                      label: const Text('Delete'),
+                    ),
                 ],
               ),
             ],
@@ -502,6 +544,22 @@ class _BillingScreenState extends State<BillingScreen> {
                   }
                 },
               ),
+              if (widget.user.isFullAdmin)
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete_outline_rounded,
+                    color: AppleColors.red,
+                  ),
+                  tooltip: 'Delete Client (Super Admin)',
+                  onPressed: () => confirmSuperAdminDelete(
+                    context,
+                    label: 'client "${c.companyName}"',
+                    onDelete: () => widget.viewModel.deleteRecord(
+                      entity: 'client',
+                      id: c.id,
+                    ),
+                  ),
+                ),
             ],
           ),
         );

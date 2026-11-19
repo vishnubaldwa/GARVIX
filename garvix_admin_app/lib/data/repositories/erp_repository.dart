@@ -191,6 +191,32 @@ class ErpRepository {
     );
   }
 
+  // --- Authorized Signatory Signature ---
+  Future<List<int>> fetchSignatureBytes() {
+    return _apiClient.fetchBinaryBytes(
+      '/api/public/signature?v=${DateTime.now().millisecondsSinceEpoch}',
+    );
+  }
+
+  Future<void> uploadSignature(File file) async {
+    await _apiClient.uploadMultipartFiles(
+      '/api/admin/settings/signature',
+      fields: const {},
+      files: [file],
+      fileFieldName: 'file',
+    );
+  }
+
+  // --- Super-Admin-Only Permanent Delete ---
+  Future<void> deleteRecord({
+    required String entity,
+    required String id,
+  }) async {
+    await _apiClient.delete(
+      '/api/admin/records?entity=${Uri.encodeComponent(entity)}&id=${Uri.encodeComponent(id)}',
+    );
+  }
+
   // --- Audit Security Logs ---
   Future<List<AuditLogItem>> fetchAuditLogs() async {
     final data = await _apiClient.get('/api/admin/audit');

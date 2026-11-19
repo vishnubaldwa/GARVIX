@@ -501,6 +501,27 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         color: AppleColors.inkMuted,
                       ),
                     ),
+                  if (widget.user.isFullAdmin)
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Delete permanently',
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        size: 19,
+                        color: AppleColors.red,
+                      ),
+                      onPressed: () => confirmSuperAdminDelete(
+                        context,
+                        label: 'product "${p.name}"',
+                        onDelete: () async {
+                          await widget.erpRepository.deleteRecord(
+                            entity: 'product',
+                            id: p.id,
+                          );
+                          await _load();
+                        },
+                      ),
+                    ),
                 ],
               ),
             ],
@@ -548,6 +569,27 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         inStock ? AppleColors.greenSoft : AppleColors.blueSoft,
                     foreground: inStock ? AppleColors.green : AppleColors.blue,
                   ),
+                  if (widget.user.isFullAdmin)
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Delete permanently',
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        size: 19,
+                        color: AppleColors.red,
+                      ),
+                      onPressed: () => confirmSuperAdminDelete(
+                        context,
+                        label: 'serial "${s.serialNumber}"',
+                        onDelete: () async {
+                          await widget.erpRepository.deleteRecord(
+                            entity: 'serial',
+                            id: s.id,
+                          );
+                          await _load();
+                        },
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: 4),

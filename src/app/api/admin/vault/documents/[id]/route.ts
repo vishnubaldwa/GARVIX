@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
 import { getSafeVaultFilePath, getVaultAccessContext } from "@/lib/vault";
 
 export const dynamic = "force-dynamic";
@@ -68,9 +69,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const access = await getVaultAccessContext(session);
-    if (!access.canManage) {
-      return NextResponse.json({ error: "Manage permission required." }, { status: 403 });
+    if (!isFullAdminRole(session.role)) {
+      return NextResponse.json(
+        { error: "Only Super Admin can permanently delete Vault documents." },
+        { status: 403 }
+      );
     }
 
     const { id } = await params;

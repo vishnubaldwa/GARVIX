@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../data/repositories/erp_repository.dart';
+import '../../../../domain/models/auth_user.dart';
 import '../../../../domain/models/crm_models.dart';
 import '../../../core/theme/apple_theme.dart';
 import '../../../core/widgets/apple_card.dart';
@@ -8,9 +10,16 @@ import '../../../core/widgets/empty_state.dart';
 import '../view_models/leads_view_model.dart';
 
 class LeadsScreen extends StatefulWidget {
-  const LeadsScreen({super.key, required this.viewModel});
+  const LeadsScreen({
+    super.key,
+    required this.viewModel,
+    required this.user,
+    required this.erpRepository,
+  });
 
   final LeadsViewModel viewModel;
+  final AuthUser user;
+  final ErpRepository erpRepository;
 
   @override
   State<LeadsScreen> createState() => _LeadsScreenState();
@@ -216,6 +225,36 @@ class _LeadsScreenState extends State<LeadsScreen> {
                                                   color: AppleColors.inkMuted,
                                                 ),
                                               ),
+                                              if (widget.user.isFullAdmin) ...[
+                                                const SizedBox(width: 4),
+                                                IconButton(
+                                                  visualDensity:
+                                                      VisualDensity.compact,
+                                                  tooltip:
+                                                      'Delete permanently',
+                                                  icon: const Icon(
+                                                    Icons
+                                                        .delete_outline_rounded,
+                                                    size: 19,
+                                                    color: AppleColors.red,
+                                                  ),
+                                                  onPressed: () =>
+                                                      confirmSuperAdminDelete(
+                                                    context,
+                                                    label:
+                                                        'lead "${lead.name}"',
+                                                    onDelete: () async {
+                                                      await widget.erpRepository
+                                                          .deleteRecord(
+                                                        entity: 'lead',
+                                                        id: lead.id,
+                                                      );
+                                                      await widget.viewModel
+                                                          .load();
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
                                             ],
                                           ),
                                         ],

@@ -141,7 +141,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         icon: Icons.table_chart_outlined,
         color: AppleColors.green,
         onTap: () => _push(
-          FinanceScreen(erpRepository: widget.erpRepository, initialTab: 2),
+          FinanceScreen(
+            erpRepository: widget.erpRepository,
+            user: u,
+            initialTab: 2,
+          ),
         ),
       );
       addPill(
@@ -149,7 +153,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         icon: Icons.payments_outlined,
         color: AppleColors.red,
         onTap: () => _push(
-          FinanceScreen(erpRepository: widget.erpRepository, initialTab: 0),
+          FinanceScreen(
+            erpRepository: widget.erpRepository,
+            user: u,
+            initialTab: 0,
+          ),
         ),
       );
     }
@@ -158,7 +166,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         label: 'Roles',
         icon: Icons.admin_panel_settings_outlined,
         color: AppleColors.amber,
-        onTap: () => _push(RolesMatrixScreen(viewModel: widget.teamViewModel)),
+        onTap: () => _push(
+          RolesMatrixScreen(viewModel: widget.teamViewModel, currentUser: u),
+        ),
       );
     }
 
@@ -281,6 +291,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ? () => _push(
                                   FinanceScreen(
                                     erpRepository: widget.erpRepository,
+                                    user: widget.user,
                                     initialTab: 1,
                                   ),
                                 )
@@ -364,7 +375,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             vertical: 14,
                           ),
                           onTap: () => _push(
-                            LeadsScreen(viewModel: widget.leadsViewModel),
+                            LeadsScreen(
+                              viewModel: widget.leadsViewModel,
+                              user: widget.user,
+                              erpRepository: widget.erpRepository,
+                            ),
                           ),
                           child: Row(
                             children: [
@@ -594,7 +609,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       TextButton(
                         onPressed: () => _push(
-                          LeadsScreen(viewModel: widget.leadsViewModel),
+                          LeadsScreen(
+                            viewModel: widget.leadsViewModel,
+                            user: widget.user,
+                            erpRepository: widget.erpRepository,
+                          ),
                         ),
                         child: const Text('All leads'),
                       ),

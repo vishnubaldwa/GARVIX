@@ -196,6 +196,32 @@ class _OutstandingScreenState extends State<OutstandingScreen> {
                                 icon: const Icon(Icons.ios_share_rounded, size: 16),
                                 label: const Text('Send Reminder'),
                               ),
+                              if (widget.user.isFullAdmin)
+                                OutlinedButton.icon(
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppleColors.red,
+                                    side: const BorderSide(
+                                      color: Color(0x33BE123C),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 9,
+                                    ),
+                                  ),
+                                  onPressed: () => confirmSuperAdminDelete(
+                                    context,
+                                    label: 'invoice ${inv.invoiceNumber}',
+                                    onDelete: () => widget.viewModel.deleteRecord(
+                                      entity: 'invoice',
+                                      id: inv.id,
+                                    ),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.delete_outline_rounded,
+                                    size: 16,
+                                  ),
+                                  label: const Text('Delete'),
+                                ),
                             ],
                           ),
                         ],

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { ensureDefaultRoles, hasPermission } from "@/lib/permissions";
+import { ensureDefaultRoles, hasPermission, isFullAdminRole } from "@/lib/permissions";
 import { RolesManagementView } from "@/components/admin/RolesManagementView";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +34,10 @@ export default async function RolesPage() {
 
   return (
     <div className="space-y-6">
-      <RolesManagementView initialRoles={roles} />
+      <RolesManagementView
+        initialRoles={roles}
+        isSuperAdmin={isFullAdminRole(session.role)}
+      />
     </div>
   );
 }

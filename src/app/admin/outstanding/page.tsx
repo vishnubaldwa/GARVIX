@@ -1,8 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
+import { getCompanySettings } from "@/lib/settings";
 import { Clock, AlertCircle, ArrowUpRight, MessageSquare, CheckCircle2, Building2 } from "lucide-react";
 import Link from "next/link";
 import { RecordPaymentModal } from "@/components/admin/RecordPaymentModal";
+import { SuperAdminDeleteButton } from "@/components/admin/SuperAdminDeleteButton";
 import { buildWhatsAppLink, getPaymentReminderWhatsAppText } from "@/lib/whatsapp";
 
 export const dynamic = "force-dynamic";
@@ -10,18 +14,23 @@ export const dynamic = "force-dynamic";
 const SITE_URL = process.env.NEXTAUTH_URL || process.env.SITE_URL || "https://garvix.in";
 
 export default async function OutstandingPaymentsPage() {
-  const pendingInvoices = await prisma.invoice.findMany({
-    where: {
-      paymentStatus: { in: ["UNPAID", "PARTIAL"] },
-    },
-    include: {
-      customer: true,
-      payments: true,
-    },
-    orderBy: {
-      invoiceDate: "desc",
-    },
-  });
+  const [session, company, pendingInvoices] = await Promise.all([
+    getSession(),
+    getCompanySettings(),
+    prisma.invoice.findMany({
+      where: {
+        paymentStatus: { in: ["UNPAID", "PARTIAL"] },
+      },
+      include: {
+        customer: true,
+        payments: true,
+      },
+      orderBy: {
+        invoiceDate: "desc",
+      },
+    }),
+  ]);
+  const isSuperAdmin = isFullAdminRole(session?.role);
 
   const totalOutstanding = pendingInvoices.reduce((sum, inv) => sum + inv.balanceDue, 0);
   const totalBilled = pendingInvoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
@@ -139,6 +148,8 @@ export default async function OutstandingPaymentsPage() {
                     balanceDue: inv.balanceDue,
                     daysPending: daysOld,
                     portalUrl,
+                    companyName: company.name,
+                    companyPhone: company.phone,
                   });
                   const waLink = buildWhatsAppLink(inv.customer.phone, waText);
 
@@ -201,6 +212,14 @@ export default async function OutstandingPaymentsPage() {
 
                           {/* Record Payment Modal */}
                           <RecordPaymentModal invoice={inv} />
+
+                          {isSuperAdmin && (
+                            <SuperAdminDeleteButton
+                              entity="invoice"
+                              id={inv.id}
+                              label={`invoice ${inv.invoiceNumber}`}
+                            />
+                          )}
                         </div>
                       </td>
                     </tr>

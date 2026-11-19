@@ -6,6 +6,8 @@ import { ClientQuotationAcceptButton } from "@/components/portal/ClientQuotation
 import { PrintButton } from "@/components/portal/PrintButton";
 import { getCompanySettings } from "@/lib/settings";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ token: string }>;
 }
@@ -36,7 +38,7 @@ export default async function ClientQuotationPage({ params }: Props) {
         {/* Top Action Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-cyan-500/30 bg-[#0d1424] p-4 no-print">
           <div>
-            <span className="text-xs font-semibold text-slate-400">GARVIX Client Document Portal</span>
+            <span className="text-xs font-semibold text-slate-400">{company.name} Client Document Portal</span>
             <h2 className="text-base font-bold text-white">Quotation #{quotation.quoteNumber}</h2>
           </div>
           <div className="flex items-center gap-3">
@@ -190,13 +192,19 @@ export default async function ClientQuotationPage({ params }: Props) {
           {/* Footer Signature */}
           <div className="mt-12 pt-8 border-t border-slate-800 flex justify-between items-end text-xs text-slate-400">
             <div>
-              <p className="font-semibold text-slate-300">Thank you for considering GARVIX.</p>
-              <p className="text-[11px] text-slate-500 mt-1">Computer-generated quotation powered by Garvix ERP Engine.</p>
+              <p className="font-semibold text-slate-300">Thank you for considering {company.name}.</p>
+              <p className="text-[11px] text-slate-500 mt-1">Computer-generated quotation powered by {company.name}.</p>
             </div>
             <div className="text-right">
-              <div className="h-10 border-b border-dashed border-slate-700 w-44 mb-1"></div>
-              <p className="text-slate-300 font-semibold">Authorized Signatory</p>
-              <p className="text-[11px] text-slate-500">{company.name}</p>
+              <div className="flex justify-end items-end border-b border-dashed border-slate-700 w-52 ml-auto pb-1 mb-1.5">
+                <img
+                  src="/api/public/signature"
+                  alt="Authorized Signatory"
+                  className="h-14 w-auto max-w-[180px] object-contain brightness-0 invert print:filter-none"
+                />
+              </div>
+              <p className="text-slate-300 font-semibold">For {company.name}</p>
+              <p className="text-[11px] text-slate-500">Authorized Signatory</p>
             </div>
           </div>
         </div>

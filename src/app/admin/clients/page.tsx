@@ -1,20 +1,27 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
 import { Users, Building2, Phone, Mail, FileText, PlusCircle, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { ClientCreateModal } from "@/components/admin/ClientCreateModal";
+import { SuperAdminDeleteButton } from "@/components/admin/SuperAdminDeleteButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminClientsPage() {
-  const customers = await prisma.customer.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      quotations: true,
-      invoices: true,
-      amcContracts: true,
-    },
-  });
+  const [session, customers] = await Promise.all([
+    getSession(),
+    prisma.customer.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        quotations: true,
+        invoices: true,
+        amcContracts: true,
+      },
+    }),
+  ]);
+  const isSuperAdmin = isFullAdminRole(session?.role);
 
   const totalClients = customers.length;
   const b2bClients = customers.filter((c) => c.isB2B || c.gstin).length;
@@ -132,13 +139,22 @@ export default async function AdminClientsPage() {
                     </td>
 
                     <td className="py-3.5 px-4 text-right font-sans">
-                      <Link
-                        href={`/admin/quotations/create`}
-                        className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm"
-                      >
-                        <span>New Quote</span>
-                        <ArrowUpRight className="h-3 w-3 text-slate-400" />
-                      </Link>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Link
+                          href={`/admin/quotations/create`}
+                          className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm"
+                        >
+                          <span>New Quote</span>
+                          <ArrowUpRight className="h-3 w-3 text-slate-400" />
+                        </Link>
+                        {isSuperAdmin && (
+                          <SuperAdminDeleteButton
+                            entity="client"
+                            id={c.id}
+                            label={`client "${c.companyName}"`}
+                          />
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

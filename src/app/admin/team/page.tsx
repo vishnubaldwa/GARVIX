@@ -53,6 +53,7 @@ export default async function TeamPage() {
         initialEmployees={employees}
         initialRoles={rawRoles}
         currentUserEmail={session.email}
+        isSuperAdmin={isFullAdminRole(session.role)}
       />
     </div>
   );

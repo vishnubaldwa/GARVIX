@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { hasPermission } from "@/lib/permissions";
+import { hasPermission, isFullAdminRole } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
@@ -77,9 +77,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    const canManageRoles = await hasPermission(session.role, "CAN_MANAGE_ROLES");
-    if (!canManageRoles) {
-      return NextResponse.json({ error: "Access denied." }, { status: 403 });
+    if (!isFullAdminRole(session.role)) {
+      return NextResponse.json(
+        { error: "Access denied. Only Super Admin can delete roles." },
+        { status: 403 }
+      );
     }
 
     const { id } = await params;

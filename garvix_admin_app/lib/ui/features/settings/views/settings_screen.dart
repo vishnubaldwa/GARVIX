@@ -1,7 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../data/repositories/erp_repository.dart';
 import '../../../../domain/models/erp_models.dart';
+import '../../../core/theme/apple_theme.dart';
 import '../../../core/widgets/apple_card.dart';
 
 class CompanySettingsScreen extends StatefulWidget {
@@ -30,11 +35,53 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen> {
 
   bool _loading = true;
   bool _saving = false;
+  Uint8List? _signatureBytes;
+  bool _uploadingSignature = false;
 
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  Future<void> _loadSignature() async {
+    try {
+      final bytes = await widget.erpRepository.fetchSignatureBytes();
+      if (mounted && bytes.isNotEmpty) {
+        setState(() => _signatureBytes = Uint8List.fromList(bytes));
+      }
+    } catch (_) {
+      // Ignore if signature preview fails on offline load
+    }
+  }
+
+  Future<void> _uploadSignature() async {
+    final picked = await FilePicker.pickFiles(type: FileType.image);
+    if (picked.isEmpty) return;
+    final path = picked.first.path;
+    if (path == null || path.isEmpty) return;
+
+    setState(() => _uploadingSignature = true);
+    try {
+      await widget.erpRepository.uploadSignature(File(path));
+      await _loadSignature();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Signature updated live on all Invoices & Quotations!',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    } finally {
+      if (mounted) setState(() => _uploadingSignature = false);
+    }
   }
 
   Future<void> _load() async {
@@ -54,6 +101,7 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen> {
       _bankNameCtrl.text = s.bankName ?? '';
       _accountNoCtrl.text = s.accountNo ?? '';
       _ifscCtrl.text = s.ifscCode ?? '';
+      await _loadSignature();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -275,6 +323,71 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen> {
                           ),
                         )
                       : const Text('Save Company Settings'),
+                ),
+                const SizedBox(height: 18),
+                AppleCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'Authorized Signatory Signature',
+                        style: TextStyle(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Appears automatically on all Invoices & Quotations. White background is removed automatically on upload.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppleColors.inkSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        height: 92,
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: AppleColors.border),
+                        ),
+                        child: _signatureBytes != null
+                            ? Image.memory(
+                                _signatureBytes!,
+                                height: 70,
+                                fit: BoxFit.contain,
+                              )
+                            : const Text(
+                                'No signature preview loaded',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppleColors.inkMuted,
+                                ),
+                              ),
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed:
+                            _uploadingSignature ? null : _uploadSignature,
+                        icon: _uploadingSignature
+                            ? const SizedBox(
+                                height: 16,
+                                width: 16,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.draw_outlined, size: 18),
+                        label: Text(
+                          _uploadingSignature
+                              ? 'Processing & Uploading...'
+                              : 'Upload / Change Signature',
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

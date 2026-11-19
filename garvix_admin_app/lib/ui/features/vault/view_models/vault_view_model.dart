@@ -159,6 +159,21 @@ class VaultViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteFolder(String folderId) async {
+    _isBusy = true;
+    notifyListeners();
+    try {
+      await _repository.deleteFolder(folderId);
+      if (_selectedFolderId == folderId) {
+        _selectedFolderId = 'ALL';
+      }
+      await load();
+    } finally {
+      _isBusy = false;
+      notifyListeners();
+    }
+  }
+
   Future<File> downloadDocument(VaultDocument doc) async {
     _isBusy = true;
     notifyListeners();

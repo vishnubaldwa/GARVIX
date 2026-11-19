@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../../../../domain/models/auth_user.dart';
 import '../../../../domain/models/crm_models.dart';
 import '../../../../domain/models/erp_models.dart';
 import '../../../core/theme/apple_theme.dart';
@@ -8,9 +9,14 @@ import '../../../core/widgets/empty_state.dart';
 import '../view_models/team_view_model.dart';
 
 class RolesMatrixScreen extends StatefulWidget {
-  const RolesMatrixScreen({super.key, required this.viewModel});
+  const RolesMatrixScreen({
+    super.key,
+    required this.viewModel,
+    required this.currentUser,
+  });
 
   final TeamViewModel viewModel;
+  final AuthUser currentUser;
 
   @override
   State<RolesMatrixScreen> createState() => _RolesMatrixScreenState();
@@ -169,6 +175,7 @@ class _RolesMatrixScreenState extends State<RolesMatrixScreen> {
         builder: (_) => _RolePermissionEditorScreen(
           role: role,
           viewModel: widget.viewModel,
+          currentUser: widget.currentUser,
         ),
       ),
     );
@@ -293,10 +300,12 @@ class _RolePermissionEditorScreen extends StatefulWidget {
   const _RolePermissionEditorScreen({
     required this.role,
     required this.viewModel,
+    required this.currentUser,
   });
 
   final RoleItem role;
   final TeamViewModel viewModel;
+  final AuthUser currentUser;
 
   @override
   State<_RolePermissionEditorScreen> createState() =>
@@ -383,7 +392,7 @@ class _RolePermissionEditorScreenState
       appBar: AppBar(
         title: Text(widget.role.displayName),
         actions: [
-          if (!widget.role.isSystem)
+          if (widget.currentUser.isFullAdmin && !widget.role.isSystem)
             IconButton(
               onPressed: _deleteRole,
               icon: const Icon(Icons.delete_outline_rounded, color: AppleColors.red),

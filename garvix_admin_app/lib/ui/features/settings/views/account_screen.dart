@@ -241,7 +241,7 @@ class AccountScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600),
                   ),
                   subtitle: Text(
-                    '$serverUrl • GARVIX ERP v2.2',
+                    '$serverUrl • GARVIX ERP v2.3',
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppleColors.inkMuted,

@@ -1,13 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
+import { getCompanySettings } from "@/lib/settings";
 import { Clock, ShieldCheck, Wrench, CheckCircle2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { WhatsAppShareButton } from "@/components/admin/WhatsAppShareButton";
+import { SuperAdminDeleteButton } from "@/components/admin/SuperAdminDeleteButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminAmcPage() {
-  const [contracts, tickets] = await Promise.all([
+  const [session, company, contracts, tickets] = await Promise.all([
+    getSession(),
+    getCompanySettings(),
     prisma.aMCContract.findMany({
       include: { customer: true },
       orderBy: { endDate: "asc" },
@@ -17,6 +23,7 @@ export default async function AdminAmcPage() {
       orderBy: { createdAt: "desc" },
     }),
   ]);
+  const isSuperAdmin = isFullAdminRole(session?.role);
 
   return (
     <div className="space-y-8">
@@ -92,6 +99,7 @@ export default async function AdminAmcPage() {
                             amount={c.contractValue}
                             portalUrl={`https://garvix.in/admin/quotations/create`}
                             customLabel="Renewal Alert"
+                            companyName={company.name}
                           />
                           <Link
                             href={`/admin/quotations/create`}
@@ -100,6 +108,13 @@ export default async function AdminAmcPage() {
                           >
                             <span>Renew Quote</span>
                           </Link>
+                          {isSuperAdmin && (
+                            <SuperAdminDeleteButton
+                              entity="amc"
+                              id={c.id}
+                              label={`AMC ${c.contractNumber}`}
+                            />
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -126,6 +141,7 @@ export default async function AdminAmcPage() {
                   <th className="py-3 px-4">Assigned Engineer</th>
                   <th className="py-3 px-4">Resolution Summary</th>
                   <th className="py-3 px-4 text-center">Status</th>
+                  {isSuperAdmin && <th className="py-3 px-4 text-right">Delete</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -153,6 +169,15 @@ export default async function AdminAmcPage() {
                         <CheckCircle2 className="h-3 w-3" /> {t.status}
                       </span>
                     </td>
+                    {isSuperAdmin && (
+                      <td className="py-3.5 px-4 text-right">
+                        <SuperAdminDeleteButton
+                          entity="ticket"
+                          id={t.id}
+                          label={`ticket ${t.ticketNumber}`}
+                        />
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

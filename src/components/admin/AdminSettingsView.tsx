@@ -11,6 +11,8 @@ import {
   Edit3,
   Save,
   X,
+  PenTool,
+  Upload,
 } from "lucide-react";
 
 export function AdminSettingsView({
@@ -31,6 +33,9 @@ export function AdminSettingsView({
     address: string;
     upiId: string;
     upiName: string;
+    bankName?: string | null;
+    accountNo?: string | null;
+    ifscCode?: string | null;
   };
 }) {
   // Password state
@@ -47,6 +52,41 @@ export function AdminSettingsView({
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState("");
   const [profileError, setProfileError] = useState("");
+
+  // Authorized signature upload state
+  const [sigVersion, setSigVersion] = useState<number>(() => Date.now());
+  const [sigUploading, setSigUploading] = useState(false);
+  const [sigSuccess, setSigSuccess] = useState("");
+  const [sigError, setSigError] = useState("");
+
+  const handleSignatureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSigUploading(true);
+    setSigSuccess("");
+    setSigError("");
+
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/settings/signature", {
+        method: "POST",
+        body: fd,
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSigVersion(Date.now());
+        setSigSuccess("Signature updated! Auto-converted to clean transparent PNG across all Invoices & Quotations.");
+      } else {
+        setSigError(data.error || "Failed to upload signature.");
+      }
+    } catch {
+      setSigError("Network error while uploading signature.");
+    } finally {
+      setSigUploading(false);
+      e.target.value = "";
+    }
+  };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,6 +316,40 @@ export function AdminSettingsView({
                       className="w-full admin-input py-2 px-3 text-xs"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-semibold mb-1">Bank Name (NEFT / IMPS)</label>
+                    <input
+                      type="text"
+                      value={profileData.bankName || ""}
+                      onChange={(e) => setProfileData({ ...profileData, bankName: e.target.value })}
+                      placeholder="e.g. HDFC Bank"
+                      className="w-full admin-input py-2 px-3 text-xs"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-slate-700 font-semibold mb-1">Account Number</label>
+                      <input
+                        type="text"
+                        value={profileData.accountNo || ""}
+                        onChange={(e) => setProfileData({ ...profileData, accountNo: e.target.value })}
+                        placeholder="Account No."
+                        className="w-full admin-input py-2 px-3 text-xs font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-700 font-semibold mb-1">IFSC Code</label>
+                      <input
+                        type="text"
+                        value={profileData.ifscCode || ""}
+                        onChange={(e) => setProfileData({ ...profileData, ifscCode: e.target.value.toUpperCase() })}
+                        placeholder="HDFC0001234"
+                        className="w-full admin-input py-2 px-3 text-xs font-mono uppercase"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
@@ -355,9 +429,76 @@ export function AdminSettingsView({
                 </div>
               </div>
 
+              {(profileData.bankName || profileData.accountNo || profileData.ifscCode) && (
+                <>
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Bank Name</label>
+                    <div className="font-semibold text-slate-900 text-xs bg-slate-50 border border-slate-200 rounded-lg p-2">
+                      {profileData.bankName || "—"}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Account No. &amp; IFSC</label>
+                    <div className="font-mono font-semibold text-slate-900 text-xs bg-slate-50 border border-slate-200 rounded-lg p-2">
+                      {profileData.accountNo || "—"} {profileData.ifscCode ? `• ${profileData.ifscCode}` : ""}
+                    </div>
+                  </div>
+                </>
+              )}
+
               <div className="sm:col-span-2">
                 <p className="text-[11px] text-slate-500 leading-relaxed">
                   💡 This UPI ID is automatically encoded into the <b>Dynamic NPCI QR code</b> generated on every Tax Invoice and Client Payment Portal link for instant settlement.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Authorized Signatory Digital Signature */}
+          <div className="admin-card p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <PenTool className="h-5 w-5 text-blue-600" />
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+                  Authorized Signatory Signature
+                </h3>
+              </div>
+              <label className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 px-3 py-1.5 text-xs font-semibold text-white shadow-sm cursor-pointer transition">
+                <Upload className="h-3.5 w-3.5" />
+                <span>{sigUploading ? "Uploading..." : "Upload / Change"}</span>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  disabled={sigUploading}
+                  onChange={handleSignatureUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            {sigSuccess && (
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs text-emerald-800 font-semibold flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" /> {sigSuccess}
+              </div>
+            )}
+            {sigError && (
+              <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-xs text-rose-700 font-semibold flex items-center gap-1.5">
+                <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" /> {sigError}
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 rounded-xl border border-slate-200 bg-slate-50/80 p-4">
+              <div className="flex h-20 w-48 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-white p-2 shrink-0">
+                <img
+                  src={`/api/public/signature?v=${sigVersion}`}
+                  alt="Authorized Signatory"
+                  className="max-h-16 w-auto object-contain"
+                />
+              </div>
+              <div className="text-xs text-slate-600 space-y-1">
+                <p className="font-bold text-slate-900">Active Signature on Invoices &amp; Quotations</p>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Automatically appears above <b>For {profileData.name} — Authorized Signatory</b>. Upload any PNG/JPG signature photo — white background is removed automatically.
                 </p>
               </div>
             </div>

@@ -2,15 +2,21 @@ import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../data/repositories/erp_repository.dart';
+import '../../../../domain/models/auth_user.dart';
 import '../../../../domain/models/erp_models.dart';
 import '../../../core/theme/apple_theme.dart';
 import '../../../core/widgets/apple_card.dart';
 import '../../../core/widgets/empty_state.dart';
 
 class AmcScreen extends StatefulWidget {
-  const AmcScreen({super.key, required this.erpRepository});
+  const AmcScreen({
+    super.key,
+    required this.erpRepository,
+    required this.user,
+  });
 
   final ErpRepository erpRepository;
+  final AuthUser user;
 
   @override
   State<AmcScreen> createState() => _AmcScreenState();
@@ -181,6 +187,27 @@ class _AmcScreenState extends State<AmcScreen> {
                       if (await canLaunchUrl(uri)) await launchUrl(uri);
                     },
                   ),
+                  if (widget.user.isFullAdmin)
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Delete permanently',
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        size: 19,
+                        color: AppleColors.red,
+                      ),
+                      onPressed: () => confirmSuperAdminDelete(
+                        context,
+                        label: 'AMC "${c.contractNumber}"',
+                        onDelete: () async {
+                          await widget.erpRepository.deleteRecord(
+                            entity: 'amc',
+                            id: c.id,
+                          );
+                          await _load();
+                        },
+                      ),
+                    ),
                 ],
               ),
             ],
@@ -229,6 +256,27 @@ class _AmcScreenState extends State<AmcScreen> {
                     foreground:
                         isResolved ? AppleColors.green : AppleColors.amber,
                   ),
+                  if (widget.user.isFullAdmin)
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Delete permanently',
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        size: 19,
+                        color: AppleColors.red,
+                      ),
+                      onPressed: () => confirmSuperAdminDelete(
+                        context,
+                        label: 'ticket "${t.ticketNumber}"',
+                        onDelete: () async {
+                          await widget.erpRepository.deleteRecord(
+                            entity: 'ticket',
+                            id: t.id,
+                          );
+                          await _load();
+                        },
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: 6),

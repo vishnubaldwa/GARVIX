@@ -610,7 +610,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                             icon: const Icon(Icons.key_outlined, size: 15),
                             label: const Text('Reset Pass'),
                           ),
-                          if (!isSelf && !isSuper)
+                          if (widget.currentUser.isFullAdmin && !isSelf && !isSuper)
                             OutlinedButton.icon(
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: AppleColors.red,

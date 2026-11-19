@@ -1,22 +1,31 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
+import { getCompanySettings } from "@/lib/settings";
 import Link from "next/link";
 import { PlusCircle, ExternalLink } from "lucide-react";
 import { ConvertQuotationButton } from "@/components/admin/ConvertQuotationButton";
 import { CopyPortalLinkButton } from "@/components/admin/CopyPortalLinkButton";
 import { WhatsAppShareButton } from "@/components/admin/WhatsAppShareButton";
 import { QuotationReviseModal } from "@/components/admin/QuotationReviseModal";
+import { SuperAdminDeleteButton } from "@/components/admin/SuperAdminDeleteButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminQuotationsPage() {
-  const quotations = await prisma.quotation.findMany({
-    include: {
-      customer: true,
-      items: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [session, company, quotations] = await Promise.all([
+    getSession(),
+    getCompanySettings(),
+    prisma.quotation.findMany({
+      include: {
+        customer: true,
+        items: true,
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+  const isSuperAdmin = isFullAdminRole(session?.role);
 
   return (
     <div className="space-y-6">
@@ -126,6 +135,7 @@ export default async function AdminQuotationsPage() {
                         documentNumber={quote.quoteNumber}
                         amount={quote.totalAmount}
                         portalUrl={`https://garvix.in/portal/quotation/${quote.token}`}
+                        companyName={company.name}
                       />
 
                       <CopyPortalLinkButton token={quote.token} type="quotation" />
@@ -141,6 +151,14 @@ export default async function AdminQuotationsPage() {
 
                       {quote.status !== "CONVERTED" && (
                         <ConvertQuotationButton quotationId={quote.id} />
+                      )}
+
+                      {isSuperAdmin && (
+                        <SuperAdminDeleteButton
+                          entity="quotation"
+                          id={quote.id}
+                          label={`quotation ${quote.quoteNumber}`}
+                        />
                       )}
                     </div>
                   </td>

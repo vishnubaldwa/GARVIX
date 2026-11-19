@@ -25,8 +25,10 @@ interface RoleData {
 
 export function RolesManagementView({
   initialRoles,
+  isSuperAdmin = false,
 }: {
   initialRoles: RoleData[];
+  isSuperAdmin?: boolean;
 }) {
   const [roles, setRoles] = useState<RoleData[]>(initialRoles);
   const [activeRole, setActiveRole] = useState<RoleData>(initialRoles[0] || null);
@@ -226,13 +228,13 @@ export function RolesManagementView({
                     </div>
                   </div>
 
-                  {!r.isSystem && (
+                  {isSuperAdmin && !r.isSystem && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteRole(r);
                       }}
-                      title="Delete Custom Role"
+                      title="Delete Custom Role (Super Admin Only)"
                       className="text-slate-400 hover:text-rose-600 p-1 transition"
                     >
                       <Trash2 className="h-3.5 w-3.5" />

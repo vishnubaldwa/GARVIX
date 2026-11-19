@@ -301,12 +301,9 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const allowed =
-      isFullAdminRole(session.role) ||
-      (await hasPermission(session.role, "CAN_MANAGE_TEAM"));
-    if (!allowed) {
+    if (!isFullAdminRole(session.role)) {
       return NextResponse.json(
-        { error: "Access denied. Team management permission required." },
+        { error: "Access denied. Only Super Admin can permanently delete accounts." },
         { status: 403 }
       );
     }

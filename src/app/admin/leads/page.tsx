@@ -1,17 +1,22 @@
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
 import { getCompanySettings } from "@/lib/settings";
 import { Phone, Mail } from "lucide-react";
 import { LeadStatusSelector } from "@/components/admin/LeadStatusSelector";
+import { SuperAdminDeleteButton } from "@/components/admin/SuperAdminDeleteButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminLeadsPage() {
-  const [leads, company] = await Promise.all([
+  const [session, leads, company] = await Promise.all([
+    getSession(),
     prisma.lead.findMany({
       orderBy: { createdAt: "desc" },
     }),
     getCompanySettings(),
   ]);
+  const isSuperAdmin = isFullAdminRole(session?.role);
 
   return (
     <div className="space-y-6">
@@ -71,7 +76,16 @@ export default async function AdminLeadsPage() {
                   </td>
 
                   <td className="py-3.5 px-4">
-                    <LeadStatusSelector leadId={lead.id} currentStatus={lead.status} />
+                    <div className="flex items-center gap-2">
+                      <LeadStatusSelector leadId={lead.id} currentStatus={lead.status} />
+                      {isSuperAdmin && (
+                        <SuperAdminDeleteButton
+                          entity="lead"
+                          id={lead.id}
+                          label={`lead "${lead.name}"`}
+                        />
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

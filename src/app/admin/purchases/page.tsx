@@ -1,14 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
 import { ShoppingCart, ShieldCheck, Plus, CheckCircle2 } from "lucide-react";
+import { SuperAdminDeleteButton } from "@/components/admin/SuperAdminDeleteButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPurchasesPage() {
-  const purchases = await prisma.purchase.findMany({
-    include: { items: true },
-    orderBy: { billDate: "desc" },
-  });
+  const [session, purchases] = await Promise.all([
+    getSession(),
+    prisma.purchase.findMany({
+      include: { items: true },
+      orderBy: { billDate: "desc" },
+    }),
+  ]);
+  const isSuperAdmin = isFullAdminRole(session?.role);
 
   const totalPurchases = purchases.reduce((s, p) => s + p.totalAmount, 0);
   const totalItc = purchases
@@ -44,6 +51,7 @@ export default async function AdminPurchasesPage() {
                 <th className="py-3 px-4 text-right">Tax (GST)</th>
                 <th className="py-3 px-4 text-right">Bill Total</th>
                 <th className="py-3 px-4 text-center">ITC Eligibility</th>
+                {isSuperAdmin && <th className="py-3 px-4 text-right">Delete</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-mono">
@@ -65,6 +73,15 @@ export default async function AdminPurchasesPage() {
                         <ShieldCheck className="h-3 w-3" /> Eligible ITC
                       </span>
                     </td>
+                    {isSuperAdmin && (
+                      <td className="py-3.5 px-4 text-right font-sans">
+                        <SuperAdminDeleteButton
+                          entity="purchase"
+                          id={p.id}
+                          label={`purchase bill #${p.billNumber}`}
+                        />
+                      </td>
+                    )}
                   </tr>
                 );
               })}

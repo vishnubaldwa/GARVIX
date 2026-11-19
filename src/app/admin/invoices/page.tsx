@@ -1,22 +1,31 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR } from "@/lib/gst";
+import { getSession } from "@/lib/auth";
+import { isFullAdminRole } from "@/lib/permissions";
+import { getCompanySettings } from "@/lib/settings";
 import Link from "next/link";
 import { PlusCircle, ExternalLink } from "lucide-react";
 import { CopyPortalLinkButton } from "@/components/admin/CopyPortalLinkButton";
 import { RecordPaymentModal } from "@/components/admin/RecordPaymentModal";
 import { WhatsAppShareButton } from "@/components/admin/WhatsAppShareButton";
+import { SuperAdminDeleteButton } from "@/components/admin/SuperAdminDeleteButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminInvoicesPage() {
-  const invoices = await prisma.invoice.findMany({
-    include: {
-      customer: true,
-      items: true,
-      payments: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [session, company, invoices] = await Promise.all([
+    getSession(),
+    getCompanySettings(),
+    prisma.invoice.findMany({
+      include: {
+        customer: true,
+        items: true,
+        payments: true,
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+  const isSuperAdmin = isFullAdminRole(session?.role);
 
   return (
     <div className="space-y-6">
@@ -113,10 +122,11 @@ export default async function AdminInvoicesPage() {
                       <WhatsAppShareButton
                         phone={inv.customer.phone}
                         clientName={inv.customer.companyName}
-                        documentType="Tax Invoice"
+                        documentType={inv.invoiceType === "PROFORMA_INVOICE" ? "Proforma Invoice" : "Tax Invoice"}
                         documentNumber={inv.invoiceNumber}
                         amount={inv.totalAmount}
                         portalUrl={`https://garvix.in/portal/invoice/${inv.token}`}
+                        companyName={company.name}
                       />
 
                       <RecordPaymentModal invoice={inv} />
@@ -131,6 +141,14 @@ export default async function AdminInvoicesPage() {
                       >
                         <ExternalLink className="h-4 w-4" />
                       </Link>
+
+                      {isSuperAdmin && (
+                        <SuperAdminDeleteButton
+                          entity="invoice"
+                          id={inv.id}
+                          label={`invoice ${inv.invoiceNumber}`}
+                        />
+                      )}
                     </div>
                   </td>
                 </tr>

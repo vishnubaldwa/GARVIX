@@ -11,6 +11,7 @@ export function WhatsAppShareButton({
   amount,
   portalUrl,
   customLabel,
+  companyName,
 }: {
   phone?: string | null;
   clientName: string;
@@ -19,8 +20,10 @@ export function WhatsAppShareButton({
   amount: number;
   portalUrl: string;
   customLabel?: string;
+  companyName?: string;
 }) {
   const handleShare = () => {
+    const orgName = companyName?.trim() || "GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED";
     let cleanPhone = "";
     if (phone) {
       cleanPhone = phone.replace(/[^\d]/g, "");
@@ -31,13 +34,13 @@ export function WhatsAppShareButton({
 
     let message = "";
     if (documentType === "AMC Renewal") {
-      message = `Dear ${clientName},\n\nThis is a friendly reminder that your Annual Maintenance Contract (AMC) *#${documentNumber}* with *GARVIX SOFTWARE SOLUTIONS PVT LTD* is due for renewal.\n\n💰 *Annual Value:* ${formatINR(amount)}\n\nTo ensure uninterrupted hardware maintenance and priority technical support, please renew your contract.\n\n🔗 *Details:* ${portalUrl}\n\nThank you!`;
+      message = `Dear ${clientName},\n\nThis is a friendly reminder that your Annual Maintenance Contract (AMC) *#${documentNumber}* with *${orgName}* is due for renewal.\n\n💰 *Annual Value:* ${formatINR(amount)}\n\nTo ensure uninterrupted hardware maintenance and priority technical support, please renew your contract.\n\n🔗 *Details:* ${portalUrl}\n\nThank you!`;
     } else if (documentType === "Payment Reminder") {
-      message = `Dear ${clientName},\n\nThis is a gentle payment reminder regarding Invoice *#${documentNumber}* with an outstanding balance of *${formatINR(amount)}* due to *GARVIX SOFTWARE SOLUTIONS PVT LTD*.\n\nKindly arrange the clearance at your earliest convenience.\n\n🔗 *View & Pay Online:* ${portalUrl}\n\nThank you!`;
+      message = `Dear ${clientName},\n\nThis is a gentle payment reminder regarding Invoice *#${documentNumber}* with an outstanding balance of *${formatINR(amount)}* due to *${orgName}*.\n\nKindly arrange the clearance at your earliest convenience.\n\n🔗 *View & Pay Online:* ${portalUrl}\n\nThank you!`;
     } else if (documentType === "Proforma Invoice") {
-      message = `Dear ${clientName},\n\nPlease find your Proforma Invoice *#${documentNumber}* for *${formatINR(amount)}* from *GARVIX SOFTWARE SOLUTIONS PVT LTD*.\n\n🔗 *View & Pay Advance:* ${portalUrl}\n\nThank you for choosing GARVIX!`;
+      message = `Dear ${clientName},\n\nPlease find your Proforma Invoice *#${documentNumber}* for *${formatINR(amount)}* from *${orgName}*.\n\n🔗 *View & Pay Advance:* ${portalUrl}\n\nThank you for choosing ${orgName}!`;
     } else {
-      message = `Dear ${clientName},\n\nPlease find your ${documentType} *#${documentNumber}* for *${formatINR(amount)}* from *GARVIX SOFTWARE SOLUTIONS PVT LTD*.\n\n🔗 *View & Download Document:* ${portalUrl}\n\nThank you for choosing GARVIX!`;
+      message = `Dear ${clientName},\n\nPlease find your ${documentType} *#${documentNumber}* for *${formatINR(amount)}* from *${orgName}*.\n\n🔗 *View & Download Document:* ${portalUrl}\n\nThank you for choosing ${orgName}!`;
     }
 
     const encodedMessage = encodeURIComponent(message);
