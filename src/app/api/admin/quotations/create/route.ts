@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { computeGst, HARYANA_STATE_CODE } from "@/lib/gst";
 import { getSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
-import { sendTelegramQuotationAlert } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
@@ -88,15 +87,6 @@ export async function POST(request: Request) {
         details: `Created Quotation ${quoteNumber} for ${customer.companyName} (INR ${grandTotal})`,
       },
     });
-
-    // Telegram Push Alert
-    sendTelegramQuotationAlert({
-      quoteNumber,
-      customerName: customer.companyName,
-      totalAmount: grandTotal,
-      itemCount: itemsData.length,
-      portalUrl: `https://garvix.in/portal/quotation/${quotation.token}`,
-    }).catch((e) => console.error("Telegram quotation alert failed:", e));
 
     return NextResponse.json({ success: true, quotation });
   } catch (err: any) {

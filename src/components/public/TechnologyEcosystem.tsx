@@ -129,12 +129,12 @@ export function TechnologyEcosystem() {
       subtitle: "Physical & digital actuation",
       icon: BellRing,
       color: "emerald",
-      protocols: "Telegram Bot • WhatsApp • SMS • Relay Actuators",
+      protocols: "Mobile App • Email • SMS • Relay Actuators",
       details:
-        "Instant real-world execution: automated boom barrier opening, warehouse dock green lights, security sirens on unbilled exit, and Telegram alerts to management.",
+        "Instant real-world execution: automated boom barrier opening, warehouse dock green lights, security sirens on unbilled exit, and instant mobile alerts to management.",
       features: [
         "Instant boom barrier relay actuation",
-        "Telegram & WhatsApp instant alerts",
+        "Mobile App & Email instant alerts",
         "Anti-theft strobe & siren trigger",
         "Automated dispatch verification",
       ],

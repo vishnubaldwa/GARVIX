@@ -15,7 +15,6 @@ model User {
   name           String
   role           String              @default("SUPER_ADMIN") // SUPER_ADMIN, ADMIN, SALES, ACCOUNTS, SERVICE, DOCUMENT_VIEWER
   phone          String?
-  telegramChatId String?             @unique
   isActive       Boolean             @default(true)
   expiresAt      DateTime?
   createdAt      DateTime            @default(now())
@@ -33,7 +32,6 @@ model Lead {
   solution         String   // RFID_JEWELLERY, RFID_WAREHOUSE, RFID_ASSET, RFID_FASTAG, CUSTOM_SOFTWARE, OTHER
   message          String
   status           String   @default("NEW") // NEW, CONTACTED, DEMO_SCHEDULED, PROPOSAL_SENT, WON, LOST
-  telegramNotified Boolean  @default(false)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
@@ -346,16 +344,6 @@ model Role {
   isSystem    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-}
-
-model TelegramSession {
-  id        String   @id @default(cuid())
-  chatId    String   @unique
-  flow      String
-  step      Int      @default(1)
-  stateData String   // JSON object string
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model CompanySetting {

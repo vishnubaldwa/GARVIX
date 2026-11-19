@@ -36,7 +36,6 @@ async function main() {
       name: "Vishnu Baldwa",
       role: "SUPER_ADMIN",
       phone: "9876543210",
-      telegramChatId: "8543269562",
     },
   });
 
@@ -489,7 +488,6 @@ async function main() {
         solution: "RFID_JEWELLERY",
         message: "Need RFID scanning trays and handheld readers for stock count in 2 stores.",
         status: "PROPOSAL_SENT",
-        telegramNotified: true,
       },
       {
         name: "Arun Mehra",
@@ -499,7 +497,6 @@ async function main() {
         solution: "RFID_WAREHOUSE",
         message: "Automated pallet dispatch detection at -20 degree freezer gates.",
         status: "NEW",
-        telegramNotified: true,
       },
       {
         name: "Dr. Sunita Kapoor",
@@ -509,7 +506,6 @@ async function main() {
         solution: "RFID_ASSET",
         message: "Track diagnostic equipment and medical assets across 3 floors.",
         status: "CONTACTED",
-        telegramNotified: false,
       },
     ],
   });

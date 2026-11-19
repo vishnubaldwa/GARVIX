@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Phone, Mail, CheckCircle2 } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 import { LeadStatusSelector } from "@/components/admin/LeadStatusSelector";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export default async function AdminLeadsPage() {
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Leads & CRM Pipeline</h1>
           <p className="text-xs text-slate-500 mt-1">
-            Website enquiries captured with real-time Telegram Bot dispatch logs.
+            Website enquiries captured and synced with info@garvix.in &amp; GARVIX ERP Mobile App.
           </p>
         </div>
       </div>
@@ -29,7 +29,7 @@ export default async function AdminLeadsPage() {
                 <th className="py-3 px-4">Company</th>
                 <th className="py-3 px-4">Interest / Solution</th>
                 <th className="py-3 px-4">Requirement</th>
-                <th className="py-3 px-4 text-center">Telegram Alert</th>
+                <th className="py-3 px-4">Received</th>
                 <th className="py-3 px-4">Pipeline Status</th>
               </tr>
             </thead>
@@ -62,16 +62,8 @@ export default async function AdminLeadsPage() {
                     {lead.message}
                   </td>
 
-                  <td className="py-3.5 px-4 text-center">
-                    {lead.telegramNotified ? (
-                      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-                        <CheckCircle2 className="h-3 w-3" /> Sent
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500">
-                        Pending
-                      </span>
-                    )}
+                  <td className="py-3.5 px-4 font-mono text-[11px] text-slate-500">
+                    {new Date(lead.createdAt).toLocaleDateString("en-IN")}
                   </td>
 
                   <td className="py-3.5 px-4">

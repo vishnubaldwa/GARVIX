@@ -5,14 +5,9 @@ import {
   Lock,
   Building2,
   Landmark,
-  QrCode,
-  Send,
   CheckCircle2,
   AlertCircle,
   ShieldCheck,
-  Smartphone,
-  Bot,
-  RefreshCw,
   Edit3,
   Save,
   X,
@@ -46,16 +41,6 @@ export function AdminSettingsView({
   const [pwSuccess, setPwSuccess] = useState("");
   const [pwError, setPwError] = useState("");
 
-  // Telegram test state
-  const [tgLoading, setTgLoading] = useState(false);
-  const [tgSuccess, setTgSuccess] = useState("");
-  const [tgError, setTgError] = useState("");
-
-  // Telegram webhook registration state
-  const [whLoading, setWhLoading] = useState(false);
-  const [whSuccess, setWhSuccess] = useState("");
-  const [whError, setWhError] = useState("");
-
   // Profile editing state
   const [editingProfile, setEditingProfile] = useState(false);
   const [profileData, setProfileData] = useState(companyInfo);
@@ -86,31 +71,6 @@ export function AdminSettingsView({
       setProfileError("Network error occurred.");
     } finally {
       setSavingProfile(false);
-    }
-  };
-
-  const handleRegisterWebhook = async () => {
-    setWhLoading(true);
-    setWhSuccess("");
-    setWhError("");
-    try {
-      const res = await fetch("/api/admin/telegram/webhook-register", {
-        method: "POST",
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setWhSuccess(
-          "Two-Way Interactive Webhook Activated! You can now send commands like 'quotation', 'invoice', 'leads', 'summary' or tap buttons in your Telegram chat."
-        );
-      } else {
-        setWhError(
-          data.error || data.result?.description || "Failed to register webhook."
-        );
-      }
-    } catch {
-      setWhError("Network error occurred while connecting webhook.");
-    } finally {
-      setWhLoading(false);
     }
   };
 
@@ -155,111 +115,8 @@ export function AdminSettingsView({
     }
   };
 
-  const handleSendTelegramTest = async () => {
-    setTgLoading(true);
-    setTgSuccess("");
-    setTgError("");
-
-    try {
-      const res = await fetch("/api/admin/telegram/test", { method: "POST" });
-      const data = await res.json();
-      if (res.ok) {
-        setTgSuccess("Test notification sent! Check your Telegram app right now.");
-      } else {
-        setTgError(data.error || "Failed to send Telegram test message.");
-      }
-    } catch {
-      setTgError("Network error occurred.");
-    } finally {
-      setTgLoading(false);
-    }
-  };
-
   return (
     <div className="space-y-6">
-      {/* 1. Top Section: Telegram Bot Alert Integration */}
-      <div className="admin-card p-6 border-l-4 border-l-blue-600 space-y-3">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="rounded-xl bg-blue-50 p-2.5 text-blue-600">
-              <Smartphone className="h-6 w-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-slate-900">Telegram Bot & Interactive Command Center</h3>
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-                  <CheckCircle2 className="h-3 w-3" /> Active
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                Connected Bot: <code className="font-bold text-blue-600">@garvix_software_bot</code> • Authorized Chat ID: <code className="font-mono font-bold text-slate-700">8543269562</code>
-              </p>
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
-                  ⚡ Push Alerts
-                </span>
-                <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
-                  💬 /start Menu
-                </span>
-                <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
-                  📋 &quot;quotation&quot;
-                </span>
-                <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
-                  🧾 &quot;invoice&quot;
-                </span>
-                <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
-                  👥 &quot;leads&quot;
-                </span>
-                <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700">
-                  📊 &quot;summary&quot;
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
-            <button
-              type="button"
-              onClick={handleRegisterWebhook}
-              disabled={whLoading}
-              className="flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-3.5 py-2 text-xs font-bold text-white shadow-sm transition disabled:opacity-50"
-            >
-              <Bot className="h-4 w-4" /> {whLoading ? "Connecting..." : "Activate Two-Way Webhook"}
-            </button>
-            <button
-              type="button"
-              onClick={handleSendTelegramTest}
-              disabled={tgLoading}
-              className="flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 px-3.5 py-2 text-xs font-bold text-white shadow-sm transition disabled:opacity-50"
-            >
-              <Send className="h-4 w-4" /> {tgLoading ? "Sending..." : "Send Test Ping"}
-            </button>
-          </div>
-        </div>
-
-        {whSuccess && (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs text-emerald-800 font-semibold flex items-center gap-1.5">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" /> {whSuccess}
-          </div>
-        )}
-        {whError && (
-          <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-xs text-rose-700 font-semibold flex items-center gap-1.5">
-            <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" /> {whError}
-          </div>
-        )}
-
-        {tgSuccess && (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-xs text-emerald-800 font-semibold flex items-center gap-1.5">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" /> {tgSuccess}
-          </div>
-        )}
-        {tgError && (
-          <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-xs text-rose-700 font-semibold flex items-center gap-1.5">
-            <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" /> {tgError}
-          </div>
-        )}
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column (7 cols): Company, GST & Bank Details */}
         <div className="lg:col-span-7 space-y-6">

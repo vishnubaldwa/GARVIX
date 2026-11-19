@@ -492,7 +492,7 @@ export default async function HomePage() {
                 <Workflow className="h-5 w-5 text-[#2997ff]" />
                 <h4 className="text-sm font-semibold text-white">Billing & Integrations</h4>
                 <p className="text-xs text-[#a1a1a6] leading-relaxed">
-                  Auto GST billing, Tally/SAP sync, WhatsApp/Telegram alerts & custom APIs.
+                  Auto GST billing, Tally/SAP sync, real-time email &amp; mobile alerts, and custom APIs.
                 </p>
               </div>
             </div>

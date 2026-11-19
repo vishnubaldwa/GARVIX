@@ -96,11 +96,11 @@ export function SoftwareShowcase() {
       badge: "Sales & Support",
       tagline: "Lead qualification, interactive quotes, customer portal, and RMA service tracking.",
       details:
-        "Empower your sales and support teams with instant lead capture from web enquiries, interactive digital proposal links with 1-click customer digital acceptance, Telegram bot alerts, and field technician service ticket management.",
+        "Empower your sales and support teams with instant lead capture from web enquiries, interactive digital proposal links with 1-click customer digital acceptance, real-time mobile ERP alerts, and field technician service ticket management.",
       bulletPoints: [
         "Web client portal where customers view and digitally accept quotations",
         "1-Click Quotation-to-Invoice conversion without double-entry",
-        "Instant Telegram lead alerts directly to your mobile sales team",
+        "Instant mobile ERP lead alerts directly to your sales team",
         "Field service ticket logging with serial number warranty lookups",
       ],
       stats: { primary: "4x", label: "Quotation Turnaround", secondary: "100%", label2: "Audit Trail Integrity" },

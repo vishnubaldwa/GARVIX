@@ -36,7 +36,7 @@ export default async function ContactPage() {
     },
     {
       q: "What warranty and support do you provide on RFID readers and antennas?",
-      a: "All fixed readers, gate portals, and handheld scanner guns deployed by GARVIX include a 1-Year Comprehensive Replacement Warranty. We also offer ongoing Annual Maintenance Contracts (AMC) with preventative checkups and 24/7 Telegram/Phone support desks.",
+      a: "All fixed readers, gate portals, and handheld scanner guns deployed by GARVIX include a 1-Year Comprehensive Replacement Warranty. We also offer ongoing Annual Maintenance Contracts (AMC) with preventative checkups and dedicated Email & Phone support desks.",
     },
     {
       q: "How fast can a custom software or RFID solution be deployed?",
@@ -152,17 +152,17 @@ export default async function ContactPage() {
                 </div>
               </div>
 
-              {/* Telegram Instant Bot Callout */}
+              {/* Instant Engineering Dispatch Callout */}
               <div className="rounded-3xl border border-blue-500/30 bg-gradient-to-br from-[#0c1630] to-[#070b16] p-6 text-xs space-y-3">
                 <div className="flex items-center gap-2 text-cyan-400 font-bold uppercase tracking-wider text-[11px]">
                   <Send className="h-4 w-4" />
-                  <span>Instant Bot Dispatch</span>
+                  <span>Direct Engineering Desk</span>
                 </div>
                 <h4 className="text-sm font-bold text-white">
-                  Connected to @garvix_software_bot
+                  Instant Sync to info@garvix.in &amp; ERP App
                 </h4>
                 <p className="text-slate-300 leading-relaxed">
-                  Every enquiry submitted through this portal is instantly routed to our on-call operations engineers via secure Telegram webhook dispatch.
+                  Every enquiry submitted through this portal is instantly routed to our engineering team via direct email and our live GARVIX ERP platform.
                 </p>
               </div>
             </div>

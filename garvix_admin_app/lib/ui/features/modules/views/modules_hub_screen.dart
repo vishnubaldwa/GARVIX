@@ -330,7 +330,7 @@ class ModulesHubScreen extends StatelessWidget {
       adminItems.add(
         _ModuleItem(
           title: 'Company Settings & UPI',
-          subtitle: 'GSTIN, bank details, UPI ID & Telegram ping',
+          subtitle: 'Legal profile, GSTIN, bank details & UPI ID',
           icon: Icons.settings_outlined,
           color: AppleColors.inkPrimary,
           bgColor: AppleColors.canvas,

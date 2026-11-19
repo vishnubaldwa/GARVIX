@@ -4,7 +4,6 @@ import { computeGst } from "@/lib/gst";
 import { buildUpiUri } from "@/lib/upi";
 import { getSession } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
-import { sendTelegramInvoiceAlert } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
@@ -118,16 +117,6 @@ export async function POST(request: Request) {
         details: `Issued Tax Invoice ${invoiceNumber} to ${customer.companyName} (INR ${grandTotal})`,
       },
     });
-
-    // Telegram Push Alert
-    sendTelegramInvoiceAlert({
-      invoiceNumber,
-      customerName: customer.companyName,
-      subtotal,
-      taxAmount: taxDetails.totalTax,
-      totalAmount: grandTotal,
-      portalUrl: `https://garvix.in/portal/invoice/${invoice.token}`,
-    }).catch((e) => console.error("Telegram invoice alert failed:", e));
 
     return NextResponse.json({ success: true, invoice });
   } catch (err: any) {

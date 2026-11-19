@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import {
   Users,
   UserPlus,
-  ShieldCheck,
   Smartphone,
   CheckCircle2,
   AlertCircle,
@@ -13,9 +12,6 @@ import {
   UserCheck,
   Search,
   Filter,
-  Link2Off,
-  Briefcase,
-  Lock,
   Edit3,
 } from "lucide-react";
 
@@ -26,7 +22,6 @@ interface Employee {
   name: string;
   role: string;
   phone: string | null;
-  telegramChatId: string | null;
   isActive: boolean;
   createdAt: string;
 }
@@ -208,29 +203,6 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
     }
   };
 
-  const handleUnlinkTelegram = async (emp: Employee) => {
-    if (!confirm(`Are you sure you want to unlink Telegram for ${emp.name}?`)) return;
-
-    try {
-      const res = await fetch("/api/admin/employees/unlink-telegram", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: emp.id }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setEmployees(
-          employees.map((e) => (e.id === emp.id ? { ...e, telegramChatId: null } : e))
-        );
-        showToast(`Telegram unlinked for ${emp.name}.`);
-      } else {
-        alert(data.error || "Failed to unlink Telegram.");
-      }
-    } catch {
-      alert("Network error.");
-    }
-  };
-
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedEmp) return;
@@ -286,7 +258,7 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
             <div>
               <h2 className="text-lg font-bold text-slate-900">Staff & Employee Management</h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Manage roles, login credentials, and automatic Telegram Bot access linked via verified mobile numbers.
+                Manage staff roles, login credentials, mobile numbers, and active access across Web Admin and the Mobile App.
               </p>
             </div>
           </div>
@@ -333,7 +305,7 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
         <div className="flex items-center gap-3 text-xs text-slate-600 font-medium self-end sm:self-center">
           <span>Active: <b>{employees.filter((e) => e.isActive).length}</b></span>
           <span>•</span>
-          <span>Telegram Linked: <b>{employees.filter((e) => e.telegramChatId).length}</b></span>
+          <span>Total Staff: <b>{employees.length}</b></span>
         </div>
       </div>
 
@@ -346,7 +318,6 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                 <th className="py-3 px-4">Employee</th>
                 <th className="py-3 px-4">Role & Dept</th>
                 <th className="py-3 px-4">Mobile Number</th>
-                <th className="py-3 px-4">Telegram Bot Link</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
@@ -354,7 +325,7 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
             <tbody className="divide-y divide-slate-100">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400 font-medium">
+                  <td colSpan={5} className="py-8 text-center text-slate-400 font-medium">
                     No employees matching your search or filter.
                   </td>
                 </tr>
@@ -386,29 +357,6 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                           </div>
                         ) : (
                           <span className="text-slate-400 italic">Not set</span>
-                        )}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        {emp.telegramChatId ? (
-                          <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-                              <CheckCircle2 className="h-3 w-3" /> Linked
-                            </span>
-                            <span className="font-mono text-[10px] text-slate-500">
-                              ID: {emp.telegramChatId}
-                            </span>
-                            <button
-                              onClick={() => handleUnlinkTelegram(emp)}
-                              title="Unlink Telegram Account"
-                              className="text-slate-400 hover:text-rose-600 transition p-1"
-                            >
-                              <Link2Off className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-medium text-slate-500">
-                            ⚪ Not Linked Yet
-                          </span>
                         )}
                       </td>
                       <td className="py-3.5 px-4">
@@ -541,7 +489,7 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
 
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
-                  Mobile Number (for Telegram Auto-Link) *
+                  Mobile Number *
                 </label>
                 <input
                   type="tel"
@@ -551,9 +499,6 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full admin-input py-2 px-3 text-xs font-mono"
                 />
-                <p className="text-[10px] text-slate-500 mt-1">
-                  💡 Jab employee Telegram Bot (@garvix_software_bot) par aayega, ye number verify karke unki Chat ID auto link ho jayegi.
-                </p>
               </div>
 
               <div>
@@ -657,7 +602,7 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
 
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
-                  Mobile Number (for Telegram Auto-Link) *
+                  Mobile Number *
                 </label>
                 <input
                   type="tel"
@@ -667,9 +612,6 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                   onChange={(e) => setEditPhone(e.target.value)}
                   className="w-full admin-input py-2 px-3 text-xs font-mono"
                 />
-                <p className="text-[10px] text-slate-500 mt-1">
-                  💡 Is mobile number se employee Telegram Bot (@garvix_software_bot) par auto-link hota hai.
-                </p>
               </div>
 
               <div>
@@ -683,27 +625,6 @@ export function EmployeeListView({ initialEmployees }: { initialEmployees: Emplo
                   <option value="INACTIVE">🔴 Inactive (Account Suspended)</option>
                 </select>
               </div>
-
-              {editingEmp.telegramChatId && (
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 flex items-center justify-between gap-2">
-                  <div className="text-[11px] text-emerald-800">
-                    <span className="font-bold flex items-center gap-1">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Telegram Account Connected
-                    </span>
-                    <span className="font-mono text-slate-600 text-[10px]">Chat ID: {editingEmp.telegramChatId}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      await handleUnlinkTelegram(editingEmp);
-                      setEditingEmp({ ...editingEmp, telegramChatId: null });
-                    }}
-                    className="flex items-center gap-1 rounded-lg border border-rose-200 bg-white px-2.5 py-1 text-[11px] font-bold text-rose-600 hover:bg-rose-50 transition"
-                  >
-                    <Link2Off className="h-3 w-3" /> Unlink
-                  </button>
-                </div>
-              )}
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
                 <button

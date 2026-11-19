@@ -173,7 +173,7 @@ export function RolesManagementView({
             <div>
               <h2 className="text-lg font-bold text-slate-900">Roles & Dynamic Permissions Matrix</h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Customize granular access rules across Web Admin and the Telegram Bot (@garvix_software_bot).
+                Customize granular access rules across Web Admin and the GARVIX ERP Mobile App.
               </p>
             </div>
           </div>

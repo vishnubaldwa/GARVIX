@@ -30,7 +30,6 @@ export async function GET() {
         name: true,
         role: true,
         phone: true,
-        telegramChatId: true,
         isActive: true,
         createdAt: true,
         updatedAt: true,
@@ -129,7 +128,6 @@ export async function POST(request: Request) {
         name: true,
         role: true,
         phone: true,
-        telegramChatId: true,
         isActive: true,
         createdAt: true,
       },
@@ -203,12 +201,6 @@ export async function PATCH(request: Request) {
       }
     }
 
-    // If phone is changed, unlink existing telegramChatId so new phone can be verified fresh
-    let telegramChatId = existingEmp.telegramChatId;
-    if (cleanPhone !== existingEmp.phone && telegramChatId) {
-      telegramChatId = null;
-    }
-
     const updatedUser = await prisma.user.update({
       where: { id },
       data: {
@@ -216,7 +208,6 @@ export async function PATCH(request: Request) {
         role,
         phone: cleanPhone,
         isActive: typeof isActive === "boolean" ? isActive : existingEmp.isActive,
-        telegramChatId,
       },
       select: {
         id: true,
@@ -225,7 +216,6 @@ export async function PATCH(request: Request) {
         name: true,
         role: true,
         phone: true,
-        telegramChatId: true,
         isActive: true,
         createdAt: true,
         updatedAt: true,

@@ -21,7 +21,7 @@ export default async function AdminSettingsPage() {
       <div>
         <h1 className="text-2xl font-black text-slate-900 tracking-tight">Business & System Settings</h1>
         <p className="text-xs text-slate-500 mt-1">
-          Manage your account security, Telegram bot push alerts, company profile, and dynamic UPI QR settings.
+          Manage your account security, company legal profile, GSTIN, and dynamic UPI QR settings.
         </p>
       </div>
 

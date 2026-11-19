@@ -29,7 +29,6 @@ export default async function TeamPage() {
       name: true,
       role: true,
       phone: true,
-      telegramChatId: true,
       isActive: true,
       createdAt: true,
     },

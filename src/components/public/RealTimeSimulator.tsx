@@ -38,7 +38,7 @@ export function RealTimeSimulator() {
         { name: "GARVIX Engine Identifies Product", detail: "Resolved in memory cache: Solitaire Ring (₹1,45,000 / HSN 7113)", latency: "1.1 ms" },
         { name: "Inventory Updated", detail: "Database record updated to AUDITED_CURRENT with timestamp", latency: "1.9 ms" },
         { name: "Dashboard Updated", detail: "Showcase tray GUI changes from yellow to glowing emerald green", latency: "2.4 ms" },
-        { name: "Automation Triggered", detail: "Daily audit summary compiled and Telegram notification pushed", latency: "3.2 ms" },
+        { name: "Automation Triggered", detail: "Daily audit summary compiled and management alert pushed", latency: "3.2 ms" },
       ],
     },
     WAREHOUSE: {

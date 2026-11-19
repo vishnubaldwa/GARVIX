@@ -57,7 +57,7 @@ export function CoreSolutionsSection() {
       href: "/software#middleware",
       accent: "from-cyan-400/20 to-sky-500/20",
       border: "hover:border-cyan-400",
-      features: ["LLRP & Socket Reader Drivers", "Two-Way Telegram & WhatsApp Bots", "Tally / Legacy ERP Connectors"],
+      features: ["LLRP & Socket Reader Drivers", "Real-Time Webhook & App Alerts", "Tally / Legacy ERP Connectors"],
     },
     {
       title: "Real-Time Analytics & BI",

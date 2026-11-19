@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { HARYANA_STATE_CODE } from "@/lib/gst";
-import { sendTelegramReply } from "@/lib/telegram";
-import { buildWhatsAppLink, getQuotationWhatsAppText } from "@/lib/whatsapp";
 
 export async function POST(request: Request) {
   try {
@@ -119,44 +117,6 @@ export async function POST(request: Request) {
         details: `Quotation ${quote.quoteNumber} rate revised from INR ${quote.totalAmount} to INR ${totalAmount} (Rev ${newRev}): ${reason || "Negotiation"}`,
       },
     });
-
-    // 5. Send Telegram Notification
-    const token = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
-    const SITE_URL = process.env.NEXTAUTH_URL || process.env.SITE_URL || "https://garvix.in";
-    const portalUrl = `${SITE_URL}/portal/quotation/${quote.token}`;
-
-    if (token && chatId) {
-      const waText = getQuotationWhatsAppText({
-        customerName: quote.customer.companyName,
-        contactPerson: quote.customer.contactPerson,
-        quoteNumber: `${quote.quoteNumber} (Rev ${newRev})`,
-        totalAmount,
-        itemSummary: validatedItems.map((i) => i.description).join(", "),
-        portalUrl,
-      });
-
-      const text = `
-🔄 <b>QUOTATION RATE REVISED (Rev ${newRev})</b>
-━━━━━━━━━━━━━━━━━━━━
-🔢 <b>Quote #:</b> <code>${quote.quoteNumber}</code> (Rev ${newRev})
-🏢 <b>Client:</b> ${quote.customer.companyName}
-💰 <b>New Total:</b> ₹${totalAmount.toLocaleString("en-IN")}
-📉 <b>Previous Total:</b> ₹${quote.totalAmount.toLocaleString("en-IN")}
-📝 <b>Reason:</b> ${reason || "Client negotiation"}
-━━━━━━━━━━━━━━━━━━━━
-🕒 <i>${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST</i>
-      `.trim();
-
-      sendTelegramReply(chatId, text, {
-        inline_keyboard: [
-          [
-            { text: "📄 Open Revised Quote", url: portalUrl },
-            { text: "💬 WhatsApp Client", url: buildWhatsAppLink(quote.customer.phone, waText) },
-          ],
-        ],
-      }).catch((e) => console.error("Telegram revise quote alert failed:", e));
-    }
 
     return NextResponse.json({
       success: true,

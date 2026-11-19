@@ -30,7 +30,6 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen> {
 
   bool _loading = true;
   bool _saving = false;
-  bool _pinging = false;
 
   @override
   void initState() {
@@ -115,25 +114,6 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen> {
       }
     } finally {
       if (mounted) setState(() => _saving = false);
-    }
-  }
-
-  Future<void> _testTelegram() async {
-    setState(() => _pinging = true);
-    try {
-      await widget.erpRepository.sendTelegramTestPing();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Telegram test alert sent!')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.toString())));
-      }
-    } finally {
-      if (mounted) setState(() => _pinging = false);
     }
   }
 
@@ -295,16 +275,6 @@ class _CompanySettingsScreenState extends State<CompanySettingsScreen> {
                           ),
                         )
                       : const Text('Save Company Settings'),
-                ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: _pinging ? null : _testTelegram,
-                  icon: const Icon(Icons.send_rounded, size: 17),
-                  label: Text(
-                    _pinging
-                        ? 'Sending Test Ping...'
-                        : 'Send Telegram Bot Test Alert',
-                  ),
                 ),
               ],
             ),

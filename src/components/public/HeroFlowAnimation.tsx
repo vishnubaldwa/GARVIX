@@ -86,7 +86,7 @@ export function HeroFlowAnimation() {
       label: "5. Live Dashboard",
       sub: "Automation & Alerts",
       icon: Gauge,
-      desc: "Instant ERP Dispatches & Telegram",
+      desc: "Instant ERP Dispatches & Alerts",
       color: "from-emerald-400 to-cyan-400",
       activeText: "Action: Barrier Open / Audit Verified",
     },

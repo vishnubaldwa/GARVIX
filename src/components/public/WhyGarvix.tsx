@@ -52,7 +52,7 @@ export function WhyGarvix() {
     },
     {
       title: "Comprehensive Long-Term Support",
-      desc: "Guaranteed 1-Year hardware replacement warranty, preventative AMC checkups, and dedicated Telegram/Phone engineering desks.",
+      desc: "Guaranteed 1-Year hardware replacement warranty, preventative AMC checkups, and dedicated Email & Phone engineering desks.",
       icon: Headphones,
       badge: "Continuous SLA",
     },

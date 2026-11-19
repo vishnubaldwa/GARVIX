@@ -540,7 +540,7 @@ const List<PermissionDef> kAllPermissions = [
     code: 'CAN_MANAGE_SETTINGS',
     label: 'Manage Company Settings',
     category: 'SETTINGS',
-    description: 'Edit legal profile, GSTIN, UPI ID, bank info & Telegram alerts.',
+    description: 'Edit legal profile, GSTIN, UPI ID & company bank details.',
   ),
 ];
 

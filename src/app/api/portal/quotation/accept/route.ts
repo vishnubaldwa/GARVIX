@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildUpiUri } from "@/lib/upi";
-import { sendTelegramQuotationAcceptedAlert } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
@@ -100,20 +99,6 @@ export async function POST(request: Request) {
         details: `Quotation ${quotation.quoteNumber} approved by ${signature.trim()} (${quotation.customer.companyName}). Auto Proforma Invoice ${proformaInvoice.invoiceNumber} created.`,
       },
     });
-
-    const SITE_URL = process.env.NEXTAUTH_URL || process.env.SITE_URL || "https://garvix.in";
-    const piUrl = `${SITE_URL}/portal/invoice/${proformaInvoice.token}`;
-
-    // 4. Push Telegram Alert with instant PI link and WhatsApp action
-    sendTelegramQuotationAcceptedAlert({
-      quoteNumber: quotation.quoteNumber,
-      customerName: quotation.customer.companyName,
-      totalAmount: quotation.totalAmount,
-      signature: signature.trim(),
-      piNumber: proformaInvoice.invoiceNumber,
-      piUrl,
-      customerPhone: quotation.customer.phone,
-    }).catch((e) => console.error("Telegram quote accepted alert failed:", e));
 
     return NextResponse.json({
       success: true,

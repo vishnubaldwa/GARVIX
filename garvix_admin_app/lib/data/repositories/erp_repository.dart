@@ -191,10 +191,6 @@ class ErpRepository {
     );
   }
 
-  Future<void> sendTelegramTestPing() async {
-    await _apiClient.post('/api/admin/telegram/test');
-  }
-
   // --- Audit Security Logs ---
   Future<List<AuditLogItem>> fetchAuditLogs() async {
     final data = await _apiClient.get('/api/admin/audit');

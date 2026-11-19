@@ -53,7 +53,6 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.customer.deleteMany();
   await prisma.lead.deleteMany();
-  await prisma.telegramSession.deleteMany();
 
   // 3. Ensure primary Super Admin user is preserved
   const superAdmins = await prisma.user.findMany({
@@ -71,7 +70,6 @@ async function main() {
         name: "Vishnu Baldwa",
         role: "SUPER_ADMIN",
         phone: "+91 98765 43210",
-        telegramChatId: "8543269562",
       },
     });
   } else {

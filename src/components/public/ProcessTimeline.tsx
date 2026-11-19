@@ -66,7 +66,7 @@ export function ProcessTimeline() {
       tagline: "Monitoring, upgrades and technical support continue after deployment.",
       description:
         "Long-term partnership backed by comprehensive Annual Maintenance Contracts (AMC), hardware warranty replacements, remote diagnostics, and continual software feature upgrades.",
-      deliverables: ["1-Year comprehensive hardware warranty", "Dedicated Telegram/Phone support desk", "Quarterly preventative maintenance"],
+      deliverables: ["1-Year comprehensive hardware warranty", "Dedicated Email & Phone support desk", "Quarterly preventative maintenance"],
     },
   ];
 

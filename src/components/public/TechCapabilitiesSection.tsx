@@ -56,8 +56,8 @@ export function TechCapabilitiesSection() {
     {
       name: "REST APIs & Webhooks",
       icon: Network,
-      desc: "Clean JSON REST endpoints with HMAC authentication, rate limiting, and two-way Telegram/WhatsApp bot webhook dispatchers.",
-      stack: ["RESTful JSON Endpoints", "Telegram Bot API", "HMAC Webhook Signatures", "WhatsApp Cloud API"],
+      desc: "Clean JSON REST endpoints with HMAC authentication, rate limiting, and real-time webhook event dispatchers.",
+      stack: ["RESTful JSON Endpoints", "Webhook Events", "HMAC Signatures", "Mobile App APIs"],
     },
     {
       name: "Automation & Actuation Engines",

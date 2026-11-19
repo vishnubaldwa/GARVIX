@@ -318,7 +318,7 @@ export default async function AdminDashboardPage() {
           <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
             <div>
               <h3 className="text-base font-semibold text-[#1d1d1f]">Website Enquiries</h3>
-              <p className="text-xs text-[#86868b]">Synced with info@garvix.in & Telegram</p>
+              <p className="text-xs text-[#86868b]">Synced with info@garvix.in &amp; ERP App</p>
             </div>
             <Link
               href="/admin/leads"
