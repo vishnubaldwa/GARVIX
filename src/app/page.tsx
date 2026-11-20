@@ -37,9 +37,22 @@ export default async function HomePage() {
       {/* 0. First-Fold Flagship Showcase — GARVIX Retail POS & Store ERP */}
       <section
         id="retail-software"
-        className="pt-5 pb-10 sm:pt-7 sm:pb-14 bg-white border-b border-black/[0.06] scroll-mt-20"
+        className="pt-8 pb-12 sm:pt-11 sm:pb-16 bg-white border-b border-black/[0.06] scroll-mt-20"
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-7 sm:mb-8">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0071e3]">
+              Flagship Software &bull; Built by GARVIX
+            </p>
+            <h1 className="mt-2.5 text-3xl sm:text-5xl font-bold tracking-tight text-[#1d1d1f] leading-[1.08]">
+              Built for Modern Retail.{" "}
+              <span className="text-[#86868b]">Engineered by GARVIX.</span>
+            </h1>
+            <p className="mt-3 text-sm sm:text-base text-[#6e6e73] max-w-2xl mx-auto leading-relaxed">
+              Complete GST POS billing, barcode &amp; RFID stock sync, instant UPI QR payments, and multi-store cloud ERP &mdash; developed in-house by our team.
+            </p>
+          </div>
+
           <div className="rounded-[1.75rem] sm:rounded-[2rem] border border-black/[0.06] bg-[#f5f5f7] overflow-hidden shadow-[0_14px_44px_rgba(0,0,0,0.06)]">
             <img
               src="/images/products/garvix-retail-software.jpg"
@@ -85,10 +98,10 @@ export default async function HomePage() {
             GARVIX Smart Retail & Software
           </p>
 
-          <h1 className="mt-3 text-4xl sm:text-6xl font-bold tracking-tight text-[#1d1d1f] leading-[1.08] max-w-3xl mx-auto">
+          <h2 className="mt-3 text-4xl sm:text-6xl font-bold tracking-tight text-[#1d1d1f] leading-[1.08] max-w-3xl mx-auto">
             Smart RFID Tags.{" "}
             <span className="text-[#86868b]">Custom Software.</span>
-          </h1>
+          </h2>
 
           <p className="mt-5 text-base sm:text-xl text-[#6e6e73] max-w-2xl mx-auto leading-relaxed">
             Branded UHF RFID tags paired with tailor-made software for jewellery, apparel, laundry, factories, vehicles — and any custom software your business needs.
