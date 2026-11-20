@@ -603,6 +603,60 @@ export default async function HomePage() {
               />
             </div>
           </div>
+
+          {/* 4.5. Featured Flagship Retail Software Showcase — Built by GARVIX */}
+          <div
+            id="retail-software"
+            className="mt-10 rounded-[2rem] border border-black/[0.06] bg-[#fbfbfd] overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.04)] scroll-mt-24"
+          >
+            <div className="px-6 py-7 sm:px-10 sm:py-8 flex flex-col lg:flex-row lg:items-end justify-between gap-5 bg-white">
+              <div className="max-w-2xl">
+                <p className="text-xs font-semibold uppercase tracking-widest text-[#0071e3]">
+                  Flagship Software &bull; Built by GARVIX
+                </p>
+                <h3 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f]">
+                  GARVIX Retail POS &amp; Store ERP
+                </h3>
+                <p className="mt-2 text-sm sm:text-base text-[#6e6e73] leading-relaxed">
+                  Designed and engineered in-house by our team for modern retail showrooms &mdash; combining fast GST billing, barcode &amp; RFID stock sync, instant UPI QR payments, and live multi-store cloud analytics.
+                </p>
+              </div>
+              <div className="shrink-0">
+                <EnquireButton
+                  solution="Retail POS & Store ERP"
+                  label="Request Live Demo"
+                  variant="primary"
+                />
+              </div>
+            </div>
+
+            <div className="border-y border-black/[0.05] bg-[#f5f5f7]">
+              <img
+                src="/images/products/garvix-retail-software.jpg"
+                alt="GARVIX Retail POS & Store ERP — Custom Retail Billing, Inventory & Multi-Store Software built by GARVIX"
+                className="w-full h-auto block"
+              />
+            </div>
+
+            <div className="px-6 py-5 sm:px-10 bg-white grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm font-medium text-[#424245]">
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-[#0071e3] shrink-0" />
+                <span>Fast GST &amp; POS Billing</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-[#0071e3] shrink-0" />
+                <span>Barcode &amp; RFID Stock Sync</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-[#0071e3] shrink-0" />
+                <span>Instant UPI QR Payments</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-[#0071e3] shrink-0" />
+                <span>Desktop POS + Mobile App</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

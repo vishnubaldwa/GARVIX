@@ -192,6 +192,15 @@ export default async function SoftwarePage() {
                   </div>
 
                   <div className="lg:col-span-4 rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-[#0a1224] to-[#070b16] p-6 text-center space-y-4">
+                    {sol.id === "pos" && (
+                      <div className="overflow-hidden rounded-xl border border-white/10 bg-white shadow-md">
+                        <img
+                          src="/images/products/garvix-retail-software.jpg"
+                          alt="GARVIX Retail POS & Store ERP Software"
+                          className="w-full h-auto block"
+                        />
+                      </div>
+                    )}
                     <div className="text-xs font-mono uppercase text-slate-400">
                       ENGINEERING SPECIFICATION
                     </div>
