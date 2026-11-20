@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { Navbar } from "@/components/public/Navbar";
 import { Footer } from "@/components/public/Footer";
 import { ContactForm } from "@/components/public/ContactForm";
+import { ShowcaseVideoPlayer } from "@/components/public/ShowcaseVideoPlayer";
 import { getCompanySettings } from "@/lib/settings";
 import Link from "next/link";
 import {
@@ -192,6 +193,15 @@ export default async function SoftwarePage() {
                   </div>
 
                   <div className="lg:col-span-4 rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-[#0a1224] to-[#070b16] p-6 text-center space-y-4">
+                    {sol.id === "erp" && (
+                      <div className="overflow-hidden rounded-xl border border-white/10 bg-white shadow-md">
+                        <ShowcaseVideoPlayer
+                          src="/videos/garvix-erp-showcase.mp4"
+                          poster="/images/products/garvix-erp-poster.jpg"
+                          label="GARVIX Business ERP & Mobile App Video"
+                        />
+                      </div>
+                    )}
                     {sol.id === "pos" && (
                       <div className="overflow-hidden rounded-xl border border-white/10 bg-white shadow-md">
                         <img

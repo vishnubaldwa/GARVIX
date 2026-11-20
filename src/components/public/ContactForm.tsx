@@ -228,6 +228,7 @@ export function ContactForm({
               className="w-full rounded-xl border border-black/[0.1] bg-[#f5f5f7]/60 py-2.5 pl-10 pr-3 text-sm font-medium text-[#1d1d1f] focus:bg-white focus:outline-none focus:ring-3 focus:ring-[#0071e3]/15 focus:border-[#0071e3] transition"
             >
               <option value="Retail POS & Store ERP">Retail POS &amp; Store ERP Software</option>
+              <option value="Business ERP & Mobile App">GARVIX Business ERP &amp; Android Mobile App</option>
               <option value="Custom Software">Custom Software Development (ERP / App / Web)</option>
               <option value="Jewellery RFID">Jewellery RFID Tags & Software</option>
               <option value="Garment RFID">Garment Hang Tags, Hard Tags & Retail POS</option>
