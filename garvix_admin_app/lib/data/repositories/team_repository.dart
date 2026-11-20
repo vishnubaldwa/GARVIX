@@ -6,11 +6,21 @@ class TeamRepository {
 
   final ApiClient _apiClient;
 
-  Future<List<EmployeeItem>> fetchEmployees() async {
+  Future<({String companyName, List<EmployeeItem> employees})>
+      fetchEmployeesWithCompany() async {
     final data = await _apiClient.get('/api/admin/employees');
-    return ((data['employees'] as List?) ?? const [])
+    final companyName = (data['companyName'] ??
+            'GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED')
+        .toString();
+    final employees = ((data['employees'] as List?) ?? const [])
         .map((e) => EmployeeItem.fromJson(e as Map<String, dynamic>))
         .toList();
+    return (companyName: companyName, employees: employees);
+  }
+
+  Future<List<EmployeeItem>> fetchEmployees() async {
+    final res = await fetchEmployeesWithCompany();
+    return res.employees;
   }
 
   Future<void> createEmployee({

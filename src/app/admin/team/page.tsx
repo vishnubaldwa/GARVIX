@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { ensureDefaultRoles, hasPermission, isFullAdminRole } from "@/lib/permissions";
+import { getCompanySettings } from "@/lib/settings";
 import { EmployeeListView } from "@/components/admin/EmployeeListView";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +23,7 @@ export default async function TeamPage() {
 
   await ensureDefaultRoles();
 
-  const [rawEmployees, rawRoles] = await Promise.all([
+  const [rawEmployees, rawRoles, company] = await Promise.all([
     prisma.user.findMany({
       orderBy: { createdAt: "asc" },
       select: {
@@ -40,6 +41,7 @@ export default async function TeamPage() {
       orderBy: [{ isSystem: "desc" }, { name: "asc" }],
       select: { name: true, displayName: true },
     }),
+    getCompanySettings(),
   ]);
 
   const employees = rawEmployees.map((e) => ({
@@ -54,6 +56,7 @@ export default async function TeamPage() {
         initialRoles={rawRoles}
         currentUserEmail={session.email}
         isSuperAdmin={isFullAdminRole(session.role)}
+        companyName={company.name}
       />
     </div>
   );

@@ -11,6 +11,9 @@ class TeamViewModel extends ChangeNotifier {
   List<EmployeeItem> _employees = const [];
   List<EmployeeItem> get employees => _employees;
 
+  String _companyName = 'GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED';
+  String get companyName => _companyName;
+
   List<RoleItem> _roles = const [];
   List<RoleItem> get roles => _roles;
 
@@ -29,10 +32,18 @@ class TeamViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       final results = await Future.wait([
-        _repository.fetchEmployees().catchError((_) => <EmployeeItem>[]),
+        _repository.fetchEmployeesWithCompany().catchError(
+              (_) => (
+                companyName: _companyName,
+                employees: <EmployeeItem>[],
+              ),
+            ),
         _repository.fetchRoles().catchError((_) => <RoleItem>[]),
       ]);
-      _employees = results[0] as List<EmployeeItem>;
+      final empResult = results[0]
+          as ({String companyName, List<EmployeeItem> employees});
+      _companyName = empResult.companyName;
+      _employees = empResult.employees;
       _roles = results[1] as List<RoleItem>;
     } catch (e) {
       _error = e.toString();

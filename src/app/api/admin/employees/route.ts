@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { hasPermission, isFullAdminRole } from "@/lib/permissions";
+import { getCompanySettings } from "@/lib/settings";
 import bcrypt from "bcryptjs";
 
 export const dynamic = "force-dynamic";
@@ -21,22 +22,28 @@ export async function GET() {
       return NextResponse.json({ error: "Access denied. Team management permission required." }, { status: 403 });
     }
 
-    const employees = await prisma.user.findMany({
-      orderBy: { createdAt: "asc" },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        name: true,
-        role: true,
-        phone: true,
-        isActive: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    const [employees, company] = await Promise.all([
+      prisma.user.findMany({
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          name: true,
+          role: true,
+          phone: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+      getCompanySettings(),
+    ]);
 
-    return NextResponse.json({ employees });
+    return NextResponse.json({
+      companyName: company.name,
+      employees,
+    });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

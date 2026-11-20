@@ -14,6 +14,10 @@ import {
   Filter,
   Edit3,
   Trash2,
+  MessageSquareShare,
+  Copy,
+  Check,
+  Wand2,
 } from "lucide-react";
 
 interface Employee {
@@ -68,16 +72,27 @@ function isSuperAdminRole(roleName: string): boolean {
   return upper === "SUPER_ADMIN" || upper === "ADMIN";
 }
 
+function generateStrongPassword(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let suffix = "";
+  for (let i = 0; i < 4; i++) {
+    suffix += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return `Garvix@${suffix}`;
+}
+
 export function EmployeeListView({
   initialEmployees,
   initialRoles,
   currentUserEmail,
   isSuperAdmin = false,
+  companyName = "GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED",
 }: {
   initialEmployees: Employee[];
   initialRoles?: RoleOption[];
   currentUserEmail?: string;
   isSuperAdmin?: boolean;
+  companyName?: string;
 }) {
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [searchTerm, setSearchTerm] = useState("");
@@ -187,9 +202,117 @@ export function EmployeeListView({
   const [resetError, setResetError] = useState("");
   const [toastMessage, setToastMessage] = useState("");
 
+  // Share Credentials Modal state
+  const [shareEmp, setShareEmp] = useState<Employee | null>(null);
+  const [sharePhone, setSharePhone] = useState("");
+  const [sharePassword, setSharePassword] = useState("");
+  const [shareResetBeforeSend, setShareResetBeforeSend] = useState(false);
+  const [shareBusy, setShareBusy] = useState(false);
+  const [shareError, setShareError] = useState("");
+  const [copiedCreds, setCopiedCreds] = useState(false);
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(""), 4000);
+  };
+
+  const getCleanRoleLabel = (roleCode: string): string => {
+    const dynamicRole = availableRoles.find((r) => r.name === roleCode);
+    const raw =
+      dynamicRole?.displayName ||
+      roleBadgeConfig[roleCode]?.label ||
+      roleCode.replace(/_/g, " ");
+    return raw.replace(/^[^\w]+/, "").trim() || roleCode;
+  };
+
+  const buildCredentialsMessage = (emp: Employee, plainPassword?: string): string => {
+    const roleLabel = getCleanRoleLabel(emp.role);
+    const isVaultViewer = emp.role.toUpperCase() === "DOCUMENT_VIEWER";
+    const portalTitle = isVaultViewer
+      ? `${companyName} Company Document Vault`
+      : `${companyName} ERP Portal`;
+
+    const lines = [
+      `Hello *${emp.name}*,`,
+      ``,
+      `Your *${portalTitle}* login credentials are ready:`,
+      `• *Role:* ${roleLabel}`,
+      `• *Login ID:* ${emp.email}`,
+    ];
+    if (plainPassword && plainPassword.trim().length > 0) {
+      lines.push(`• *Password:* ${plainPassword.trim()}`);
+    }
+    lines.push(
+      ``,
+      `🌐 *Web Portal:* https://garvix.in/admin/login`,
+      `📱 *Android App:* https://garvix.in/download-app`,
+      ``,
+      `_For security, please change your password after your first login._`
+    );
+    return lines.join("\n");
+  };
+
+  const openShareModal = (emp: Employee, prefilledPassword = "", alreadyApplied = false) => {
+    setShareEmp(emp);
+    setSharePhone(emp.phone || "");
+    setSharePassword(prefilledPassword);
+    setShareResetBeforeSend(!alreadyApplied && prefilledPassword.length > 0);
+    setShareError("");
+    setCopiedCreds(false);
+  };
+
+  const launchWhatsAppCredentials = (phoneRaw: string, message: string) => {
+    let cleanPhone = phoneRaw.replace(/[^\d]/g, "");
+    if (cleanPhone.length === 10) {
+      cleanPhone = `91${cleanPhone}`;
+    }
+    const encoded = encodeURIComponent(message);
+    const url = cleanPhone
+      ? `https://wa.me/${cleanPhone}?text=${encoded}`
+      : `https://wa.me/?text=${encoded}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const handleShareCredentialsAction = async (mode: "whatsapp" | "copy") => {
+    if (!shareEmp) return;
+    setShareError("");
+
+    if (shareResetBeforeSend) {
+      if (sharePassword.trim().length < 6) {
+        setShareError("Password must be at least 6 characters to reset and share.");
+        return;
+      }
+      setShareBusy(true);
+      try {
+        const res = await fetch("/api/admin/employees/reset-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: shareEmp.id, newPassword: sharePassword.trim() }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setShareError(data.error || "Failed to update password before sharing.");
+          return;
+        }
+        setShareResetBeforeSend(false);
+        showToast(`Fresh password set for ${shareEmp.name}!`);
+      } catch {
+        setShareError("Network error while updating password.");
+        return;
+      } finally {
+        setShareBusy(false);
+      }
+    }
+
+    const message = buildCredentialsMessage(shareEmp, sharePassword);
+    if (mode === "copy") {
+      await navigator.clipboard.writeText(message);
+      setCopiedCreds(true);
+      setTimeout(() => setCopiedCreds(false), 2500);
+      showToast("Login credentials copied to clipboard!");
+    } else {
+      launchWhatsAppCredentials(sharePhone, message);
+    }
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -205,14 +328,17 @@ export function EmployeeListView({
       });
       const data = await res.json();
       if (res.ok) {
-        setEmployees([data.employee, ...employees]);
+        const createdPassword = password;
+        const createdEmp: Employee = data.employee;
+        setEmployees([createdEmp, ...employees]);
         setCreateModalOpen(false);
         setName("");
         setUsername("");
         setRole("DIRECTOR");
         setPhone("");
         setPassword("");
-        showToast(`Staff account created for ${data.employee.name}!`);
+        showToast(`Staff account created for ${createdEmp.name}!`);
+        openShareModal(createdEmp, createdPassword, true);
       } else {
         setCreateError(data.error || "Failed to create staff member.");
       }
@@ -284,9 +410,14 @@ export function EmployeeListView({
       });
       const data = await res.json();
       if (res.ok) {
+        const targetEmp = selectedEmp;
+        const appliedPassword = newPassword;
         setResetModalOpen(false);
         setNewPassword("");
-        showToast(`Password updated for ${selectedEmp.name}!`);
+        showToast(`Password updated for ${targetEmp.name}!`);
+        if (!isSuperAdminRole(targetEmp.role) && targetEmp.email !== currentUserEmail) {
+          openShareModal(targetEmp, appliedPassword, true);
+        }
       } else {
         setResetError(data.error || "Failed to reset password.");
       }
@@ -443,6 +574,17 @@ export function EmployeeListView({
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          {!isProtectedSuperAdmin && !isSelf && (
+                            <button
+                              type="button"
+                              onClick={() => openShareModal(emp)}
+                              title="Share Login Credentials on WhatsApp"
+                              className="p-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition shadow-sm"
+                            >
+                              <MessageSquareShare className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+
                           <button
                             onClick={() => handleOpenEdit(emp)}
                             title="Edit Staff Member"
@@ -784,6 +926,143 @@ export function EmployeeListView({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Modal: Share Login Credentials on WhatsApp */}
+      {shareEmp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="rounded-lg bg-emerald-50 p-1.5 text-emerald-600">
+                  <MessageSquareShare className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Share Login Credentials — {shareEmp.name}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-mono">
+                    {shareEmp.email} • {getCleanRoleLabel(shareEmp.role)}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShareEmp(null)}
+                className="text-slate-400 hover:text-slate-600 text-lg leading-none"
+              >
+                &times;
+              </button>
+            </div>
+
+            {shareError && (
+              <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-xs text-rose-700 font-semibold flex items-center gap-1.5">
+                <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" /> {shareError}
+              </div>
+            )}
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">
+                  Recipient WhatsApp Number (Optional)
+                </label>
+                <input
+                  type="tel"
+                  placeholder="e.g. 9876543210 (leave blank to pick contact in WhatsApp)"
+                  value={sharePhone}
+                  onChange={(e) => setSharePhone(e.target.value)}
+                  className="w-full admin-input py-2 px-3 text-xs font-mono"
+                />
+              </div>
+
+              <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="font-semibold text-slate-700">
+                    Password to include in message
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSharePassword(generateStrongPassword());
+                      setShareResetBeforeSend(true);
+                      setShareError("");
+                    }}
+                    className="inline-flex items-center gap-1 rounded-md bg-blue-50 border border-blue-200 px-2 py-1 text-[11px] font-bold text-blue-700 hover:bg-blue-100 transition"
+                  >
+                    <Wand2 className="h-3 w-3" /> Generate Fresh Password
+                  </button>
+                </div>
+
+                <input
+                  type="text"
+                  placeholder="Leave blank to share Login ID & Links only, or enter/generate password"
+                  value={sharePassword}
+                  onChange={(e) => setSharePassword(e.target.value)}
+                  className="w-full admin-input py-2 px-3 text-xs font-mono bg-white"
+                />
+
+                <label className="flex items-center gap-2 text-[11px] text-slate-600 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={shareResetBeforeSend}
+                    onChange={(e) => setShareResetBeforeSend(e.target.checked)}
+                    className="h-3.5 w-3.5 rounded border-slate-300 text-blue-600"
+                  />
+                  <span>
+                    Also update/reset this account&apos;s password to the value above before sharing
+                  </span>
+                </label>
+              </div>
+
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  WhatsApp Message Preview
+                </span>
+                <pre className="whitespace-pre-wrap rounded-xl border border-emerald-200 bg-emerald-50/40 p-3 text-[11px] font-sans text-slate-800 leading-relaxed">
+                  {buildCredentialsMessage(shareEmp, sharePassword)}
+                </pre>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setShareEmp(null)}
+                className="px-3.5 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold text-xs"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                disabled={shareBusy}
+                onClick={() => handleShareCredentialsAction("copy")}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs transition disabled:opacity-50"
+              >
+                {copiedCreds ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-emerald-600" /> Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3.5 w-3.5" /> Copy Message
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                disabled={shareBusy}
+                onClick={() => handleShareCredentialsAction("whatsapp")}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition disabled:opacity-50"
+              >
+                <MessageSquareShare className="h-3.5 w-3.5" />
+                {shareBusy
+                  ? "Updating Password..."
+                  : shareResetBeforeSend
+                  ? "Set Password & Share on WhatsApp"
+                  : "Share on WhatsApp"}
+              </button>
+            </div>
           </div>
         </div>
       )}

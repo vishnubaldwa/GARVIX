@@ -1,4 +1,9 @@
+import 'dart:math';
+
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../domain/models/auth_user.dart';
 import '../../../../domain/models/crm_models.dart';
@@ -67,6 +72,292 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
       default:
         return code;
     }
+  }
+
+  String _generatePassword() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    final rand = Random.secure();
+    final suffix =
+        List.generate(4, (_) => chars[rand.nextInt(chars.length)]).join();
+    return 'Garvix@$suffix';
+  }
+
+  String _cleanRoleName(String code) {
+    final raw = _roleLabel(code);
+    final stripped = raw.replaceFirst(RegExp(r'^[^\w]+'), '').trim();
+    return stripped.isNotEmpty ? stripped : code;
+  }
+
+  String _buildCredentialsMessage(
+    EmployeeItem emp, {
+    String? plainPassword,
+  }) {
+    final org = widget.viewModel.companyName;
+    final roleName = _cleanRoleName(emp.role);
+    final isVault = emp.role.toUpperCase() == 'DOCUMENT_VIEWER';
+    final portalTitle =
+        isVault ? '$org Company Document Vault' : '$org ERP Portal';
+
+    final lines = <String>[
+      'Hello *${emp.name}*,',
+      '',
+      'Your *$portalTitle* login credentials are ready:',
+      '• *Role:* $roleName',
+      '• *Login ID:* ${emp.email}',
+      if (plainPassword != null && plainPassword.trim().isNotEmpty)
+        '• *Password:* ${plainPassword.trim()}',
+      '',
+      '🌐 *Web Portal:* https://garvix.in/admin/login',
+      '📱 *Android App:* https://garvix.in/download-app',
+      '',
+      '_For security, please change your password after your first login._',
+    ];
+    return lines.join('\n');
+  }
+
+  Future<void> _showShareCredentialsSheet(
+    EmployeeItem emp, {
+    String prefilledPassword = '',
+    bool alreadyApplied = false,
+  }) async {
+    final phoneCtrl = TextEditingController(text: emp.phone ?? '');
+    final passCtrl = TextEditingController(text: prefilledPassword);
+    bool resetBeforeSend = !alreadyApplied && prefilledPassword.isNotEmpty;
+    bool busy = false;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) {
+          Future<void> executeShare(String mode) async {
+            if (resetBeforeSend) {
+              if (passCtrl.text.trim().length < 6) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Password must be at least 6 characters to reset.',
+                    ),
+                  ),
+                );
+                return;
+              }
+              setModalState(() => busy = true);
+              try {
+                await widget.viewModel.resetPassword(
+                  id: emp.id,
+                  newPassword: passCtrl.text.trim(),
+                );
+                setModalState(() {
+                  resetBeforeSend = false;
+                  busy = false;
+                });
+              } catch (e) {
+                setModalState(() => busy = false);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(e.toString())),
+                  );
+                }
+                return;
+              }
+            }
+
+            final msg = _buildCredentialsMessage(
+              emp,
+              plainPassword: passCtrl.text.trim(),
+            );
+
+            if (mode == 'copy') {
+              await Clipboard.setData(ClipboardData(text: msg));
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Credentials copied to clipboard!'),
+                  ),
+                );
+              }
+              return;
+            }
+
+            if (mode == 'system') {
+              await SharePlus.instance.share(ShareParams(text: msg));
+              return;
+            }
+
+            var digits = phoneCtrl.text.replaceAll(RegExp(r'[^\d]'), '');
+            if (digits.length == 10) digits = '91$digits';
+            final encoded = Uri.encodeComponent(msg);
+            final waUri = Uri.parse(
+              digits.isNotEmpty
+                  ? 'https://wa.me/$digits?text=$encoded'
+                  : 'https://wa.me/?text=$encoded',
+            );
+            final ok = await launchUrl(
+              waUri,
+              mode: LaunchMode.externalApplication,
+            );
+            if (!ok) {
+              await SharePlus.instance.share(ShareParams(text: msg));
+            }
+          }
+
+          return Padding(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              16,
+              20,
+              MediaQuery.of(ctx).viewInsets.bottom + 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppleColors.border,
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    'Share Credentials — ${emp.name}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    '${emp.email} • ${_cleanRoleName(emp.role)}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppleColors.inkMuted,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: phoneCtrl,
+                    keyboardType: TextInputType.phone,
+                    decoration: const InputDecoration(
+                      labelText: 'WhatsApp Mobile Number (Optional)',
+                      hintText: 'Leave blank to choose contact in WhatsApp',
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: passCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'Password in Message (Optional)',
+                            hintText: 'Blank = share ID & links only',
+                          ),
+                          onChanged: (_) => setModalState(() {}),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          setModalState(() {
+                            passCtrl.text = _generatePassword();
+                            resetBeforeSend = true;
+                          });
+                        },
+                        icon: const Icon(Icons.auto_fix_high_rounded, size: 16),
+                        label: const Text('Generate'),
+                      ),
+                    ],
+                  ),
+                  SwitchListTile.adaptive(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text(
+                      'Reset account password before sharing',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                    value: resetBeforeSend,
+                    onChanged: (v) => setModalState(() => resetBeforeSend = v),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppleColors.greenSoft,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: AppleColors.green.withValues(alpha: 0.25),
+                      ),
+                    ),
+                    child: Text(
+                      _buildCredentialsMessage(
+                        emp,
+                        plainPassword: passCtrl.text.trim(),
+                      ),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        height: 1.4,
+                        color: AppleColors.inkPrimary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppleColors.green,
+                    ),
+                    onPressed: busy ? null : () => executeShare('whatsapp'),
+                    icon: busy
+                        ? const SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.chat_outlined, size: 18),
+                    label: Text(
+                      resetBeforeSend
+                          ? 'Set Password & Share on WhatsApp'
+                          : 'Share on WhatsApp',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: busy ? null : () => executeShare('copy'),
+                          icon: const Icon(Icons.copy_rounded, size: 16),
+                          label: const Text('Copy Text'),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: busy ? null : () => executeShare('system'),
+                          icon: const Icon(Icons.ios_share_rounded, size: 16),
+                          label: const Text('Other Apps'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Future<void> _showAddEmployeeSheet() async {
@@ -191,14 +482,16 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                           }
                           setModalState(() => submitting = true);
                           try {
+                            final createdUser = usernameCtrl.text.trim();
+                            final createdPass = passCtrl.text;
                             await widget.viewModel.createEmployee(
                               name: nameCtrl.text.trim(),
-                              username: usernameCtrl.text.trim(),
+                              username: createdUser,
                               role: selectedRole,
                               phone: phoneCtrl.text.trim().isEmpty
                                   ? null
                                   : phoneCtrl.text.trim(),
-                              password: passCtrl.text,
+                              password: createdPass,
                             );
                             if (ctx.mounted) Navigator.pop(ctx);
                             if (mounted) {
@@ -207,6 +500,22 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                                   content: Text('Staff account created!'),
                                 ),
                               );
+                              final createdEmail = createdUser.contains('@')
+                                  ? createdUser.toLowerCase()
+                                  : '${createdUser.toLowerCase()}@garvix.in';
+                              final match = widget.viewModel.employees
+                                  .where(
+                                    (e) =>
+                                        e.email.toLowerCase() == createdEmail,
+                                  )
+                                  .toList();
+                              if (match.isNotEmpty) {
+                                await _showShareCredentialsSheet(
+                                  match.first,
+                                  prefilledPassword: createdPass,
+                                  alreadyApplied: true,
+                                );
+                              }
                             }
                           } catch (e) {
                             setModalState(() => submitting = false);
@@ -392,15 +701,24 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
       ),
     );
     if (ok == true && passCtrl.text.length >= 6) {
+      final appliedPass = passCtrl.text;
       try {
         await widget.viewModel.resetPassword(
           id: emp.id,
-          newPassword: passCtrl.text,
+          newPassword: appliedPass,
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Password reset for ${emp.name}.')),
           );
+          if (!_isSuperAdminRole(emp.role) &&
+              emp.email != widget.currentUser.email) {
+            await _showShareCredentialsSheet(
+              emp,
+              prefilledPassword: appliedPass,
+              alreadyApplied: true,
+            );
+          }
         }
       } catch (e) {
         if (mounted) {
@@ -588,6 +906,23 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                         spacing: 8,
                         runSpacing: 8,
                         children: [
+                          if (!isSelf && !isSuper)
+                            OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppleColors.green,
+                                side: BorderSide(
+                                  color: AppleColors.green
+                                      .withValues(alpha: 0.35),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                              ),
+                              onPressed: () => _showShareCredentialsSheet(emp),
+                              icon: const Icon(Icons.chat_outlined, size: 15),
+                              label: const Text('WhatsApp'),
+                            ),
                           OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
