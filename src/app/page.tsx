@@ -34,6 +34,50 @@ export default async function HomePage() {
     <div className="min-h-screen bg-white text-[#1d1d1f] selection:bg-[#0071e3] selection:text-white antialiased">
       <Navbar />
 
+      {/* 0. First-Fold Flagship Showcase — GARVIX Retail POS & Store ERP */}
+      <section
+        id="retail-software"
+        className="pt-5 pb-10 sm:pt-7 sm:pb-14 bg-white border-b border-black/[0.06] scroll-mt-20"
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-[1.75rem] sm:rounded-[2rem] border border-black/[0.06] bg-[#f5f5f7] overflow-hidden shadow-[0_14px_44px_rgba(0,0,0,0.06)]">
+            <img
+              src="/images/products/garvix-retail-software.jpg"
+              alt="GARVIX Retail POS & Store ERP — Custom Retail Billing, Inventory & Multi-Store Software built by GARVIX"
+              fetchPriority="high"
+              className="w-full h-auto block"
+            />
+            <div className="bg-white border-t border-black/[0.05] px-5 py-4 sm:px-8 sm:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3.5">
+                <span className="inline-flex w-fit items-center rounded-full bg-[#0071e3]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#0071e3] shrink-0">
+                  Built by GARVIX
+                </span>
+                <p className="text-sm text-[#424245] leading-snug">
+                  <span className="font-semibold text-[#1d1d1f]">
+                    GARVIX Retail POS &amp; Store ERP
+                  </span>{" "}
+                  &mdash; in-house retail billing, barcode &amp; RFID stock sync, and multi-store cloud software.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <EnquireButton
+                  solution="Retail POS & Store ERP"
+                  label="Request Live Demo"
+                  variant="primary"
+                />
+                <Link
+                  href="#products"
+                  className="inline-flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-medium text-[#0071e3] hover:underline transition"
+                >
+                  <span>Explore Products</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 1. Hero Section — Pure Apple Simplicity */}
       <section className="pt-14 pb-20 sm:pt-20 sm:pb-24 bg-[#fbfbfd]">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
@@ -601,60 +645,6 @@ export default async function HomePage() {
                 label="Discuss Your Custom Software"
                 variant="primary"
               />
-            </div>
-          </div>
-
-          {/* 4.5. Featured Flagship Retail Software Showcase — Built by GARVIX */}
-          <div
-            id="retail-software"
-            className="mt-10 rounded-[2rem] border border-black/[0.06] bg-[#fbfbfd] overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.04)] scroll-mt-24"
-          >
-            <div className="px-6 py-7 sm:px-10 sm:py-8 flex flex-col lg:flex-row lg:items-end justify-between gap-5 bg-white">
-              <div className="max-w-2xl">
-                <p className="text-xs font-semibold uppercase tracking-widest text-[#0071e3]">
-                  Flagship Software &bull; Built by GARVIX
-                </p>
-                <h3 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f]">
-                  GARVIX Retail POS &amp; Store ERP
-                </h3>
-                <p className="mt-2 text-sm sm:text-base text-[#6e6e73] leading-relaxed">
-                  Designed and engineered in-house by our team for modern retail showrooms &mdash; combining fast GST billing, barcode &amp; RFID stock sync, instant UPI QR payments, and live multi-store cloud analytics.
-                </p>
-              </div>
-              <div className="shrink-0">
-                <EnquireButton
-                  solution="Retail POS & Store ERP"
-                  label="Request Live Demo"
-                  variant="primary"
-                />
-              </div>
-            </div>
-
-            <div className="border-y border-black/[0.05] bg-[#f5f5f7]">
-              <img
-                src="/images/products/garvix-retail-software.jpg"
-                alt="GARVIX Retail POS & Store ERP — Custom Retail Billing, Inventory & Multi-Store Software built by GARVIX"
-                className="w-full h-auto block"
-              />
-            </div>
-
-            <div className="px-6 py-5 sm:px-10 bg-white grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm font-medium text-[#424245]">
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-[#0071e3] shrink-0" />
-                <span>Fast GST &amp; POS Billing</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-[#0071e3] shrink-0" />
-                <span>Barcode &amp; RFID Stock Sync</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-[#0071e3] shrink-0" />
-                <span>Instant UPI QR Payments</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-[#0071e3] shrink-0" />
-                <span>Desktop POS + Mobile App</span>
-              </div>
             </div>
           </div>
         </div>
