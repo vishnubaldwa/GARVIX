@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Radio, Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
+import { GarvixLogoMark } from "@/components/brand/GarvixLogo";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -27,8 +28,8 @@ export function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <Link href="/" className="group flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#1d1d1f] text-white transition-transform group-hover:scale-105">
-            <Radio className="h-4 w-4 text-[#2997ff]" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#16171a] border border-[#d8b56c]/25 shadow-xs transition-transform group-hover:scale-105">
+            <GarvixLogoMark className="h-5 w-5" />
           </div>
           <span className="text-base font-bold tracking-tight text-[#1d1d1f]">
             GARVIX

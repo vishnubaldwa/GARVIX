@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Radio, Mail, Phone, MapPin, ShieldCheck, ArrowUpRight } from "lucide-react";
+import { Mail, Phone, MapPin, ShieldCheck, ArrowUpRight } from "lucide-react";
+import { GarvixLogoMark } from "@/components/brand/GarvixLogo";
 import { getCompanySettings } from "@/lib/settings";
 
 export async function Footer() {
@@ -13,8 +14,8 @@ export async function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1d1d1f] text-white">
-                <Radio className="h-4.5 w-4.5 text-[#2997ff]" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#16171a] border border-[#d8b56c]/25 shadow-xs">
+                <GarvixLogoMark className="h-5 w-5" />
               </div>
               <div>
                 <span className="text-base font-bold tracking-tight text-[#1d1d1f] block leading-none">

@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { formatINR, numberToWords } from "@/lib/gst";
 import { notFound } from "next/navigation";
-import { Radio, Printer, QrCode, ShieldCheck, CheckCircle2, Landmark } from "lucide-react";
+import { Printer, QrCode, ShieldCheck, CheckCircle2, Landmark } from "lucide-react";
+import { GarvixLogoMark } from "@/components/brand/GarvixLogo";
 import { buildUpiUri, generateUpiQrCodeDataUrl } from "@/lib/upi";
 import { getCompanySettings } from "@/lib/settings";
 import { PrintButton } from "@/components/portal/PrintButton";
@@ -73,8 +74,8 @@ export default async function ClientInvoicePortalPage({ params }: Props) {
           <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-b border-slate-800 pb-8">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-950 border border-cyan-500/40 text-cyan-400">
-                  <Radio className="h-5 w-5" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#16171a] border border-[#d8b56c]/40">
+                  <GarvixLogoMark className="h-5 w-5" />
                 </div>
                 <span className="text-2xl font-black tracking-widest text-white">
                   {company.name.split(" ")[0] || "GARVIX"}

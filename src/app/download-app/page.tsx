@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import Link from "next/link";
 import {
-  Radio,
   Download,
   Smartphone,
   ShieldCheck,
@@ -10,6 +9,7 @@ import {
   ArrowLeft,
   FolderLock,
 } from "lucide-react";
+import { GarvixLogoMark } from "@/components/brand/GarvixLogo";
 
 export const dynamic = "force-dynamic";
 
@@ -43,8 +43,8 @@ export default function DownloadAppPage() {
       <div className="mx-auto w-full max-w-md space-y-6">
         {/* Brand Header */}
         <div className="text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#1d1d1f] text-white shadow-[0_12px_30px_rgba(0,0,0,0.14)]">
-            <Radio className="h-8 w-8 text-[#2997ff]" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#16171a] border border-[#d8b56c]/30 shadow-[0_12px_30px_rgba(0,0,0,0.16)]">
+            <GarvixLogoMark className="h-9 w-9" />
           </div>
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#1d1d1f]">
             GARVIX ERP App

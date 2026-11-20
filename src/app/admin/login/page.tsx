@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Radio, Lock, User, ArrowRight, AlertCircle, ShieldCheck, Smartphone } from "lucide-react";
+import { Lock, User, ArrowRight, AlertCircle, ShieldCheck, Smartphone } from "lucide-react";
 import Link from "next/link";
+import { GarvixLogoMark } from "@/components/brand/GarvixLogo";
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");
@@ -51,8 +52,8 @@ export default function AdminLoginPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-[400px] text-center">
         {/* Minimal Apple-Style Brand Mark */}
         <Link href="/" className="inline-flex flex-col items-center gap-3 group">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1d1d1f] text-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform">
-            <Radio className="h-7 w-7 text-[#2997ff]" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#16171a] border border-[#d8b56c]/30 shadow-[0_8px_24px_rgba(0,0,0,0.14)] group-hover:scale-105 transition-transform">
+            <GarvixLogoMark className="h-8 w-8" />
           </div>
           <div>
             <span className="text-2xl font-bold tracking-tight text-[#1d1d1f] block">

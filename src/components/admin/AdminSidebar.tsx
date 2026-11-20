@@ -15,7 +15,6 @@ import {
   Clock,
   Download,
   ShieldCheck,
-  Radio,
   LogOut,
   X,
   Menu,
@@ -28,6 +27,7 @@ import {
   Globe,
 } from "lucide-react";
 import { useState } from "react";
+import { GarvixLogoMark } from "@/components/brand/GarvixLogo";
 import { AuthSession } from "@/lib/auth";
 import { PermissionCode } from "@/lib/permissions";
 
@@ -137,8 +137,8 @@ export function AdminSidebar({
       {/* Mobile Top Bar with Hamburger (Apple Frosted Glass) */}
       <div className="md:hidden sticky top-0 z-40 flex items-center justify-between border-b border-black/[0.06] bg-white/85 backdrop-blur-xl px-4 py-3">
         <Link href="/admin" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#1d1d1f] text-white shadow-sm">
-            <Radio className="h-4 w-4 text-[#2997ff]" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#16171a] border border-[#d8b56c]/25 shadow-sm">
+            <GarvixLogoMark className="h-5 w-5" />
           </div>
           <div>
             <span className="font-bold text-[#1d1d1f] text-sm tracking-tight block leading-none">
@@ -174,8 +174,8 @@ export function AdminSidebar({
           {/* Brand Logo */}
           <div className="flex items-center justify-between px-2 pb-4 border-b border-black/[0.06]">
             <Link href="/admin" className="flex items-center gap-2.5 group">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1d1d1f] text-white shadow-sm group-hover:scale-105 transition-transform">
-                <Radio className="h-4.5 w-4.5 text-[#2997ff]" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#16171a] border border-[#d8b56c]/25 shadow-sm group-hover:scale-105 transition-transform">
+                <GarvixLogoMark className="h-5 w-5" />
               </div>
               <div className="leading-tight">
                 <span className="text-base font-bold tracking-tight text-[#1d1d1f]">GARVIX</span>

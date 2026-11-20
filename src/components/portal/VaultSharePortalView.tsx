@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { GarvixLogoMark } from "@/components/brand/GarvixLogo";
 import {
-  Radio,
   Lock,
   ShieldCheck,
   Download,
@@ -111,8 +111,8 @@ export function VaultSharePortalView({ token }: { token: string }) {
       <header className="sticky top-0 z-30 border-b border-black/[0.06] bg-white/85 backdrop-blur-xl">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#1d1d1f] text-white">
-              <Radio className="h-4 w-4 text-[#2997ff]" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#16171a] border border-[#d8b56c]/25">
+              <GarvixLogoMark className="h-5 w-5" />
             </div>
             <div className="leading-tight">
               <span className="text-sm font-bold tracking-tight block">GARVIX</span>
