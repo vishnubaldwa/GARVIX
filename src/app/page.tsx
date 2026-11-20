@@ -55,7 +55,7 @@ export default async function HomePage() {
 
           <div className="rounded-[1.75rem] sm:rounded-[2rem] border border-black/[0.06] bg-[#f5f5f7] overflow-hidden shadow-[0_14px_44px_rgba(0,0,0,0.06)]">
             <img
-              src="/images/products/garvix-retail-software.jpg"
+              src="/images/products/garvix-retail-software.jpg?v=2"
               alt="GARVIX Retail POS & Store ERP — Custom Retail Billing, Inventory & Multi-Store Software built by GARVIX"
               fetchPriority="high"
               className="w-full h-auto block"
