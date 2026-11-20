@@ -25,6 +25,7 @@ import {
   Shield,
   FolderLock,
   Smartphone,
+  Globe,
 } from "lucide-react";
 import { useState } from "react";
 import { AuthSession } from "@/lib/auth";
@@ -58,6 +59,7 @@ const navSections: NavSection[] = [
       { href: "/admin/clients", label: "Parties & Clients", icon: Building2, requiredPermission: "CAN_CREATE_CLIENT" },
       { href: "/admin/quotations", label: "Quotations & Proposals", icon: FileSpreadsheet, requiredPermission: "CAN_CREATE_QUOTATION" },
       { href: "/admin/leads", label: "Website Leads & CRM", icon: Users, requiredPermission: "CAN_VIEW_LEADS" },
+      { href: "/admin/website-clients", label: "Website Clients", icon: Globe, requiredPermission: "CAN_CREATE_CLIENT" },
     ],
   },
   {

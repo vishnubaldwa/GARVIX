@@ -4,6 +4,7 @@ import { Footer } from "@/components/public/Footer";
 import { ContactForm } from "@/components/public/ContactForm";
 import { EnquireButton } from "@/components/public/EnquireButton";
 import { getCompanySettings } from "@/lib/settings";
+import { prisma } from "@/lib/prisma";
 import {
   Check,
   Cpu,
@@ -13,12 +14,21 @@ import {
   Layers,
   ShieldCheck,
   ChevronRight,
+  ExternalLink,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const company = await getCompanySettings();
+  const [company, websiteClients] = await Promise.all([
+    getCompanySettings(),
+    prisma.websiteClient
+      .findMany({
+        where: { isVisible: true },
+        orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
+      })
+      .catch(() => []),
+  ]);
 
   return (
     <div className="min-h-screen bg-white text-[#1d1d1f] selection:bg-[#0071e3] selection:text-white antialiased">
@@ -448,6 +458,88 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* 3.5. Dynamic Our Clients Section (Controlled live from Admin Panel) */}
+      {websiteClients.length > 0 && (
+        <section
+          id="our-clients"
+          className="py-16 sm:py-20 bg-white border-t border-black/[0.05] scroll-mt-20"
+        >
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#0071e3]">
+                Our Clients
+              </p>
+              <h2 className="mt-2.5 text-3xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f]">
+                Trusted by growing businesses.
+              </h2>
+              <p className="mt-3 text-sm sm:text-base text-[#6e6e73]">
+                Retail brands, manufacturers, and enterprises running on GARVIX RFID &amp; custom software.
+              </p>
+            </div>
+
+            <div className="mt-10 flex flex-wrap items-stretch justify-center gap-4 sm:gap-5">
+              {websiteClients.map((client) => {
+                const initials = client.name
+                  .split(/\s+/)
+                  .map((w) => w[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2);
+
+                const cardInner = (
+                  <div className="group h-full rounded-2xl border border-black/[0.06] bg-[#fbfbfd] hover:bg-white hover:border-black/[0.12] hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-200 px-5 py-6 flex flex-col items-center justify-center text-center">
+                    {client.logoFile ? (
+                      <div className="h-14 w-full flex items-center justify-center mb-3.5">
+                        <img
+                          src={`/api/public/client-logo/${client.id}?v=${client.updatedAt.getTime()}`}
+                          alt={client.name}
+                          className="max-h-12 max-w-[150px] w-auto object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-12 w-12 rounded-2xl bg-[#1d1d1f] text-white flex items-center justify-center text-sm font-bold tracking-wide mb-3.5 shadow-xs">
+                        {initials || "G"}
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-center gap-1">
+                      <span className="text-sm font-bold text-[#1d1d1f] tracking-tight leading-snug">
+                        {client.name}
+                      </span>
+                      {client.websiteUrl && (
+                        <ExternalLink className="h-3 w-3 text-[#86868b] group-hover:text-[#0071e3] transition shrink-0" />
+                      )}
+                    </div>
+
+                    {client.industry && (
+                      <span className="mt-1.5 inline-block rounded-full bg-black/[0.04] px-2.5 py-0.5 text-[11px] font-medium text-[#6e6e73]">
+                        {client.industry}
+                      </span>
+                    )}
+                  </div>
+                );
+
+                return client.websiteUrl ? (
+                  <a
+                    key={client.id}
+                    href={client.websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-[calc(50%-0.5rem)] sm:w-52 md:w-56 block"
+                  >
+                    {cardInner}
+                  </a>
+                ) : (
+                  <div key={client.id} className="w-[calc(50%-0.5rem)] sm:w-52 md:w-56">
+                    {cardInner}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 4. Dedicated Custom Software Section */}
       <section id="custom-software" className="py-20 sm:py-24 bg-white scroll-mt-20">

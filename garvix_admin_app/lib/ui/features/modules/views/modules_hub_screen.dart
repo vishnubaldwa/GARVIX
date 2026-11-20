@@ -14,6 +14,7 @@ import '../../leads/views/leads_screen.dart';
 import '../../operations/views/amc_screen.dart';
 import '../../operations/views/challans_screen.dart';
 import '../../operations/views/inventory_screen.dart';
+import '../../operations/views/website_clients_screen.dart';
 import '../../settings/views/audit_logs_screen.dart';
 import '../../settings/views/settings_screen.dart';
 import '../../team/view_models/team_view_model.dart';
@@ -152,6 +153,21 @@ class ModulesHubScreen extends StatelessWidget {
           color: AppleColors.green,
           bgColor: AppleColors.greenSoft,
           onTap: () => showCreateClientSheet(context, billingViewModel),
+        ),
+      );
+    }
+    if (user.canCreateClient || user.canManageSettings) {
+      salesItems.add(
+        _ModuleItem(
+          title: 'Website Clients (garvix.in)',
+          subtitle: 'Manage "Our Clients" logos & homepage visibility',
+          icon: Icons.language_rounded,
+          color: const Color(0xFF0F766E),
+          bgColor: const Color(0xFFCCFBF1),
+          onTap: () => _push(
+            context,
+            WebsiteClientsScreen(erpRepository: erpRepository, user: user),
+          ),
         ),
       );
     }

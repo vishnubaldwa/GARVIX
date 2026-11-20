@@ -296,6 +296,19 @@ model Expense {
   updatedAt           DateTime @default(now()) @updatedAt
 }
 
+model WebsiteClient {
+  id           String   @id @default(cuid())
+  name         String
+  industry     String?
+  websiteUrl   String?
+  logoFile     String?
+  logoMimeType String?
+  displayOrder Int      @default(0)
+  isVisible    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model AMCContract {
   id             String          @id @default(cuid())
   contractNumber String          @unique

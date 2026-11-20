@@ -601,3 +601,40 @@ const List<Map<String, String>> kIndianStates = [
   {'name': 'Odisha', 'code': '21'},
   {'name': 'Assam', 'code': '18'},
 ];
+
+class WebsiteClientItem {
+  const WebsiteClientItem({
+    required this.id,
+    required this.name,
+    this.industry,
+    this.websiteUrl,
+    this.hasLogo = false,
+    this.logoUrl,
+    this.displayOrder = 0,
+    this.isVisible = true,
+  });
+
+  final String id;
+  final String name;
+  final String? industry;
+  final String? websiteUrl;
+  final bool hasLogo;
+  final String? logoUrl;
+  final int displayOrder;
+  final bool isVisible;
+
+  factory WebsiteClientItem.fromJson(Map<String, dynamic> json) {
+    return WebsiteClientItem(
+      id: (json['id'] ?? '').toString(),
+      name: (json['name'] ?? '').toString(),
+      industry: json['industry']?.toString(),
+      websiteUrl: json['websiteUrl']?.toString(),
+      hasLogo: json['hasLogo'] == true,
+      logoUrl: json['logoUrl']?.toString(),
+      displayOrder: (json['displayOrder'] is num)
+          ? (json['displayOrder'] as num).toInt()
+          : 0,
+      isVisible: json['isVisible'] != false,
+    );
+  }
+}

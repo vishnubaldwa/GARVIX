@@ -494,6 +494,97 @@ class ErpRepository {
     );
   }
 
+  // --- Website Showcase Clients ---
+  Future<String> getBaseUrl() => _apiClient.getBaseUrl();
+
+  Future<List<WebsiteClientItem>> fetchWebsiteClients() async {
+    final data = await _apiClient.get('/api/admin/website-clients');
+    return ((data['clients'] as List?) ?? const [])
+        .map((e) => WebsiteClientItem.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> createWebsiteClient({
+    required String name,
+    String? industry,
+    String? websiteUrl,
+    int displayOrder = 0,
+    bool isVisible = true,
+    File? logoFile,
+  }) async {
+    final fields = <String, String>{
+      'name': name,
+      'displayOrder': displayOrder.toString(),
+      'isVisible': isVisible.toString(),
+      'industry': ?industry,
+      'websiteUrl': ?websiteUrl,
+    };
+
+    if (logoFile != null) {
+      await _apiClient.uploadMultipartFiles(
+        '/api/admin/website-clients',
+        fields: fields,
+        files: [logoFile],
+        fileFieldName: 'logo',
+        method: 'POST',
+      );
+    } else {
+      await _apiClient.post(
+        '/api/admin/website-clients',
+        body: {
+          ...fields,
+          'displayOrder': displayOrder,
+          'isVisible': isVisible,
+        },
+      );
+    }
+  }
+
+  Future<void> updateWebsiteClient({
+    required String id,
+    String? name,
+    String? industry,
+    String? websiteUrl,
+    int? displayOrder,
+    bool? isVisible,
+    File? logoFile,
+    bool removeLogo = false,
+  }) async {
+    if (logoFile != null) {
+      final fields = <String, String>{
+        'name': ?name,
+        'industry': ?industry,
+        'websiteUrl': ?websiteUrl,
+        if (displayOrder != null) 'displayOrder': displayOrder.toString(),
+        if (isVisible != null) 'isVisible': isVisible.toString(),
+        if (removeLogo) 'removeLogo': 'true',
+      };
+      await _apiClient.uploadMultipartFiles(
+        '/api/admin/website-clients/$id',
+        fields: fields,
+        files: [logoFile],
+        fileFieldName: 'logo',
+        method: 'PATCH',
+      );
+    } else {
+      await _apiClient.patch(
+        '/api/admin/website-clients/$id',
+        body: {
+          'name': ?name,
+          'industry': ?industry,
+          'websiteUrl': ?websiteUrl,
+          'displayOrder': ?displayOrder,
+          'isVisible': ?isVisible,
+          if (removeLogo) 'removeLogo': true,
+        },
+      );
+    }
+  }
+
+  Future<void> deleteWebsiteClient(String id) async {
+    await _apiClient.delete('/api/admin/website-clients/$id');
+  }
+
   // --- Audit Security Logs ---
   Future<List<AuditLogItem>> fetchAuditLogs() async {
     final data = await _apiClient.get('/api/admin/audit');
