@@ -24,6 +24,10 @@ import {
   Cloud,
   Building2,
   FolderLock,
+  UtensilsCrossed,
+  ChefHat,
+  PackageCheck,
+  Users,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -477,6 +481,179 @@ export default async function HomePage() {
           </div>
 
           <SmartProductsCarousel />
+        </div>
+      </section>
+
+      {/* 3.25. Restaurant & Café Software — GARVIX Hospitality OS Video Showcase */}
+      <section
+        id="restaurant-software"
+        className="py-16 sm:py-20 bg-[#fbfaf7] border-t border-black/[0.06] scroll-mt-20"
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#15803d]">
+              Hospitality Suite &bull; Web POS + Live KDS + Mobile App
+            </p>
+            <h2 className="mt-2.5 text-3xl sm:text-5xl font-bold tracking-tight text-[#1f1915] leading-[1.08]">
+              Restaurant &amp;{" "}
+              <span className="text-[#15803d]">Caf&eacute; Software.</span>
+            </h2>
+            <p className="mt-3.5 text-sm sm:text-lg text-[#786d63] max-w-2xl mx-auto leading-relaxed">
+              QR table self-ordering with UPI/Razorpay, dark-mode Kitchen Display (KDS), multi-round table billing, recipe-linked auto inventory, vendor dues, daily expenses, staff shifts &amp; Flutter mobile app.
+            </p>
+          </div>
+
+          {/* 15s Full HD Autoplay Showcase Video Card */}
+          <div className="rounded-[1.75rem] sm:rounded-[2rem] border border-[#eae3d8] bg-white overflow-hidden shadow-[0_18px_54px_rgba(31,25,21,0.08)]">
+            <ShowcaseVideoPlayer
+              src="/videos/garvix-restaurant-showcase.mp4"
+              poster="/images/products/garvix-restaurant-poster.jpg"
+              label="GARVIX Restaurant & Café Software — 15 Second Product Showcase Video"
+            />
+            <div className="bg-white border-t border-[#eae3d8] px-5 py-4 sm:px-8 sm:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-[#4a423b]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ecfdf5] border border-[#a7f3d0] px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#15803d]">
+                  Built by GARVIX
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <QrCode className="h-3.5 w-3.5 text-[#15803d]" />
+                  <span>QR Table Self-Ordering</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <ChefHat className="h-3.5 w-3.5 text-[#d97706]" />
+                  <span>Live Kitchen Display (KDS)</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <PackageCheck className="h-3.5 w-3.5 text-[#15803d]" />
+                  <span>Recipe Auto-Inventory</span>
+                </span>
+              </div>
+              <div className="shrink-0">
+                <EnquireButton
+                  solution="Restaurant & Café Software"
+                  label="Request Café Demo"
+                  variant="primary"
+                  className="!bg-[#15803d] hover:!bg-[#166534]"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 4 Core Hospitality Capabilities */}
+          <div className="mt-14 sm:mt-16">
+            <div className="text-center max-w-2xl mx-auto mb-9">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#15803d]">
+                Table to Kitchen to Accounts
+              </p>
+              <h3 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#1f1915]">
+                Everything your restaurant needs in sync.
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[
+                {
+                  icon: QrCode,
+                  title: "QR Table Self-Ordering",
+                  desc: "Unique table QR menus with prepaid Razorpay/UPI checkout and 1-tap staff approval queue.",
+                },
+                {
+                  icon: ChefHat,
+                  title: "Live Kitchen Display (KDS)",
+                  desc: "Dark-mode chef screen with live prep timers, New → Preparing → Ready workflow & zero paper slips.",
+                },
+                {
+                  icon: PackageCheck,
+                  title: "Recipe Auto-Inventory",
+                  desc: "Link raw ingredients to every dish so milk, beans, cheese & bread auto-deduct with low-stock alerts.",
+                },
+                {
+                  icon: Users,
+                  title: "Billing, Staff & Vendors",
+                  desc: "5-role PIN login, multi-round table bills, vendor dues, daily expenses, shift attendance & P&L reports.",
+                },
+              ].map((cap) => {
+                const Icon = cap.icon;
+                return (
+                  <div
+                    key={cap.title}
+                    className="rounded-3xl border border-[#eae3d8] bg-white p-6 shadow-[0_4px_20px_rgba(31,25,21,0.03)] space-y-3"
+                  >
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#ecfdf5] text-[#15803d]">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h4 className="text-base font-bold text-[#1f1915] tracking-tight">
+                      {cap.title}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-[#786d63] leading-relaxed">
+                      {cap.desc}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Ideal For Food & Hospitality Formats */}
+          <div className="mt-14 sm:mt-16 pt-12 border-t border-[#eae3d8]">
+            <div className="text-center max-w-2xl mx-auto mb-9">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#15803d]">
+                Ideal For Food &amp; Hospitality
+              </p>
+              <h3 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#1f1915]">
+                One Caf&eacute; OS. Every Kitchen.
+              </h3>
+              <p className="mt-2.5 text-sm sm:text-base text-[#786d63]">
+                Runs across Web Billing Counters, Kitchen Display Tablets, Waiter Phones &amp; Owner Mobile App.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {[
+                {
+                  name: "Cafés & Coffee Bars",
+                  desc: "Table QR self-menus, rapid chai/coffee KOTs, milk & bean recipe tracking.",
+                },
+                {
+                  name: "Fine-Dine Restaurants",
+                  desc: "Multi-round open table bills, tableside waiter app & live kitchen display.",
+                },
+                {
+                  name: "QSR & Fast-Food Outlets",
+                  desc: "High-speed counter POS billing, kitchen tokens & instant Cash/UPI/Card settle.",
+                },
+                {
+                  name: "Cloud Kitchens",
+                  desc: "Dark-mode chef KDS queue, raw ingredient auto-deduct & supplier vendor ledgers.",
+                },
+                {
+                  name: "Bakeries & Dessert Lounges",
+                  desc: "Daily kitchen expense logging, low-stock ingredient alerts & shift attendance.",
+                },
+                {
+                  name: "Multi-Outlet Food Chains",
+                  desc: "Role-based PIN access, live profit & loss analytics & Flutter owner mobile app.",
+                },
+              ].map((ind) => (
+                <div
+                  key={ind.name}
+                  className="rounded-3xl border border-[#eae3d8] bg-white p-6 flex items-start gap-3.5 shadow-[0_4px_20px_rgba(31,25,21,0.025)]"
+                >
+                  <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-xl bg-[#15803d] text-white shrink-0">
+                    <UtensilsCrossed className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-[#1f1915] tracking-tight">
+                      {ind.name}
+                    </h4>
+                    <p className="mt-1 text-xs sm:text-sm text-[#786d63] leading-relaxed">
+                      {ind.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

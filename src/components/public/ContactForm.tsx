@@ -229,6 +229,7 @@ export function ContactForm({
             >
               <option value="Retail POS & Store ERP">Retail POS &amp; Store ERP Software</option>
               <option value="Business ERP & Mobile App">GARVIX Business ERP &amp; Android Mobile App</option>
+              <option value="Restaurant & Café Software">GARVIX Restaurant &amp; Caf&eacute; POS + KDS Software</option>
               <option value="Custom Software">Custom Software Development (ERP / App / Web)</option>
               <option value="Jewellery RFID">Jewellery RFID Tags & Software</option>
               <option value="Garment RFID">Garment Hang Tags, Hard Tags & Retail POS</option>

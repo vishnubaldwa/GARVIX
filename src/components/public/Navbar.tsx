@@ -37,12 +37,15 @@ export function Navbar() {
         </Link>
 
         {/* Clean Minimal Desktop Links */}
-        <nav className="hidden lg:flex items-center gap-8 text-[13px] font-medium text-[#424245] whitespace-nowrap">
+        <nav className="hidden lg:flex items-center gap-6 xl:gap-7 text-[13px] font-medium text-[#424245] whitespace-nowrap">
           <Link href="/#retail-software" className="text-[#0071e3] font-semibold hover:underline transition-colors">
             Retail Software
           </Link>
           <Link href="/#management-software" className="text-[#0071e3] font-semibold hover:underline transition-colors">
             Management Software
+          </Link>
+          <Link href="/#restaurant-software" className="text-[#15803d] font-semibold hover:underline transition-colors">
+            Restaurant Software
           </Link>
           <Link href="/#products" className="hover:text-[#1d1d1f] transition-colors">
             RFID Products
@@ -82,6 +85,9 @@ export function Navbar() {
             </Link>
             <Link href="/#management-software" onClick={() => setMobileMenuOpen(false)} className="text-[#0071e3] font-semibold">
               Management Software
+            </Link>
+            <Link href="/#restaurant-software" onClick={() => setMobileMenuOpen(false)} className="text-[#15803d] font-semibold">
+              Restaurant Software
             </Link>
             <Link href="/#products" onClick={() => setMobileMenuOpen(false)}>
               RFID Products
