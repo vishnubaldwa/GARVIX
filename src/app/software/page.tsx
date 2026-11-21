@@ -204,10 +204,10 @@ export default async function SoftwarePage() {
                     )}
                     {sol.id === "pos" && (
                       <div className="overflow-hidden rounded-xl border border-white/10 bg-white shadow-md">
-                        <img
-                          src="/images/products/garvix-retail-software.jpg?v=2"
-                          alt="GARVIX Retail POS & Store ERP Software"
-                          className="w-full h-auto block"
+                        <ShowcaseVideoPlayer
+                          src="/videos/garvix-retail-pos-showcase.mp4"
+                          poster="/images/products/garvix-retail-pos-poster.jpg"
+                          label="GARVIX Retail POS & Store ERP Video"
                         />
                       </div>
                     )}

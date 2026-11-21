@@ -38,7 +38,7 @@ export function Navbar() {
 
         {/* Clean Minimal Desktop Links */}
         <nav className="hidden lg:flex items-center gap-6 text-xs font-medium text-[#424245]">
-          <Link href="/#retail-software" className="text-[#0071e3] font-semibold hover:underline transition-colors">
+          <Link href="/retail-software" className="text-[#0071e3] font-semibold hover:underline transition-colors">
             Retail Software
           </Link>
           <Link href="/#products" className="hover:text-[#1d1d1f] transition-colors">
@@ -89,7 +89,7 @@ export function Navbar() {
       {mobileMenuOpen && (
         <div className="border-b border-black/[0.06] bg-white/95 backdrop-blur-xl px-6 py-5 lg:hidden space-y-4">
           <div className="flex flex-col space-y-3 text-sm font-medium text-[#1d1d1f]">
-            <Link href="/#retail-software" onClick={() => setMobileMenuOpen(false)} className="text-[#0071e3] font-semibold">
+            <Link href="/retail-software" onClick={() => setMobileMenuOpen(false)} className="text-[#0071e3] font-semibold">
               Retail Software
             </Link>
             <Link href="/#products" onClick={() => setMobileMenuOpen(false)}>

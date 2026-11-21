@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   ChevronRight,
   ExternalLink,
+  Play,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -55,12 +56,22 @@ export default async function HomePage() {
           </div>
 
           <div className="rounded-[1.75rem] sm:rounded-[2rem] border border-black/[0.06] bg-[#f5f5f7] overflow-hidden shadow-[0_14px_44px_rgba(0,0,0,0.06)]">
-            <img
-              src="/images/products/garvix-retail-software.jpg?v=2"
-              alt="GARVIX Retail POS & Store ERP — Custom Retail Billing, Inventory & Multi-Store Software built by GARVIX"
-              fetchPriority="high"
-              className="w-full h-auto block"
-            />
+            <Link
+              href="/retail-software"
+              className="group relative block overflow-hidden"
+              aria-label="Watch GARVIX Retail POS & Store ERP product video"
+            >
+              <img
+                src="/images/products/garvix-retail-software.jpg?v=2"
+                alt="GARVIX Retail POS & Store ERP — Custom Retail Billing, Inventory & Multi-Store Software built by GARVIX"
+                fetchPriority="high"
+                className="w-full h-auto block transition-transform duration-500 group-hover:scale-[1.01]"
+              />
+              <span className="absolute bottom-3.5 right-3.5 sm:bottom-6 sm:right-6 inline-flex items-center gap-2 rounded-full bg-[#1d1d1f]/85 group-hover:bg-[#0071e3] text-white backdrop-blur-md px-4 py-2 text-xs sm:text-sm font-semibold shadow-lg transition-colors">
+                <Play className="h-3.5 w-3.5 fill-current" />
+                <span>Watch 15s Product Video</span>
+              </span>
+            </Link>
             <div className="bg-white border-t border-black/[0.05] px-5 py-4 sm:px-8 sm:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3.5">
                 <span className="inline-flex w-fit items-center rounded-full bg-[#0071e3]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#0071e3] shrink-0">
@@ -80,10 +91,10 @@ export default async function HomePage() {
                   variant="primary"
                 />
                 <Link
-                  href="#products"
+                  href="/retail-software"
                   className="inline-flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-medium text-[#0071e3] hover:underline transition"
                 >
-                  <span>Explore Products</span>
+                  <span>Watch Demo Video</span>
                   <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
