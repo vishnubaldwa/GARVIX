@@ -638,3 +638,181 @@ class WebsiteClientItem {
     );
   }
 }
+
+class ComplianceProfileModel {
+  const ComplianceProfileModel({
+    required this.companyName,
+    required this.state,
+    required this.stateCode,
+    required this.gstin,
+    this.incorporationDate,
+    required this.companyType,
+    required this.gstFilingFrequency,
+    this.gstRegistrationDate,
+    required this.pfEsicApplicable,
+  });
+
+  final String companyName;
+  final String state;
+  final String stateCode;
+  final String gstin;
+  final String? incorporationDate;
+  final String companyType;
+  final String gstFilingFrequency;
+  final String? gstRegistrationDate;
+  final bool pfEsicApplicable;
+
+  factory ComplianceProfileModel.fromJson(Map<String, dynamic> json) {
+    return ComplianceProfileModel(
+      companyName: (json['companyName'] ?? 'GARVIX TECHNOLOGIES').toString(),
+      state: (json['state'] ?? 'Haryana').toString(),
+      stateCode: (json['stateCode'] ?? '06').toString(),
+      gstin: (json['gstin'] ?? '').toString(),
+      incorporationDate: json['incorporationDate']?.toString(),
+      companyType: (json['companyType'] ?? 'PVT_LTD').toString(),
+      gstFilingFrequency: (json['gstFilingFrequency'] ?? 'MONTHLY').toString(),
+      gstRegistrationDate: json['gstRegistrationDate']?.toString(),
+      pfEsicApplicable: json['pfEsicApplicable'] == true,
+    );
+  }
+}
+
+class ComplianceSummaryModel {
+  const ComplianceSummaryModel({
+    required this.total,
+    required this.overdue,
+    required this.dueSoon,
+    required this.upcoming,
+    required this.filed,
+    required this.notApplicable,
+  });
+
+  final int total;
+  final int overdue;
+  final int dueSoon;
+  final int upcoming;
+  final int filed;
+  final int notApplicable;
+
+  factory ComplianceSummaryModel.fromJson(Map<String, dynamic> json) {
+    int toInt(dynamic v) => (v is num) ? v.toInt() : int.tryParse('$v') ?? 0;
+    return ComplianceSummaryModel(
+      total: toInt(json['total']),
+      overdue: toInt(json['overdue']),
+      dueSoon: toInt(json['dueSoon']),
+      upcoming: toInt(json['upcoming']),
+      filed: toInt(json['filed']),
+      notApplicable: toInt(json['notApplicable']),
+    );
+  }
+}
+
+class ImportantDateItem {
+  const ImportantDateItem({
+    required this.key,
+    this.customId,
+    required this.isCustom,
+    required this.title,
+    required this.shortCode,
+    required this.category,
+    required this.periodLabel,
+    required this.dueDate,
+    required this.daysRemaining,
+    required this.urgency,
+    required this.priority,
+    required this.portalName,
+    this.portalUrl,
+    required this.instructions,
+    this.penaltyNote,
+    this.recurrence,
+    required this.status,
+    this.filedDate,
+    this.referenceNo,
+    this.notes,
+  });
+
+  final String key;
+  final String? customId;
+  final bool isCustom;
+  final String title;
+  final String shortCode;
+  final String category;
+  final String periodLabel;
+  final String dueDate;
+  final int daysRemaining;
+  final String urgency;
+  final String priority;
+  final String portalName;
+  final String? portalUrl;
+  final String instructions;
+  final String? penaltyNote;
+  final String? recurrence;
+  final String status;
+  final String? filedDate;
+  final String? referenceNo;
+  final String? notes;
+
+  factory ImportantDateItem.fromJson(Map<String, dynamic> json) {
+    return ImportantDateItem(
+      key: (json['key'] ?? '').toString(),
+      customId: json['customId']?.toString(),
+      isCustom: json['isCustom'] == true,
+      title: (json['title'] ?? '').toString(),
+      shortCode: (json['shortCode'] ?? '').toString(),
+      category: (json['category'] ?? 'CUSTOM').toString(),
+      periodLabel: (json['periodLabel'] ?? '').toString(),
+      dueDate: (json['dueDate'] ?? '').toString(),
+      daysRemaining: (json['daysRemaining'] is num)
+          ? (json['daysRemaining'] as num).toInt()
+          : 0,
+      urgency: (json['urgency'] ?? 'UPCOMING').toString(),
+      priority: (json['priority'] ?? 'NORMAL').toString(),
+      portalName: (json['portalName'] ?? '').toString(),
+      portalUrl: json['portalUrl']?.toString(),
+      instructions: (json['instructions'] ?? '').toString(),
+      penaltyNote: json['penaltyNote']?.toString(),
+      recurrence: json['recurrence']?.toString(),
+      status: (json['status'] ?? 'PENDING').toString(),
+      filedDate: json['filedDate']?.toString(),
+      referenceNo: json['referenceNo']?.toString(),
+      notes: json['notes']?.toString(),
+    );
+  }
+}
+
+class ImportantDatesPayload {
+  const ImportantDatesPayload({
+    required this.profile,
+    required this.financialYear,
+    required this.currentFinancialYear,
+    required this.availableFYs,
+    required this.summary,
+    required this.items,
+  });
+
+  final ComplianceProfileModel profile;
+  final String financialYear;
+  final String currentFinancialYear;
+  final List<String> availableFYs;
+  final ComplianceSummaryModel summary;
+  final List<ImportantDateItem> items;
+
+  factory ImportantDatesPayload.fromJson(Map<String, dynamic> json) {
+    return ImportantDatesPayload(
+      profile: ComplianceProfileModel.fromJson(
+        (json['profile'] as Map<String, dynamic>?) ?? const {},
+      ),
+      financialYear: (json['financialYear'] ?? '').toString(),
+      currentFinancialYear: (json['currentFinancialYear'] ?? '').toString(),
+      availableFYs: ((json['availableFYs'] as List?) ?? const [])
+          .map((e) => e.toString())
+          .toList(),
+      summary: ComplianceSummaryModel.fromJson(
+        (json['summary'] as Map<String, dynamic>?) ?? const {},
+      ),
+      items: ((json['items'] as List?) ?? const [])
+          .map((e) => ImportantDateItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}

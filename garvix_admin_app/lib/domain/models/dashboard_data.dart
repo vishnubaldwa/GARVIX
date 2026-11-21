@@ -140,18 +140,97 @@ class DashboardLeadSummary {
   }
 }
 
+class ComplianceAlertTopItem {
+  const ComplianceAlertTopItem({
+    required this.key,
+    required this.title,
+    required this.category,
+    required this.dueDate,
+    required this.daysRemaining,
+    required this.urgency,
+    required this.portalName,
+    required this.priority,
+  });
+
+  final String key;
+  final String title;
+  final String category;
+  final String dueDate;
+  final int daysRemaining;
+  final String urgency;
+  final String portalName;
+  final String priority;
+
+  factory ComplianceAlertTopItem.fromJson(Map<String, dynamic> json) {
+    return ComplianceAlertTopItem(
+      key: (json['key'] ?? '').toString(),
+      title: (json['title'] ?? '').toString(),
+      category: (json['category'] ?? 'CUSTOM').toString(),
+      dueDate: (json['dueDate'] ?? '').toString(),
+      daysRemaining: (json['daysRemaining'] is num)
+          ? (json['daysRemaining'] as num).toInt()
+          : 0,
+      urgency: (json['urgency'] ?? 'UPCOMING').toString(),
+      portalName: (json['portalName'] ?? '').toString(),
+      priority: (json['priority'] ?? 'NORMAL').toString(),
+    );
+  }
+}
+
+class ComplianceDashboardAlert {
+  const ComplianceDashboardAlert({
+    required this.incorporationDateSet,
+    this.incorporationDate,
+    required this.gstFilingFrequency,
+    required this.overdueCount,
+    required this.dueSoonCount,
+    required this.pendingTotal,
+    required this.topItems,
+  });
+
+  final bool incorporationDateSet;
+  final String? incorporationDate;
+  final String gstFilingFrequency;
+  final int overdueCount;
+  final int dueSoonCount;
+  final int pendingTotal;
+  final List<ComplianceAlertTopItem> topItems;
+
+  bool get needsAttention =>
+      !incorporationDateSet || overdueCount > 0 || dueSoonCount > 0;
+
+  factory ComplianceDashboardAlert.fromJson(Map<String, dynamic> json) {
+    int toInt(dynamic v) => (v is num) ? v.toInt() : int.tryParse('$v') ?? 0;
+    return ComplianceDashboardAlert(
+      incorporationDateSet: json['incorporationDateSet'] == true,
+      incorporationDate: json['incorporationDate']?.toString(),
+      gstFilingFrequency: (json['gstFilingFrequency'] ?? 'MONTHLY').toString(),
+      overdueCount: toInt(json['overdueCount']),
+      dueSoonCount: toInt(json['dueSoonCount']),
+      pendingTotal: toInt(json['pendingTotal']),
+      topItems: ((json['topItems'] as List?) ?? const [])
+          .map(
+            (e) => ComplianceAlertTopItem.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
+    );
+  }
+}
+
 class DashboardPayload {
   const DashboardPayload({
     required this.kpis,
     required this.lowStockProducts,
     required this.recentInvoices,
     required this.recentLeads,
+    this.complianceAlerts,
   });
 
   final DashboardKpis kpis;
   final List<LowStockItem> lowStockProducts;
   final List<DashboardInvoiceSummary> recentInvoices;
   final List<DashboardLeadSummary> recentLeads;
+  final ComplianceDashboardAlert? complianceAlerts;
 
   factory DashboardPayload.fromJson(Map<String, dynamic> json) {
     return DashboardPayload(
@@ -167,6 +246,11 @@ class DashboardPayload {
       recentLeads: ((json['recentLeads'] as List?) ?? const [])
           .map((e) => DashboardLeadSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
+      complianceAlerts: json['complianceAlerts'] is Map<String, dynamic>
+          ? ComplianceDashboardAlert.fromJson(
+              json['complianceAlerts'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 }

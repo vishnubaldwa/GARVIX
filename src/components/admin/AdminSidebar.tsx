@@ -25,6 +25,7 @@ import {
   FolderLock,
   Smartphone,
   Globe,
+  CalendarClock,
 } from "lucide-react";
 import { useState } from "react";
 import { GarvixLogoMark } from "@/components/brand/GarvixLogo";
@@ -83,6 +84,7 @@ const navSections: NavSection[] = [
     items: [
       { href: "/admin/expenses", label: "Business Expenses", icon: Wallet, requiredPermission: "CAN_VIEW_FINANCES" },
       { href: "/admin/gst-returns", label: "1-Click CA Return", icon: Download, highlight: true, requiredPermission: "CAN_VIEW_FINANCES" },
+      { href: "/admin/important-dates", label: "Important Dates", icon: CalendarClock, requiredPermission: "CAN_VIEW_FINANCES" },
       { href: "/admin/purchases", label: "Vendor Purchases & ITC", icon: ShoppingCart, requiredPermission: "CAN_VIEW_FINANCES" },
     ],
   },

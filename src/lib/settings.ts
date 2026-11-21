@@ -14,6 +14,11 @@ export interface CompanySettingsData {
   bankName?: string | null;
   accountNo?: string | null;
   ifscCode?: string | null;
+  incorporationDate?: string | null;
+  companyType?: string;
+  gstFilingFrequency?: string;
+  gstRegistrationDate?: string | null;
+  pfEsicApplicable?: boolean;
 }
 
 export async function getCompanySettings(): Promise<CompanySettingsData> {
@@ -81,6 +86,15 @@ export async function getCompanySettings(): Promise<CompanySettingsData> {
       bankName: settings.bankName,
       accountNo: settings.accountNo,
       ifscCode: settings.ifscCode,
+      incorporationDate: settings.incorporationDate
+        ? settings.incorporationDate.toISOString()
+        : null,
+      companyType: settings.companyType || "PVT_LTD",
+      gstFilingFrequency: settings.gstFilingFrequency || "MONTHLY",
+      gstRegistrationDate: settings.gstRegistrationDate
+        ? settings.gstRegistrationDate.toISOString()
+        : null,
+      pfEsicApplicable: Boolean(settings.pfEsicApplicable),
     };
   } catch (err) {
     console.error("Failed to read CompanySettings from DB, falling back to env:", err);
@@ -102,6 +116,24 @@ export async function getCompanySettings(): Promise<CompanySettingsData> {
 export async function updateCompanySettings(
   data: Partial<CompanySettingsData>
 ): Promise<CompanySettingsData> {
+  const {
+    incorporationDate,
+    gstRegistrationDate,
+    ...rest
+  } = data;
+
+  const updatePayload: Record<string, unknown> = { ...rest };
+  if (incorporationDate !== undefined) {
+    updatePayload.incorporationDate = incorporationDate
+      ? new Date(incorporationDate)
+      : null;
+  }
+  if (gstRegistrationDate !== undefined) {
+    updatePayload.gstRegistrationDate = gstRegistrationDate
+      ? new Date(gstRegistrationDate)
+      : null;
+  }
+
   const updated = await prisma.companySetting.upsert({
     where: { id: "default" },
     create: {
@@ -119,10 +151,15 @@ export async function updateCompanySettings(
       bankName: data.bankName,
       accountNo: data.accountNo,
       ifscCode: data.ifscCode,
+      incorporationDate: incorporationDate ? new Date(incorporationDate) : null,
+      companyType: data.companyType || "PVT_LTD",
+      gstFilingFrequency: data.gstFilingFrequency || "MONTHLY",
+      gstRegistrationDate: gstRegistrationDate
+        ? new Date(gstRegistrationDate)
+        : null,
+      pfEsicApplicable: Boolean(data.pfEsicApplicable),
     },
-    update: {
-      ...data,
-    },
+    update: updatePayload,
   });
 
   return {
@@ -139,5 +176,14 @@ export async function updateCompanySettings(
     bankName: updated.bankName,
     accountNo: updated.accountNo,
     ifscCode: updated.ifscCode,
+    incorporationDate: updated.incorporationDate
+      ? updated.incorporationDate.toISOString()
+      : null,
+    companyType: updated.companyType || "PVT_LTD",
+    gstFilingFrequency: updated.gstFilingFrequency || "MONTHLY",
+    gstRegistrationDate: updated.gstRegistrationDate
+      ? updated.gstRegistrationDate.toISOString()
+      : null,
+    pfEsicApplicable: Boolean(updated.pfEsicApplicable),
   };
 }

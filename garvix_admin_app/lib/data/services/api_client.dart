@@ -83,6 +83,19 @@ class ApiClient {
     return _decodeResponse(response);
   }
 
+  Future<Map<String, dynamic>> put(
+    String path, {
+    Map<String, dynamic>? body,
+  }) async {
+    final baseUrl = await getBaseUrl();
+    final response = await _client.put(
+      Uri.parse('$baseUrl$path'),
+      headers: await _buildHeaders(),
+      body: jsonEncode(body ?? const {}),
+    );
+    return _decodeResponse(response);
+  }
+
   Future<Map<String, dynamic>> patch(
     String path, {
     Map<String, dynamic>? body,

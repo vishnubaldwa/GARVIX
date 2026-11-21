@@ -3,6 +3,7 @@ import { formatINR } from "@/lib/gst";
 import { getSession } from "@/lib/auth";
 import { getCompanySettings } from "@/lib/settings";
 import { isFullAdminRole, hasPermission } from "@/lib/permissions";
+import { getUpcomingComplianceAlerts } from "@/lib/compliance-engine";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
@@ -16,6 +17,7 @@ import {
   Clock,
   ShieldCheck,
   ChevronRight,
+  CalendarClock,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -49,7 +51,20 @@ export default async function AdminDashboardPage() {
     redirect("/admin/documents");
   }
 
-  const [invoices, purchases, expenses, leads, lowStockProducts, amcContracts, company] = await Promise.all([
+  const canManageSettings = await hasPermission(session.role, "CAN_MANAGE_SETTINGS");
+  const canViewCompliance =
+    isFullAdminRole(session.role) || canViewFinances || canManageSettings;
+
+  const [
+    invoices,
+    purchases,
+    expenses,
+    leads,
+    lowStockProducts,
+    amcContracts,
+    company,
+    complianceAlerts,
+  ] = await Promise.all([
     prisma.invoice.findMany({
       include: { customer: true },
       orderBy: { createdAt: "desc" },
@@ -71,6 +86,7 @@ export default async function AdminDashboardPage() {
       where: { status: "ACTIVE" },
     }),
     getCompanySettings(),
+    canViewCompliance ? getUpcomingComplianceAlerts() : Promise.resolve(null),
   ]);
 
   const totalInvoiced = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
@@ -117,6 +133,14 @@ export default async function AdminDashboardPage() {
           >
             <Download className="h-3.5 w-3.5 text-emerald-700" /> CA Return
           </Link>
+          {canViewCompliance && (
+            <Link
+              href="/admin/important-dates"
+              className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-xs font-medium text-[#0071e3] hover:bg-blue-100 transition"
+            >
+              <CalendarClock className="h-3.5 w-3.5" /> Important Dates
+            </Link>
+          )}
           <Link
             href="/admin/invoices/create"
             className="inline-flex items-center gap-1.5 rounded-full bg-[#0071e3] hover:bg-[#0077ed] px-4 py-2 text-xs font-medium text-white shadow-sm transition"
@@ -125,6 +149,105 @@ export default async function AdminDashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Statutory Compliance Alert Banner */}
+      {complianceAlerts &&
+        (!complianceAlerts.incorporationDateSet ||
+          complianceAlerts.overdueCount > 0 ||
+          complianceAlerts.dueSoonCount > 0) && (
+          <div
+            className={`rounded-3xl border p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] ${
+              complianceAlerts.overdueCount > 0
+                ? "border-rose-200 bg-gradient-to-r from-rose-50/90 via-white to-amber-50/40"
+                : complianceAlerts.dueSoonCount > 0
+                ? "border-amber-200 bg-gradient-to-r from-amber-50/90 via-white to-white"
+                : "border-blue-200 bg-gradient-to-r from-blue-50/80 via-white to-white"
+            }`}
+          >
+            <div className="flex items-start gap-3.5 min-w-0">
+              <div
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
+                  complianceAlerts.overdueCount > 0
+                    ? "bg-rose-100 text-rose-600"
+                    : complianceAlerts.dueSoonCount > 0
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-blue-100 text-[#0071e3]"
+                }`}
+              >
+                <CalendarClock className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-bold text-[#1d1d1f]">
+                    {!complianceAlerts.incorporationDateSet
+                      ? "Set Company Incorporation Date for Auto-Compliance Calendar"
+                      : complianceAlerts.overdueCount > 0
+                      ? `${complianceAlerts.overdueCount} Overdue${
+                          complianceAlerts.dueSoonCount > 0
+                            ? ` & ${complianceAlerts.dueSoonCount} Due Soon`
+                            : ""
+                        } Statutory Compliances`
+                      : `${complianceAlerts.dueSoonCount} Statutory Compliance${
+                          complianceAlerts.dueSoonCount === 1 ? "" : "s"
+                        } Due Within 15 Days`}
+                  </span>
+                </div>
+                {!complianceAlerts.incorporationDateSet ? (
+                  <p className="text-xs text-[#6e6e73]">
+                    Enter your Incorporation Date &amp; GST scheme once to automatically track INC-20A, MCA/ROC, GST returns, TDS, and ITR-6 deadlines.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#424245]">
+                    {complianceAlerts.topItems.slice(0, 3).map((item) => (
+                      <span
+                        key={item.key}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-white/90 border border-black/[0.06] px-2.5 py-0.5 text-[11px]"
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            item.urgency === "OVERDUE" ? "bg-rose-500" : "bg-amber-500"
+                          }`}
+                        />
+                        <span className="font-semibold text-[#1d1d1f] truncate max-w-[190px]">
+                          {item.title}
+                        </span>
+                        <span
+                          className={`font-bold ${
+                            item.urgency === "OVERDUE" ? "text-rose-600" : "text-amber-700"
+                          }`}
+                        >
+                          {item.daysRemaining < 0
+                            ? `${Math.abs(item.daysRemaining)}d overdue`
+                            : item.daysRemaining === 0
+                            ? "Today"
+                            : `${item.daysRemaining}d left`}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <Link
+              href="/admin/important-dates"
+              className={`inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold shrink-0 transition ${
+                complianceAlerts.overdueCount > 0
+                  ? "bg-rose-600 hover:bg-rose-700 text-white"
+                  : complianceAlerts.dueSoonCount > 0
+                  ? "bg-amber-600 hover:bg-amber-700 text-white"
+                  : "bg-[#0071e3] hover:bg-[#0077ed] text-white"
+              }`}
+            >
+              <span>
+                {complianceAlerts.incorporationDateSet
+                  ? "Open Compliance Calendar"
+                  : "Configure Now"}
+              </span>
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        )}
 
       {/* Apple-Style KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

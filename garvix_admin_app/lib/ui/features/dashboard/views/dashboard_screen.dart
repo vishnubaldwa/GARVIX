@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../data/repositories/crm_repository.dart';
 import '../../../../data/repositories/erp_repository.dart';
 import '../../../../domain/models/auth_user.dart';
+import '../../../../domain/models/dashboard_data.dart';
 import '../../../core/theme/apple_theme.dart';
 import '../../../core/widgets/apple_card.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -14,6 +15,7 @@ import '../../finance/views/finance_screen.dart';
 import '../../leads/view_models/leads_view_model.dart';
 import '../../leads/views/leads_screen.dart';
 import '../../operations/views/challans_screen.dart';
+import '../../operations/views/important_dates_screen.dart';
 import '../../team/view_models/team_view_model.dart';
 import '../../team/views/roles_matrix_screen.dart';
 import '../view_models/dashboard_view_model.dart';
@@ -163,6 +165,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       );
       addPill(
+        label: 'Important Dates',
+        icon: Icons.event_available_rounded,
+        color: const Color(0xFF7C3AED),
+        onTap: () async {
+          await Navigator.of(context).push<void>(
+            MaterialPageRoute<void>(
+              builder: (_) => ImportantDatesScreen(
+                erpRepository: widget.erpRepository,
+                user: u,
+              ),
+            ),
+          );
+          widget.viewModel.load();
+        },
+      );
+      addPill(
         label: '+ Expense',
         icon: Icons.payments_outlined,
         color: AppleColors.red,
@@ -254,6 +272,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       scrollDirection: Axis.horizontal,
                       children: quickActions,
                     ),
+                  ),
+                  const SizedBox(height: 14),
+                ],
+
+                // Statutory Compliance Alert Banner
+                if (data.complianceAlerts != null &&
+                    data.complianceAlerts!.needsAttention) ...[
+                  _ComplianceAlertBanner(
+                    alert: data.complianceAlerts!,
+                    onTap: () async {
+                      await Navigator.of(context).push<void>(
+                        MaterialPageRoute<void>(
+                          builder: (_) => ImportantDatesScreen(
+                            erpRepository: widget.erpRepository,
+                            user: widget.user,
+                          ),
+                        ),
+                      );
+                      widget.viewModel.load();
+                    },
                   ),
                   const SizedBox(height: 14),
                 ],
@@ -797,6 +835,100 @@ class _StatusPill extends StatelessWidget {
       label: upper,
       background: AppleColors.redSoft,
       foreground: AppleColors.red,
+    );
+  }
+}
+
+class _ComplianceAlertBanner extends StatelessWidget {
+  const _ComplianceAlertBanner({
+    required this.alert,
+    required this.onTap,
+  });
+
+  final ComplianceDashboardAlert alert;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isOverdue = alert.overdueCount > 0;
+    final isSetup = !alert.incorporationDateSet;
+    final Color accent = isSetup
+        ? AppleColors.blue
+        : isOverdue
+            ? AppleColors.red
+            : AppleColors.amber;
+    final Color softBg = isSetup
+        ? AppleColors.blueSoft
+        : isOverdue
+            ? AppleColors.redSoft
+            : AppleColors.amberSoft;
+
+    final String heading = isSetup
+        ? 'Set Incorporation Date for Compliance Calendar'
+        : isOverdue
+            ? '${alert.overdueCount} Overdue${alert.dueSoonCount > 0 ? ' • ${alert.dueSoonCount} Due Soon' : ''} Compliances'
+            : '${alert.dueSoonCount} Statutory Filing${alert.dueSoonCount == 1 ? '' : 's'} Due in ≤15 Days';
+
+    final String subtitle = isSetup
+        ? 'Tap to enter DOI & GST scheme for auto MCA, GST & ITR reminders.'
+        : alert.topItems
+            .take(2)
+            .map(
+              (t) =>
+                  '${t.title} (${t.daysRemaining < 0 ? '${t.daysRemaining.abs()}d overdue' : t.daysRemaining == 0 ? 'Today' : '${t.daysRemaining}d left'})',
+            )
+            .join(' • ');
+
+    return AppleCard(
+      padding: const EdgeInsets.all(14),
+      onTap: onTap,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: softBg,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.event_available_rounded,
+              color: accent,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  heading,
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: isSetup ? AppleColors.inkPrimary : accent,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11.5,
+                    color: AppleColors.inkSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 6),
+          Icon(
+            Icons.chevron_right_rounded,
+            color: accent,
+          ),
+        ],
+      ),
     );
   }
 }

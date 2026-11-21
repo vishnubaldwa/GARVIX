@@ -585,6 +585,115 @@ class ErpRepository {
     await _apiClient.delete('/api/admin/website-clients/$id');
   }
 
+  // --- Important Dates & Statutory Compliances ---
+  Future<ImportantDatesPayload> fetchImportantDates({String? fy}) async {
+    final query = (fy != null && fy.isNotEmpty)
+        ? '?fy=${Uri.encodeComponent(fy)}'
+        : '';
+    final data = await _apiClient.get('/api/admin/important-dates$query');
+    return ImportantDatesPayload.fromJson(data);
+  }
+
+  Future<ImportantDatesPayload> saveComplianceProfile({
+    String? incorporationDate,
+    required String companyType,
+    required String gstFilingFrequency,
+    String? gstRegistrationDate,
+    required bool pfEsicApplicable,
+    String? fy,
+  }) async {
+    final data = await _apiClient.put(
+      '/api/admin/important-dates',
+      body: {
+        'incorporationDate': incorporationDate ?? '',
+        'companyType': companyType,
+        'gstFilingFrequency': gstFilingFrequency,
+        'gstRegistrationDate': gstRegistrationDate ?? '',
+        'pfEsicApplicable': pfEsicApplicable,
+        'fy': ?fy,
+      },
+    );
+    return ImportantDatesPayload.fromJson(data);
+  }
+
+  Future<void> updateComplianceStatus({
+    String? complianceKey,
+    String? customId,
+    required String financialYear,
+    required String status,
+    String? filedDate,
+    String? referenceNo,
+    String? notes,
+  }) async {
+    await _apiClient.patch(
+      '/api/admin/important-dates/status',
+      body: {
+        'complianceKey': ?complianceKey,
+        'customId': ?customId,
+        'financialYear': financialYear,
+        'status': status,
+        'filedDate': ?filedDate,
+        'referenceNo': ?referenceNo,
+        'notes': ?notes,
+      },
+    );
+  }
+
+  Future<void> createCustomImportantDate({
+    required String title,
+    required String category,
+    required String dueDate,
+    String? portalName,
+    String? portalUrl,
+    String? instructions,
+    String? penaltyNote,
+    String recurrence = 'NONE',
+  }) async {
+    await _apiClient.post(
+      '/api/admin/important-dates',
+      body: {
+        'title': title,
+        'category': category,
+        'dueDate': dueDate,
+        'portalName': ?portalName,
+        'portalUrl': ?portalUrl,
+        'instructions': ?instructions,
+        'penaltyNote': ?penaltyNote,
+        'recurrence': recurrence,
+      },
+    );
+  }
+
+  Future<void> updateCustomImportantDate({
+    required String id,
+    required String title,
+    required String category,
+    required String dueDate,
+    String? portalName,
+    String? portalUrl,
+    String? instructions,
+    String? penaltyNote,
+    String recurrence = 'NONE',
+  }) async {
+    await _apiClient.patch(
+      '/api/admin/important-dates/$id',
+      body: {
+        'title': title,
+        'category': category,
+        'dueDate': dueDate,
+        'portalName': portalName ?? '',
+        'portalUrl': portalUrl ?? '',
+        'instructions': instructions ?? '',
+        'penaltyNote': penaltyNote ?? '',
+        'recurrence': recurrence,
+      },
+    );
+  }
+
+  Future<void> deleteCustomImportantDate(String id) async {
+    await _apiClient.delete('/api/admin/important-dates/$id');
+  }
+
   // --- Audit Security Logs ---
   Future<List<AuditLogItem>> fetchAuditLogs() async {
     final data = await _apiClient.get('/api/admin/audit');

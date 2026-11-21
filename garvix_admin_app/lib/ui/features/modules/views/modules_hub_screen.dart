@@ -13,6 +13,7 @@ import '../../leads/view_models/leads_view_model.dart';
 import '../../leads/views/leads_screen.dart';
 import '../../operations/views/amc_screen.dart';
 import '../../operations/views/challans_screen.dart';
+import '../../operations/views/important_dates_screen.dart';
 import '../../operations/views/inventory_screen.dart';
 import '../../operations/views/website_clients_screen.dart';
 import '../../settings/views/audit_logs_screen.dart';
@@ -374,6 +375,20 @@ class ModulesHubScreen extends StatelessWidget {
                   erpRepository: erpRepository,
                   user: user,
                   initialTab: 2,
+                ),
+              ),
+            ),
+            _ModuleItem(
+              title: 'Important Dates & Compliances',
+              subtitle: 'MCA/ROC, GST, TDS, ITR-6 & Post-Incorp tracker',
+              icon: Icons.event_available_rounded,
+              color: const Color(0xFF7C3AED),
+              bgColor: const Color(0xFFF3E8FF),
+              onTap: () => _push(
+                context,
+                ImportantDatesScreen(
+                  erpRepository: erpRepository,
+                  user: user,
                 ),
               ),
             ),

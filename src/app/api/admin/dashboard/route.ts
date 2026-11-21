@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { hasPermission, isFullAdminRole } from "@/lib/permissions";
+import { getUpcomingComplianceAlerts } from "@/lib/compliance-engine";
 
 export const dynamic = "force-dynamic";
 
@@ -26,13 +27,17 @@ export async function GET() {
       canViewLeads,
       canCreateClient,
       canViewDocs,
+      canManageSettings,
     ] = await Promise.all([
       hasPermission(session.role, "CAN_VIEW_FINANCES"),
       hasPermission(session.role, "CAN_MANAGE_INVOICES"),
       hasPermission(session.role, "CAN_VIEW_LEADS"),
       hasPermission(session.role, "CAN_CREATE_CLIENT"),
       hasPermission(session.role, "CAN_VIEW_DOCUMENTS"),
+      hasPermission(session.role, "CAN_MANAGE_SETTINGS"),
     ]);
+
+    const canViewCompliance = fullAdmin || canViewFinances || canManageSettings;
 
     const [
       invoices,
@@ -43,6 +48,7 @@ export async function GET() {
       amcCount,
       clientCount,
       vaultDocCount,
+      complianceAlerts,
     ] = await Promise.all([
       canViewFinances || canManageInvoices
         ? prisma.invoice.findMany({
@@ -65,6 +71,7 @@ export async function GET() {
       prisma.aMCContract.count({ where: { status: "ACTIVE" } }),
       canCreateClient ? prisma.customer.count() : Promise.resolve(0),
       canViewDocs ? prisma.vaultDocument.count() : Promise.resolve(0),
+      canViewCompliance ? getUpcomingComplianceAlerts() : Promise.resolve(null),
     ]);
 
     const totalInvoiced = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
@@ -103,6 +110,7 @@ export async function GET() {
         createdAt: inv.createdAt,
       })),
       recentLeads: leads.slice(0, 6),
+      complianceAlerts,
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Failed to load dashboard" }, { status: 500 });

@@ -369,22 +369,59 @@ model Role {
 }
 
 model CompanySetting {
-  id        String   @id @default("default")
-  name      String   @default("GARVIX TECHNOLOGIES")
-  tagline   String   @default("Next-Gen RFID Ecosystems & Bespoke Software")
-  state     String   @default("Haryana")
-  stateCode String   @default("06")
-  gstin     String   @default("06AAACG1234F1Z5")
-  email     String   @default("contact@garvix.in")
-  phone     String   @default("+91 98765 43210")
-  address   String   @default("Cyber Hub, Sector 24, Gurugram, Haryana - 122002")
-  upiId     String   @default("garvix@upi")
-  upiName   String   @default("GARVIX TECHNOLOGIES")
-  bankName  String?
-  accountNo String?
-  ifscCode  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String    @id @default("default")
+  name                String    @default("GARVIX TECHNOLOGIES")
+  tagline             String    @default("Next-Gen RFID Ecosystems & Bespoke Software")
+  state               String    @default("Haryana")
+  stateCode           String    @default("06")
+  gstin               String    @default("06AAACG1234F1Z5")
+  email               String    @default("contact@garvix.in")
+  phone               String    @default("+91 98765 43210")
+  address             String    @default("Cyber Hub, Sector 24, Gurugram, Haryana - 122002")
+  upiId               String    @default("garvix@upi")
+  upiName             String    @default("GARVIX TECHNOLOGIES")
+  bankName            String?
+  accountNo           String?
+  ifscCode            String?
+  incorporationDate   DateTime?
+  companyType         String    @default("PVT_LTD") // PVT_LTD, LLP, OPC, PROPRIETORSHIP
+  gstFilingFrequency  String    @default("MONTHLY") // MONTHLY, QUARTERLY, NONE
+  gstRegistrationDate DateTime?
+  pfEsicApplicable    Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model ComplianceRecord {
+  id            String    @id @default(cuid())
+  complianceKey String    @unique
+  financialYear String
+  status        String    @default("PENDING") // PENDING, IN_PROGRESS, FILED, NOT_APPLICABLE
+  filedDate     DateTime?
+  referenceNo   String?
+  notes         String?
+  updatedBy     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model CustomImportantDate {
+  id           String    @id @default(cuid())
+  title        String
+  category     String    @default("CUSTOM") // CUSTOM, POST_INCORP, GST, MCA_ROC, INCOME_TAX, PF_ESIC
+  dueDate      DateTime
+  portalName   String?
+  portalUrl    String?
+  instructions String?
+  penaltyNote  String?
+  recurrence   String    @default("NONE") // NONE, MONTHLY, QUARTERLY, YEARLY
+  status       String    @default("PENDING") // PENDING, IN_PROGRESS, FILED, NOT_APPLICABLE
+  filedDate    DateTime?
+  referenceNo  String?
+  notes        String?
+  createdBy    String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model VaultFolder {
