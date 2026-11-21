@@ -37,7 +37,7 @@ export function Navbar() {
         </Link>
 
         {/* Clean Minimal Desktop Links */}
-        <nav className="hidden lg:flex items-center gap-4 xl:gap-5 text-xs font-medium text-[#424245] whitespace-nowrap">
+        <nav className="hidden lg:flex items-center gap-8 text-[13px] font-medium text-[#424245] whitespace-nowrap">
           <Link href="/#retail-software" className="text-[#0071e3] font-semibold hover:underline transition-colors">
             Retail Software
           </Link>
@@ -49,21 +49,6 @@ export function Navbar() {
           </Link>
           <Link href="/#custom-software" className="hover:text-[#1d1d1f] transition-colors">
             Custom Software
-          </Link>
-          <Link href="/#jewellery" className="hover:text-[#1d1d1f] transition-colors">
-            Jewellery
-          </Link>
-          <Link href="/#apparel" className="hover:text-[#1d1d1f] transition-colors">
-            Apparel
-          </Link>
-          <Link href="/#laundry" className="hover:text-[#1d1d1f] transition-colors">
-            Laundry
-          </Link>
-          <Link href="/#anti-metal" className="hover:text-[#1d1d1f] transition-colors">
-            Industrial
-          </Link>
-          <Link href="/#vehicle" className="hover:text-[#1d1d1f] transition-colors">
-            Vehicle Pass
           </Link>
         </nav>
 
@@ -103,24 +88,6 @@ export function Navbar() {
             </Link>
             <Link href="/#custom-software" onClick={() => setMobileMenuOpen(false)}>
               Custom Software
-            </Link>
-            <Link href="/#jewellery" onClick={() => setMobileMenuOpen(false)}>
-              Jewellery RFID
-            </Link>
-            <Link href="/#apparel" onClick={() => setMobileMenuOpen(false)}>
-              Garment & Hard Tags
-            </Link>
-            <Link href="/#laundry" onClick={() => setMobileMenuOpen(false)}>
-              Textile Laundry Tags
-            </Link>
-            <Link href="/#anti-metal" onClick={() => setMobileMenuOpen(false)}>
-              Anti-Metal Industrial Tags
-            </Link>
-            <Link href="/#vehicle" onClick={() => setMobileMenuOpen(false)}>
-              Vehicle RFID Pass
-            </Link>
-            <Link href="/#rolls" onClick={() => setMobileMenuOpen(false)}>
-              Printable Rolls & Inlays
             </Link>
             <Link
               href="/admin/login"
