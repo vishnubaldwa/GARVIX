@@ -22,6 +22,8 @@ import {
   Store,
   Zap,
   Cloud,
+  Building2,
+  FolderLock,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -213,8 +215,125 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* 0.5. Management Software — GARVIX Complete Business ERP & Mobile App */}
+      <section
+        id="management-software"
+        className="py-16 sm:py-20 bg-[#fbfbfd] border-b border-black/[0.06] scroll-mt-20"
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0071e3]">
+              Management Software &bull; Web ERP + Android App
+            </p>
+            <h2 className="mt-2.5 text-3xl sm:text-5xl font-bold tracking-tight text-[#1d1d1f] leading-[1.08]">
+              Complete Business ERP &amp;{" "}
+              <span className="text-[#0071e3]">Mobile App.</span>
+            </h2>
+            <p className="mt-3.5 text-sm sm:text-lg text-[#6e6e73] max-w-2xl mx-auto leading-relaxed">
+              Manage your entire company from Web &amp; Android &mdash; GST Quotations &amp; Tax Invoices with dynamic UPI QR, Delivery Challans, Serial/IMEI tracking, AMC &amp; Service Tickets, Business Expenses, 1-Click CA GST Return, and Secure Document Vault.
+            </p>
+          </div>
+
+          {/* 15s Full HD Autoplay Showcase Video Card */}
+          <div className="rounded-[1.75rem] sm:rounded-[2rem] border border-black/[0.06] bg-white overflow-hidden shadow-[0_18px_54px_rgba(0,0,0,0.07)]">
+            <ShowcaseVideoPlayer
+              src="/videos/garvix-erp-showcase.mp4"
+              poster="/images/products/garvix-erp-poster.jpg"
+              label="GARVIX Business ERP & Flutter Android Mobile App Showcase"
+            />
+            <div className="bg-white border-t border-black/[0.05] px-5 py-4 sm:px-8 sm:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-[#424245]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0071e3]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">
+                  Built by GARVIX
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Smartphone className="h-3.5 w-3.5 text-[#0071e3]" />
+                  <span>100% Web + Android Parity</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <FileSpreadsheet className="h-3.5 w-3.5 text-[#0071e3]" />
+                  <span>1-Click CA GST Return</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <FolderLock className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>Secure Company Document Vault</span>
+                </span>
+              </div>
+              <div className="shrink-0">
+                <EnquireButton
+                  solution="Business ERP & Mobile App"
+                  label="Request ERP Demo"
+                  variant="primary"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Ideal For Industries Grid */}
+          <div className="mt-14 sm:mt-16">
+            <div className="text-center max-w-2xl mx-auto mb-9">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#0071e3]">
+                Ideal For B2B &amp; Service Companies
+              </p>
+              <h3 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f]">
+                One ERP. Built for Your Industry.
+              </h3>
+              <p className="mt-2.5 text-sm sm:text-base text-[#6e6e73]">
+                Deployed with your company branding, GST state automation, role-based staff security &amp; official Android app.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {[
+                {
+                  name: "CCTV, RFID & IT Dealers",
+                  desc: "Quotations, Serial/IMEI warranty tracking, Delivery Challans, AMC contracts & support tickets.",
+                },
+                {
+                  name: "Solar, HVAC & Lift EPC",
+                  desc: "Site proposals, Proforma invoices, project expenses, staff reimbursements & yearly AMC alerts.",
+                },
+                {
+                  name: "Wholesale & B2B Distributors",
+                  desc: "GSTIN party ledgers, auto CGST/SGST vs IGST billing, outstanding recovery & 1-Click CA return.",
+                },
+                {
+                  name: "Machinery & Medical Suppliers",
+                  desc: "Returnable demo challans, serialized unit provenance, vendor ITC & digital signatory invoices.",
+                },
+                {
+                  name: "SME Factories & Manufacturers",
+                  desc: "Vendor purchase ITC, inventory tracking, E-Way/LR dispatch challans & full staff audit logs.",
+                },
+                {
+                  name: "B2B Service Agencies",
+                  desc: "Online client-approvable quotes, milestone invoices with UPI QR & password-protected Document Vault.",
+                },
+              ].map((ind) => (
+                <div
+                  key={ind.name}
+                  className="rounded-3xl border border-black/[0.06] bg-white p-6 flex items-start gap-3.5 shadow-[0_4px_20px_rgba(0,0,0,0.025)]"
+                >
+                  <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-xl bg-[#0071e3] text-white shrink-0">
+                    <Building2 className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-[#1d1d1f] tracking-tight">
+                      {ind.name}
+                    </h4>
+                    <p className="mt-1 text-xs sm:text-sm text-[#6e6e73] leading-relaxed">
+                      {ind.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 1. Hero Section — Pure Apple Simplicity */}
-      <section className="pt-14 pb-20 sm:pt-20 sm:pb-24 bg-[#fbfbfd]">
+      <section className="pt-14 pb-20 sm:pt-20 sm:pb-24 bg-white">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-[#0071e3]">
             GARVIX Smart Retail & Software
@@ -780,65 +899,6 @@ export default async function HomePage() {
                 label="Discuss Your Custom Software"
                 variant="primary"
               />
-            </div>
-          </div>
-
-          {/* 4.5. GARVIX Business ERP & Android Mobile App — Video Showcase */}
-          <div
-            id="business-erp"
-            className="mt-10 rounded-[2rem] border border-black/[0.06] bg-white overflow-hidden shadow-[0_14px_44px_rgba(0,0,0,0.05)] scroll-mt-24"
-          >
-            <div className="px-6 py-7 sm:px-10 sm:py-8 flex flex-col lg:flex-row lg:items-end justify-between gap-5">
-              <div className="max-w-2xl">
-                <p className="text-xs font-semibold uppercase tracking-widest text-[#0071e3]">
-                  Flagship ERP + Android App &bull; Built by GARVIX
-                </p>
-                <h3 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f]">
-                  Complete Business ERP &amp; Mobile App.
-                </h3>
-                <p className="mt-2 text-sm sm:text-base text-[#6e6e73] leading-relaxed">
-                  Manage your entire company from Web &amp; Android &mdash; GST Quotations &amp; Tax Invoices with dynamic UPI QR, Delivery Challans, Serial/IMEI tracking, AMC &amp; Service Tickets, Business Expenses, 1-Click CA GST Return, and Secure Document Vault.
-                </p>
-              </div>
-              <div className="shrink-0">
-                <EnquireButton
-                  solution="Business ERP & Mobile App"
-                  label="Request ERP Demo"
-                  variant="primary"
-                />
-              </div>
-            </div>
-
-            <div className="border-y border-black/[0.05]">
-              <ShowcaseVideoPlayer
-                src="/videos/garvix-erp-showcase.mp4"
-                poster="/images/products/garvix-erp-poster.jpg"
-                label="GARVIX Business ERP & Flutter Android Mobile App Showcase"
-              />
-            </div>
-
-            <div className="px-6 py-5 sm:px-10 bg-[#fbfbfd] flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-              <span className="text-[11px] font-bold uppercase tracking-widest text-[#86868b] shrink-0">
-                Ideal For
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  "CCTV, RFID & IT Dealers",
-                  "Solar, HVAC & Lift EPC",
-                  "Wholesale & B2B Distributors",
-                  "Machinery & Medical Suppliers",
-                  "SME Factories & Manufacturers",
-                  "B2B Service Agencies",
-                ].map((industry) => (
-                  <span
-                    key={industry}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.06] bg-white px-3 py-1 text-xs font-medium text-[#1d1d1f] shadow-2xs"
-                  >
-                    <Check className="h-3 w-3 text-[#0071e3] shrink-0" />
-                    <span>{industry}</span>
-                  </span>
-                ))}
-              </div>
             </div>
           </div>
         </div>
