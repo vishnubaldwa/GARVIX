@@ -16,7 +16,12 @@ import {
   ShieldCheck,
   ChevronRight,
   ExternalLink,
-  Play,
+  Receipt,
+  ScanBarcode,
+  QrCode,
+  Store,
+  Zap,
+  Cloud,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -36,68 +41,173 @@ export default async function HomePage() {
     <div className="min-h-screen bg-white text-[#1d1d1f] selection:bg-[#0071e3] selection:text-white antialiased">
       <Navbar />
 
-      {/* 0. First-Fold Flagship Showcase — GARVIX Retail POS & Store ERP */}
+      {/* 0. First-Fold Flagship Showcase — GARVIX Retail POS & Store ERP (Video + Capabilities + Industries) */}
       <section
         id="retail-software"
-        className="pt-8 pb-12 sm:pt-11 sm:pb-16 bg-white border-b border-black/[0.06] scroll-mt-20"
+        className="pt-8 pb-16 sm:pt-12 sm:pb-20 bg-white border-b border-black/[0.06] scroll-mt-20"
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-7 sm:mb-8">
+          <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#0071e3]">
-              Flagship Software &bull; Built by GARVIX
+              Flagship Retail Suite &bull; Built by GARVIX
             </p>
             <h1 className="mt-2.5 text-3xl sm:text-5xl font-bold tracking-tight text-[#1d1d1f] leading-[1.08]">
-              Built for Modern Retail.{" "}
-              <span className="text-[#86868b]">Engineered by GARVIX.</span>
+              Retail POS &amp;{" "}
+              <span className="text-[#0071e3]">Store ERP.</span>
             </h1>
-            <p className="mt-3 text-sm sm:text-base text-[#6e6e73] max-w-2xl mx-auto leading-relaxed">
-              Complete GST POS billing, barcode &amp; RFID stock sync, instant UPI QR payments, and multi-store cloud ERP &mdash; developed in-house by our team.
+            <p className="mt-3.5 text-sm sm:text-lg text-[#6e6e73] max-w-2xl mx-auto leading-relaxed">
+              Lightning-fast GST billing, barcode &amp; UHF RFID inventory sync, instant UPI QR payments, and live multi-store cloud control &mdash; engineered in-house by GARVIX.
             </p>
           </div>
 
-          <div className="rounded-[1.75rem] sm:rounded-[2rem] border border-black/[0.06] bg-[#f5f5f7] overflow-hidden shadow-[0_14px_44px_rgba(0,0,0,0.06)]">
-            <Link
-              href="/retail-software"
-              className="group relative block overflow-hidden"
-              aria-label="Watch GARVIX Retail POS & Store ERP product video"
-            >
-              <img
-                src="/images/products/garvix-retail-software.jpg?v=2"
-                alt="GARVIX Retail POS & Store ERP — Custom Retail Billing, Inventory & Multi-Store Software built by GARVIX"
-                fetchPriority="high"
-                className="w-full h-auto block transition-transform duration-500 group-hover:scale-[1.01]"
-              />
-              <span className="absolute bottom-3.5 right-3.5 sm:bottom-6 sm:right-6 inline-flex items-center gap-2 rounded-full bg-[#1d1d1f]/85 group-hover:bg-[#0071e3] text-white backdrop-blur-md px-4 py-2 text-xs sm:text-sm font-semibold shadow-lg transition-colors">
-                <Play className="h-3.5 w-3.5 fill-current" />
-                <span>Watch 15s Product Video</span>
-              </span>
-            </Link>
+          {/* 15s Full HD Autoplay Showcase Video Card */}
+          <div className="rounded-[1.75rem] sm:rounded-[2rem] border border-black/[0.06] bg-[#f5f5f7] overflow-hidden shadow-[0_18px_54px_rgba(0,0,0,0.08)]">
+            <ShowcaseVideoPlayer
+              src="/videos/garvix-retail-pos-showcase.mp4"
+              poster="/images/products/garvix-retail-pos-poster.jpg"
+              label="GARVIX Retail POS & Store ERP — 15 Second Product Showcase Video"
+            />
             <div className="bg-white border-t border-black/[0.05] px-5 py-4 sm:px-8 sm:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3.5">
-                <span className="inline-flex w-fit items-center rounded-full bg-[#0071e3]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#0071e3] shrink-0">
+              <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-[#424245]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0071e3]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">
                   Built by GARVIX
                 </span>
-                <p className="text-sm text-[#424245] leading-snug">
-                  <span className="font-semibold text-[#1d1d1f]">
-                    GARVIX Retail POS &amp; Store ERP
-                  </span>{" "}
-                  &mdash; in-house retail billing, barcode &amp; RFID stock sync, and multi-store cloud software.
-                </p>
+                <span className="inline-flex items-center gap-1.5">
+                  <Zap className="h-3.5 w-3.5 text-[#0071e3]" />
+                  <span>Offline-Capable POS</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Cloud className="h-3.5 w-3.5 text-[#0071e3]" />
+                  <span>Real-Time Multi-Store Cloud Sync</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>100% Customizable to Your Showroom</span>
+                </span>
               </div>
               <div className="flex flex-wrap items-center gap-3 shrink-0">
                 <EnquireButton
                   solution="Retail POS & Store ERP"
-                  label="Request Live Demo"
+                  label="Book Live Demo"
                   variant="primary"
                 />
-                <Link
-                  href="/retail-software"
-                  className="inline-flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-medium text-[#0071e3] hover:underline transition"
-                >
-                  <span>Watch Demo Video</span>
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
               </div>
+            </div>
+          </div>
+
+          {/* Core Retail POS Capabilities (Counter to Cloud) */}
+          <div className="mt-14 sm:mt-16">
+            <div className="text-center max-w-2xl mx-auto mb-9">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#0071e3]">
+                Counter to Cloud
+              </p>
+              <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f]">
+                Everything your retail counter needs.
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[
+                {
+                  icon: Receipt,
+                  title: "Fast GST & POS Billing",
+                  desc: "Automated CGST+SGST & IGST calculation, HSN codes, 80mm thermal receipts, and instant WhatsApp e-bills.",
+                },
+                {
+                  icon: ScanBarcode,
+                  title: "Barcode & UHF RFID Sync",
+                  desc: "Scan barcodes or batch-read 200+ RFID-tagged jewellery trays and garment racks in seconds with 99.9% accuracy.",
+                },
+                {
+                  icon: QrCode,
+                  title: "Instant UPI QR Payments",
+                  desc: "Dynamic exact-amount NPCI UPI QR displayed at the billing counter with instant payment verification.",
+                },
+                {
+                  icon: Smartphone,
+                  title: "Multi-Store Owner App",
+                  desc: "Monitor live daily showroom sales, branch transfers, low-stock alerts, and mobile RFID audits from anywhere.",
+                },
+              ].map((cap) => {
+                const Icon = cap.icon;
+                return (
+                  <div
+                    key={cap.title}
+                    className="rounded-3xl border border-black/[0.06] bg-[#fbfbfd] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-3"
+                  >
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0071e3]/10 text-[#0071e3]">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-base font-bold text-[#1d1d1f] tracking-tight">
+                      {cap.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#6e6e73] leading-relaxed">
+                      {cap.desc}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Ideal Retail Industries */}
+          <div className="mt-14 sm:mt-16 pt-12 border-t border-black/[0.06]">
+            <div className="text-center max-w-2xl mx-auto mb-9">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#0071e3]">
+                Ideal For Modern Retail
+              </p>
+              <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f]">
+                One Retail ERP. Every Counter.
+              </h2>
+              <p className="mt-2.5 text-sm sm:text-base text-[#6e6e73]">
+                Works with your existing thermal printers, barcode scanners, UHF RFID trays, and handheld audit guns.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {[
+                {
+                  name: "Jewellery Showrooms",
+                  desc: "UHF RFID tray batch billing, gross/net weight, making charges & hallmarking.",
+                },
+                {
+                  name: "Apparel & Fashion Stores",
+                  desc: "Size/color matrix, branded RFID hang tags, quick exchanges & seasonal offers.",
+                },
+                {
+                  name: "Footwear & Lifestyle Outlets",
+                  desc: "Fast barcode billing, multi-branch stock lookup & instant customer loyalty points.",
+                },
+                {
+                  name: "Supermarkets & Retail Marts",
+                  desc: "Queue-free multi-counter POS, weighing-scale integration, batch & expiry tracking.",
+                },
+                {
+                  name: "Electronics & Mobile Stores",
+                  desc: "IMEI & serial-number warranty tracking, GST B2B/B2C invoicing & exchange ledgers.",
+                },
+                {
+                  name: "Multi-Branch Retail Chains",
+                  desc: "Centralized catalog pricing, inter-branch stock transfers & real-time cloud analytics.",
+                },
+              ].map((ind) => (
+                <div
+                  key={ind.name}
+                  className="rounded-3xl border border-black/[0.06] bg-[#fbfbfd] p-6 flex items-start gap-3.5"
+                >
+                  <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-xl bg-[#0071e3] text-white shrink-0">
+                    <Store className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-[#1d1d1f] tracking-tight">
+                      {ind.name}
+                    </h3>
+                    <p className="mt-1 text-xs sm:text-sm text-[#6e6e73] leading-relaxed">
+                      {ind.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
