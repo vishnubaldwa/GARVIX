@@ -19,9 +19,10 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "About Us | GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED",
+  title: "About GARVIX Software Solutions Pvt. Ltd.",
   description:
-    "Learn about GARVIX Software Solutions Private Limited — a premier technology company engineering bespoke enterprise software and end-to-end RFID automation across India.",
+    "Learn about GARVIX Software Solutions Private Limited (CIN: U62011HR2026PTC152223) — engineering Retail POS, Restaurant OS, Business ERP & turnkey UHF RFID automation across India.",
+  alternates: { canonical: "/about" },
 };
 
 export const dynamic = "force-dynamic";

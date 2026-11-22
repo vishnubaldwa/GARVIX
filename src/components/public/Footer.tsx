@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Mail, Phone, MapPin, ShieldCheck, ArrowUpRight } from "lucide-react";
 import { GarvixLogoMark } from "@/components/brand/GarvixLogo";
 import { getCompanySettings } from "@/lib/settings";
+import { COMPANY_CIN } from "@/lib/seo";
 
 export async function Footer() {
   const company = await getCompanySettings();
@@ -27,10 +28,10 @@ export async function Footer() {
               </div>
             </div>
             <p className="text-xs text-[#6e6e73] leading-relaxed max-w-xs">
-              Smart RFID tags, hardware, and custom software built around your exact business workflow.
+              In-house Retail POS, Restaurant &amp; Caf&eacute; Software, Complete Business ERP + Android App, and turnkey UHF RFID Hardware + Software across India.
             </p>
             <Link
-              href="#contact"
+              href="/contact"
               className="inline-flex items-center gap-1.5 rounded-full bg-[#1d1d1f] hover:bg-black px-4 py-2 text-xs font-medium text-white transition"
             >
               <span>Start an Enquiry</span>
@@ -38,69 +39,35 @@ export async function Footer() {
             </Link>
           </div>
 
-          {/* RFID Products */}
+          {/* Software Suites */}
           <div className="lg:col-span-3">
             <h4 className="text-xs font-semibold text-[#1d1d1f] mb-3.5">
-              RFID Products
+              Software Suites
             </h4>
             <ul className="space-y-2.5 text-[#6e6e73]">
               <li>
-                <Link href="/#jewellery" className="hover:text-[#1d1d1f] transition">
-                  Jewellery RFID Tags
+                <Link href="/retail-software" className="hover:text-[#1d1d1f] transition">
+                  Retail POS &amp; Store ERP
                 </Link>
               </li>
               <li>
-                <Link href="/#apparel" className="hover:text-[#1d1d1f] transition">
-                  Garment Hang Tags & Hard Tags
+                <Link href="/erp-software" className="hover:text-[#1d1d1f] transition">
+                  Business ERP &amp; Mobile App
                 </Link>
               </li>
               <li>
-                <Link href="/#laundry" className="hover:text-[#1d1d1f] transition">
-                  Textile Laundry RFID Tags
+                <Link href="/restaurant-software" className="hover:text-[#1d1d1f] transition">
+                  Restaurant &amp; Caf&eacute; Software
                 </Link>
               </li>
               <li>
-                <Link href="/#anti-metal" className="hover:text-[#1d1d1f] transition">
-                  Anti-Metal Industrial Tags
+                <Link href="/software" className="hover:text-[#1d1d1f] transition">
+                  Custom Software Engineering
                 </Link>
               </li>
               <li>
-                <Link href="/#vehicle" className="hover:text-[#1d1d1f] transition">
-                  Vehicle RFID Windshield Pass
-                </Link>
-              </li>
-              <li>
-                <Link href="/#rolls" className="hover:text-[#1d1d1f] transition">
-                  Printable Rolls & Clear Inlays
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Software & Access */}
-          <div className="lg:col-span-2">
-            <h4 className="text-xs font-semibold text-[#1d1d1f] mb-3.5">
-              Software
-            </h4>
-            <ul className="space-y-2.5 text-[#6e6e73]">
-              <li>
-                <Link href="/#custom-software" className="hover:text-[#1d1d1f] transition">
-                  Custom ERP & CRM
-                </Link>
-              </li>
-              <li>
-                <Link href="/#custom-software" className="hover:text-[#1d1d1f] transition">
-                  RFID Automation Apps
-                </Link>
-              </li>
-              <li>
-                <Link href="/#custom-software" className="hover:text-[#1d1d1f] transition">
-                  Web & Mobile Apps
-                </Link>
-              </li>
-              <li>
-                <Link href="/#custom-software" className="hover:text-[#1d1d1f] transition">
-                  GST Billing & Automation
+                <Link href="/blog" className="hover:text-[#1d1d1f] transition">
+                  Guides &amp; Insights (Blog)
                 </Link>
               </li>
               <li>
@@ -109,6 +76,45 @@ export async function Footer() {
                   className="text-[#86868b] hover:text-[#0071e3] transition"
                 >
                   Staff Login (/admin)
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* RFID Products */}
+          <div className="lg:col-span-2">
+            <h4 className="text-xs font-semibold text-[#1d1d1f] mb-3.5">
+              RFID &amp; Company
+            </h4>
+            <ul className="space-y-2.5 text-[#6e6e73]">
+              <li>
+                <Link href="/rfid-jewellery" className="hover:text-[#1d1d1f] transition">
+                  Jewellery RFID System
+                </Link>
+              </li>
+              <li>
+                <Link href="/rfid" className="hover:text-[#1d1d1f] transition">
+                  All RFID Hardware &amp; Tags
+                </Link>
+              </li>
+              <li>
+                <Link href="/industries" className="hover:text-[#1d1d1f] transition">
+                  Industries Served
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="hover:text-[#1d1d1f] transition">
+                  About GARVIX
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="hover:text-[#1d1d1f] transition">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-[#1d1d1f] transition">
+                  Terms of Service
                 </Link>
               </li>
             </ul>
@@ -144,15 +150,20 @@ export async function Footer() {
                   </a>
                 </div>
               )}
-              {company.gstin && (
-                <div className="pt-1 text-[11px] font-mono text-[#86868b]">
-                  GSTIN: <span className="text-[#424245]">{company.gstin}</span>
+              <div className="pt-1 text-[11px] font-mono text-[#86868b] space-y-0.5">
+                <div>
+                  CIN: <span className="text-[#424245]">{COMPANY_CIN}</span>
                 </div>
-              )}
+                {company.gstin && (
+                  <div>
+                    GSTIN: <span className="text-[#424245]">{company.gstin}</span>
+                  </div>
+                )}
+              </div>
               <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 font-medium">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 <span>
-                  {company.state} ({company.stateCode})
+                  {company.state} ({company.stateCode}) &bull; Pan-India Support
                 </span>
               </div>
             </div>
@@ -161,9 +172,12 @@ export async function Footer() {
 
         {/* Bottom Copyright */}
         <div className="mt-12 border-t border-black/[0.06] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#86868b]">
-          <p>© {new Date().getFullYear()} {company.name}.</p>
+          <p>&copy; {new Date().getFullYear()} {company.name}.</p>
           <div className="flex items-center gap-5">
-            <Link href="#contact" className="hover:text-[#1d1d1f] transition">
+            <Link href="/blog" className="hover:text-[#1d1d1f] transition">
+              Guides &amp; Blog
+            </Link>
+            <Link href="/contact" className="hover:text-[#1d1d1f] transition">
               Enquiry Desk
             </Link>
             <a href={`mailto:${company.email}`} className="hover:text-[#1d1d1f] transition">

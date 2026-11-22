@@ -16,9 +16,10 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Contact & Engineering Desk | GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED",
+  title: "Contact & Demo Booking Desk",
   description:
-    "Schedule an architecture consultation with GARVIX Software Solutions Private Limited. Connect with our engineering desk for custom software and RFID automation across India.",
+    "Book a live demo or architecture consultation with GARVIX Software Solutions Private Limited for Retail POS, Restaurant Software, Business ERP, or UHF RFID hardware across India.",
+  alternates: { canonical: "/contact" },
 };
 
 export const dynamic = "force-dynamic";

@@ -5,6 +5,15 @@ import { Footer } from "@/components/public/Footer";
 import { ContactForm } from "@/components/public/ContactForm";
 import { EnquireButton } from "@/components/public/EnquireButton";
 import { ShowcaseVideoPlayer } from "@/components/public/ShowcaseVideoPlayer";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { FaqSection } from "@/components/seo/FaqSection";
+import {
+  buildBreadcrumbSchema,
+  buildSoftwareSchema,
+  buildVideoSchema,
+  SITE_URL,
+  type FaqItem,
+} from "@/lib/seo";
 import { getCompanySettings } from "@/lib/settings";
 import {
   Check,
@@ -20,10 +29,60 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "GARVIX Retail POS & Store ERP Software | Built by GARVIX",
+  title: "Retail POS & Store ERP Software India | GST Billing, Barcode & RFID",
   description:
-    "Custom retail billing, barcode & UHF RFID inventory sync, dynamic UPI QR payments, thermal & WhatsApp GST receipts, and multi-store cloud ERP built by GARVIX.",
+    "Custom retail GST POS billing, barcode & UHF RFID inventory sync, dynamic NPCI UPI QR payments, 80mm thermal & WhatsApp receipts, and multi-store cloud ERP built in India by GARVIX.",
+  keywords: [
+    "Retail POS Software India",
+    "Store ERP Software India",
+    "GST Retail Billing Software Gurugram Haryana",
+    "Barcode and RFID POS Software",
+    "Multi Store Retail Billing App India",
+  ],
+  alternates: { canonical: "/retail-software" },
+  openGraph: {
+    title: "GARVIX Retail POS & Store ERP Software India",
+    description:
+      "Fast GST billing, barcode & UHF RFID stock sync, dynamic UPI QR payments, thermal & WhatsApp e-bills, and multi-store cloud ERP.",
+    url: `${SITE_URL}/retail-software`,
+    images: [
+      {
+        url: `${SITE_URL}/images/products/garvix-retail-pos-poster.jpg`,
+        width: 1280,
+        height: 720,
+        alt: "GARVIX Retail POS & Store ERP Software",
+      },
+    ],
+  },
 };
+
+const RETAIL_FAQS: FaqItem[] = [
+  {
+    question: "Does GARVIX Retail POS support both barcode scanners and UHF RFID readers?",
+    answer:
+      "Yes. You can start with standard 1D/2D barcode scanners and 80mm thermal printers today, and seamlessly connect GARVIX UHF RFID counter trays or handheld audit scanners for batch jewellery or apparel inventory anytime.",
+  },
+  {
+    question: "How does Dynamic UPI QR billing work at the retail counter?",
+    answer:
+      "At checkout, GARVIX generates an exact-amount NPCI UPI QR code tied to the invoice total on the billing screen or customer display. Customers scan with GPay, PhonePe, or Paytm without typing amounts manually, eliminating short-payments and billing errors.",
+  },
+  {
+    question: "Is GARVIX Retail POS fully GST-compliant for Indian stores?",
+    answer:
+      "Yes. It automatically calculates intra-state CGST + SGST and inter-state IGST with HSN/SAC codes, prints 80mm thermal and A4 tax invoices, sends instant WhatsApp e-bills, and exports 1-click GSTR-1 and GSTR-3B Excel workbooks for your CA.",
+  },
+  {
+    question: "Can I track multiple retail branches from my phone?",
+    answer:
+      "Yes. GARVIX includes real-time multi-store cloud synchronization and a mobile owner app so you can view live showroom sales, branch-to-branch stock transfers, low-stock alerts, and staff discount logs from anywhere.",
+  },
+  {
+    question: "Can the software be customized for jewellery, apparel, or electronics stores?",
+    answer:
+      "Yes. GARVIX engineers software in-house, so we customize gross/net weight & making charges for jewellery, size/color matrix for fashion & footwear, batch/expiry for supermarkets, and IMEI/serial warranty ledgers for electronics stores.",
+  },
+];
 
 export const dynamic = "force-dynamic";
 
@@ -82,6 +141,36 @@ export default async function RetailSoftwarePage() {
 
   return (
     <div className="min-h-screen bg-white text-[#1d1d1f] selection:bg-[#0071e3] selection:text-white antialiased">
+      <JsonLd
+        data={[
+          buildBreadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Retail POS & Store ERP", path: "/retail-software" },
+          ]),
+          buildSoftwareSchema({
+            name: "GARVIX Retail POS & Store ERP",
+            description:
+              "Fast Indian Retail GST POS billing, barcode & UHF RFID inventory sync, dynamic NPCI UPI QR payments, 80mm thermal & WhatsApp bills, and multi-store cloud ERP.",
+            path: "/retail-software",
+            imagePath: "/images/products/garvix-retail-pos-poster.jpg",
+            featureList: [
+              "Fast GST POS Billing (CGST/SGST & IGST)",
+              "Barcode & UHF RFID Batch Inventory Sync",
+              "Dynamic Exact-Amount NPCI UPI QR Payments",
+              "80mm Thermal Receipts & WhatsApp E-Bills",
+              "Multi-Store Cloud Sync & Owner Mobile App",
+            ],
+          }),
+          buildVideoSchema({
+            name: "GARVIX Retail POS & Store ERP — 15s Showcase Video",
+            description:
+              "Product walkthrough of GARVIX Retail POS & Store ERP with GST billing, barcode & RFID sync, dynamic UPI QR, and multi-store cloud reports.",
+            videoPath: "/videos/garvix-retail-pos-showcase.mp4",
+            thumbnailPath: "/images/products/garvix-retail-pos-poster.jpg",
+            pagePath: "/retail-software",
+          }),
+        ]}
+      />
       <Navbar />
 
       {/* 1. Flagship Video Hero */}
@@ -264,6 +353,14 @@ export default async function RetailSoftwarePage() {
           </div>
         </div>
       </section>
+
+      {/* 3.5. Retail POS FAQs */}
+      <FaqSection
+        eyebrow="Retail POS FAQs"
+        heading="Common questions from retail store owners."
+        faqs={RETAIL_FAQS}
+        bgClass="bg-[#fbfbfd]"
+      />
 
       {/* 4. Book Demo Contact Form (Pre-selected to Retail POS & Store ERP) */}
       <section className="py-20 bg-white">

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/public/Navbar";
 import { Footer } from "@/components/public/Footer";
@@ -5,6 +6,9 @@ import { ContactForm } from "@/components/public/ContactForm";
 import { EnquireButton } from "@/components/public/EnquireButton";
 import { ShowcaseVideoPlayer } from "@/components/public/ShowcaseVideoPlayer";
 import { SmartProductsCarousel } from "@/components/public/SmartProductsCarousel";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { FaqSection } from "@/components/seo/FaqSection";
+import { buildVideoSchema, type FaqItem } from "@/lib/seo";
 import { getCompanySettings } from "@/lib/settings";
 import { prisma } from "@/lib/prisma";
 import {
@@ -30,7 +34,41 @@ import {
   Users,
 } from "lucide-react";
 
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+};
+
 export const dynamic = "force-dynamic";
+
+const HOME_FAQS: FaqItem[] = [
+  {
+    question: "What software and RFID products does GARVIX Software Solutions build?",
+    answer:
+      "GARVIX Software Solutions Private Limited builds four flagship ecosystems in-house: (1) Retail POS & Store ERP with barcode/RFID sync and dynamic UPI QR, (2) Complete Business ERP + Flutter Android Mobile App for GST billing, challans, AMC & CA returns, (3) Restaurant & Café Software with QR table self-ordering, live KDS & recipe auto-inventory, and (4) WPC-compliant UHF RFID tags & readers for jewellery, apparel, laundry, factories & vehicles.",
+  },
+  {
+    question: "How fast does GARVIX UHF RFID audit jewellery or garment inventory?",
+    answer:
+      "GARVIX UHF RFID smart trays and handheld audit scanners read 200 to 500+ tagged ornaments or garments in 0.2 seconds with 99.9% accuracy — cutting showroom stock audits from 1–2 days down to 5 minutes.",
+  },
+  {
+    question: "Does GARVIX Restaurant Software support QR self-ordering and Kitchen Display (KDS)?",
+    answer:
+      "Yes. Guests scan unique table QR codes to order and pay via Razorpay/UPI directly from their phone, while orders flow straight into a dark-mode Kitchen Display System (KDS) with live prep timers and automatic recipe ingredient deduction.",
+  },
+  {
+    question: "Is GARVIX software GST-compliant for Indian businesses?",
+    answer:
+      "Yes. All GARVIX POS and ERP suites natively handle Indian GST state codes (auto CGST + SGST vs IGST), HSN/SAC summaries, E-Way/LR fields, dynamic NPCI UPI QR billing, and 1-click GSTR-1 & GSTR-3B Excel exports for Chartered Accountants.",
+  },
+  {
+    question: "Does GARVIX provide on-site installation and support across India?",
+    answer:
+      "Yes. Headquartered in Haryana (Delhi NCR), GARVIX delivers turnkey hardware + custom software setup, staff training, and Pan-India AMC support across Gurugram, Delhi, Jaipur, Surat, Mumbai, Ahmedabad, Bengaluru, Hyderabad, and beyond.",
+  },
+];
 
 export default async function HomePage() {
   const [company, websiteClients] = await Promise.all([
@@ -45,6 +83,34 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-white text-[#1d1d1f] selection:bg-[#0071e3] selection:text-white antialiased">
+      <JsonLd
+        data={[
+          buildVideoSchema({
+            name: "GARVIX Retail POS & Store ERP — 15s Showcase",
+            description:
+              "Fast Indian GST retail billing, barcode & UHF RFID stock sync, instant UPI QR payments, and multi-store cloud ERP.",
+            videoPath: "/videos/garvix-retail-pos-showcase.mp4",
+            thumbnailPath: "/images/products/garvix-retail-pos-poster.jpg",
+            pagePath: "/retail-software",
+          }),
+          buildVideoSchema({
+            name: "GARVIX Complete Business ERP & Mobile App — 15s Showcase",
+            description:
+              "B2B GST Quotations & Invoices, UPI QR, Delivery Challans, Serial/IMEI tracking, AMC contracts, 1-Click CA GSTR exports & Document Vault.",
+            videoPath: "/videos/garvix-erp-showcase.mp4",
+            thumbnailPath: "/images/products/garvix-erp-poster.jpg",
+            pagePath: "/erp-software",
+          }),
+          buildVideoSchema({
+            name: "GARVIX Restaurant & Café Software — 15s Showcase",
+            description:
+              "QR table self-ordering with UPI/Razorpay, live dark-mode Kitchen Display System (KDS), recipe auto-inventory & Flutter mobile app.",
+            videoPath: "/videos/garvix-restaurant-showcase.mp4",
+            thumbnailPath: "/images/products/garvix-restaurant-poster.jpg",
+            pagePath: "/restaurant-software",
+          }),
+        ]}
+      />
       <Navbar />
 
       {/* 0. First-Fold Flagship Showcase — GARVIX Retail POS & Store ERP (Video + Capabilities + Industries) */}
@@ -92,6 +158,13 @@ export default async function HomePage() {
                 </span>
               </div>
               <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <Link
+                  href="/retail-software"
+                  className="inline-flex items-center gap-1 rounded-full border border-black/[0.08] bg-[#f5f5f7] hover:bg-black/[0.06] px-4 py-2.5 text-xs font-semibold text-[#1d1d1f] transition"
+                >
+                  <span>Full Details</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
                 <EnquireButton
                   solution="Retail POS & Store ERP"
                   label="Book Live Demo"
@@ -263,7 +336,14 @@ export default async function HomePage() {
                   <span>Secure Company Document Vault</span>
                 </span>
               </div>
-              <div className="shrink-0">
+              <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <Link
+                  href="/erp-software"
+                  className="inline-flex items-center gap-1 rounded-full border border-black/[0.08] bg-[#f5f5f7] hover:bg-black/[0.06] px-4 py-2.5 text-xs font-semibold text-[#1d1d1f] transition"
+                >
+                  <span>Explore ERP</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
                 <EnquireButton
                   solution="Business ERP & Mobile App"
                   label="Request ERP Demo"
@@ -528,7 +608,14 @@ export default async function HomePage() {
                   <span>Recipe Auto-Inventory</span>
                 </span>
               </div>
-              <div className="shrink-0">
+              <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <Link
+                  href="/restaurant-software"
+                  className="inline-flex items-center gap-1 rounded-full border border-[#d6cfc5] bg-[#fbfaf7] hover:bg-[#f2ece3] px-4 py-2.5 text-xs font-semibold text-[#1f1915] transition"
+                >
+                  <span>Full Details</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
                 <EnquireButton
                   solution="Restaurant & Café Software"
                   label="Request Café Demo"
@@ -852,6 +939,14 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* 5.5. SEO FAQs (with FAQPage Rich Snippet Schema) */}
+      <FaqSection
+        eyebrow="Frequently Asked Questions"
+        heading="Everything you need to know about GARVIX."
+        faqs={HOME_FAQS}
+        bgClass="bg-white"
+      />
 
       {/* 6. Contact Form -> Sends directly to Official Company Email */}
       <section className="py-20 sm:py-24 border-t border-black/[0.06] bg-white">

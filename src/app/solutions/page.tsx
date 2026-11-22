@@ -19,9 +19,10 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Enterprise Solutions | GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED",
+  title: "Enterprise Software & RFID Solutions India",
   description:
-    "Explore our complete range of technology solutions: Custom ERPs, Retail POS, School Automation, Warehouse Portals, FASTag boom barriers, and bespoke software engineering.",
+    "Explore GARVIX solutions: Retail POS & Store ERP, Restaurant & Café QR Software, Complete Business ERP + Android App, Jewellery/Apparel/Laundry RFID, and custom software engineering.",
+  alternates: { canonical: "/solutions" },
 };
 
 export const dynamic = "force-dynamic";

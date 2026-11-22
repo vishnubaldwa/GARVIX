@@ -23,9 +23,10 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Complete RFID Automation Solutions | GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED",
+  title: "Complete UHF RFID Hardware & Automation Solutions India",
   description:
-    "End-to-end RFID ecosystems across India: WPC-compliant UHF fixed readers, handheld scanners, gate portals, specialized tags, and high-throughput middleware for jewellery, warehousing, and schools.",
+    "End-to-end WPC-compliant UHF RFID ecosystems across India: fixed readers, handheld audit guns, smart counter trays, gate portals, jewellery/apparel/laundry/anti-metal tags & custom middleware.",
+  alternates: { canonical: "/rfid" },
 };
 
 export const dynamic = "force-dynamic";

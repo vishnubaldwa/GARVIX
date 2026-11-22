@@ -20,9 +20,10 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Industries We Serve | GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED",
+  title: "Industries We Serve — Retail, Jewellery, Cafés, Logistics & Factories",
   description:
-    "Tailored RFID automation and custom software solutions engineered for Retail & Jewellery, Education, Warehouses, Manufacturing, Corporate Offices, and Healthcare across India.",
+    "Tailored UHF RFID automation and custom POS/ERP software engineered for Jewellery Showrooms, Apparel Retail, Cafés & Restaurants, Laundries, Warehouses, and Factories across India.",
+  alternates: { canonical: "/industries" },
 };
 
 export const dynamic = "force-dynamic";

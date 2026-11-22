@@ -23,9 +23,10 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Custom Software Development | GARVIX SOFTWARE SOLUTIONS PRIVATE LIMITED",
+  title: "Custom Software & Enterprise ERP Development India",
   description:
-    "Tailor-made enterprise software, bespoke ERP systems, school management engines, POS billing, and handheld Android scanner applications built around your exact business workflow.",
+    "Tailor-made enterprise software, bespoke GST ERP systems, Retail POS, Restaurant/Café OS, school automation, and Flutter Android mobile apps engineered in India by GARVIX.",
+  alternates: { canonical: "/software" },
 };
 
 export const dynamic = "force-dynamic";

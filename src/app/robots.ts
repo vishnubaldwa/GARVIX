@@ -6,9 +6,10 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin/", "/api/admin/", "/api/portal/"],
+        disallow: ["/admin/", "/api/admin/", "/api/portal/", "/portal/"],
       },
     ],
     sitemap: "https://garvix.in/sitemap.xml",
+    host: "https://garvix.in",
   };
 }
